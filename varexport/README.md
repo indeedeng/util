@@ -46,14 +46,17 @@ public MyClass(final String instanceName) {
 #### Static Methods
 
 `public static VarExporter forNamespace(String namespace)`
+
 Load an exporter for a given namespace. For the global namespace, use global().
 
 Returns:exporter for the namespace; will be created if never before accessed.
 
 `public static VarExporter global()`
+
 Returns:exporter for the global namespace, use forNamespace(String) for a specific exporter
 
 `public static void visitNamespaceVariables(String namespace, VarExporter.Visitor visitor)`
+
 Visit all variables in the given namespace
 
 #### Instance Methods
