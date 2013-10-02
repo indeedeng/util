@@ -59,6 +59,7 @@ Visit all variables in the given namespace
 #### Instance Methods
 
 `public void export(Object obj, String prefix)`
+
 Export all public fields and methods of a given object instance, including static fields, that are annotated with Export.
 
 Parameters:
@@ -67,6 +68,7 @@ Parameters:
 - prefix- prefix for variable names (e.g. "mywidget-")
 
 `public void export(Class c, String prefix)`
+
 Export all public static fields and methods of a given class that are annotated with Export.
 
 Parameters:
@@ -75,6 +77,7 @@ Parameters:
 - prefix- prefix for variable names (e.g. "mywidget-")
 
 `public void export(Object obj, Member member, String prefix, String name)`
+
 Export a given public Field or Method of a given object instance. The member will be exported even if it does not have the Export annotation. This is mainly useful for exporting variables for which you cannot modify the code to add an annotation.
 
 Parameters:
@@ -85,6 +88,7 @@ Parameters:
 - name- Name to use for export (optional, will be ignored if Export annotation used)
 
 `public void export(Class c, Member member, String prefix, String name)`
+
 Export a given public static Field or Method of a given class. The member will be exported even if it does not have the Export annotation. This is mainly useful for exporting variables for which you cannot modify the code to add an annotation.
 
 Parameters:
@@ -95,21 +99,27 @@ Parameters:
 - name- Name to use for export (optional, will be ignored if Export annotation used)
 
 `public <T> T getValue(String variableName)`
+
 Load the current value of a given variable
 
 `public <T> Variable<T> getVariable(String variableName)`
+
 Load the dynamic variable
 
 `public void visitVariables(VarExporter.Visitor visitor)`
+
 Visit all the values exported by this exporter.
 
 `public Iterable<Variable> getVariables()`
+
 Returns an iterator over the exported variables
 
 `public void dump(PrintWriter out, boolean includeDoc)`
+
 Write all variables, one per line, to the given writer, in the format "name=value".
 
 `public void reset()`
+
 Remove all exported variables.
 
 ## [ViewExportedVariablesServlet](https://github.com/indeedeng/util/blob/master/varexport/src/main/java/com/indeed/util/varexport/servlet/ViewExportedVariablesServlet.java)
