@@ -13,10 +13,10 @@
         This library provides a mechanism for exposing values for introspection, statistic-gathering, etc.
     </description>
 
-    <scm>
-        <url>https://github.com/indeedeng/util</url>
-        <connection>scm:git:https://github.com/indeedeng/util.git</connection>
-        <developerConnection>scm:git:git@github.com:indeedeng/util.git</developerConnection>
+    <scm> <!-- prevent Maven from trying to override with subproject suffix -->
+        <url>${project.parent.scm.url}</url>
+        <connection>${project.parent.scm.connection}</connection>
+        <developerConnection>${project.parent.scm.developerConnection}</developerConnection>
     </scm>
 
     <dependencies>
