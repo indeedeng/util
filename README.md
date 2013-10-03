@@ -13,3 +13,7 @@ Utility that enables you to expose runtime variables from a running Java applica
 [Apache License Version 2.0](https://github.com/indeedeng/util/blob/master/LICENSE)
 
 # Contributing
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/indeedeng/util/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
