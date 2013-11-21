@@ -227,6 +227,16 @@ public class VarExporterTest {
     }
 
     @Test
+    public void testWeakReference() {
+        ExampleClass instance = new ExampleClass();
+        exporter.export(instance, "");
+        assertExportedNames(exporter, "ex1field", "ex1method", "static1field", "static1method", "myNameIsEarl");
+        instance = null;
+        System.gc();
+        assertExportedNames(exporter, "myNameIsEarl", "static1field", "static1method");
+    }
+
+    @Test
     public void testExportSubclassInstance() {
         ExampleSubclass instance = new ExampleSubclass();
         exporter.export(instance, "");

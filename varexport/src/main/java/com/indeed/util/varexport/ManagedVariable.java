@@ -82,6 +82,12 @@ public class ManagedVariable<T> extends Variable<T> {
         lastUpdated = clock.get();
     }
 
+    /** Managed variables are always considered "live" */
+    @Override
+    protected boolean isLive() {
+        return true;
+    }
+
     protected boolean canExpand() {
         return value != null && Map.class.isAssignableFrom(value.getClass());
     }
