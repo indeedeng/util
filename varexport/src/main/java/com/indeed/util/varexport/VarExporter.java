@@ -485,7 +485,7 @@ public class VarExporter {
         public MethodVariable(String name, String doc, boolean expand, Method method, Object object) {
             super(name, doc, expand);
             this.method = method;
-            this.objectRef = object != null ? new WeakReference<Object>(object) : null;
+            this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(method.getReturnType()) && !ImmutableMap.class.isAssignableFrom(method.getReturnType())) {
                 log.warn("Variable " + name + " is not an ImmutableMap, which may result in sporadic errors");
             }
