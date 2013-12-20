@@ -434,8 +434,8 @@ public class VarExporter {
     }
 
     private static class FieldVariable<T> extends Variable<T> {
-        private Field field;
-        private WeakReference<Object> objectRef;
+        private final Field field;
+        private final WeakReference<Object> objectRef;
 
         public FieldVariable(String name, String doc, boolean expand, Field field, Object object) {
             super(name, doc, expand);
@@ -470,8 +470,8 @@ public class VarExporter {
     }
 
     private static class MethodVariable<T> extends Variable<T> {
-        private Method method;
-        private WeakReference<Object> objectRef;
+        private final Method method;
+        private final WeakReference<Object> objectRef;
 
         public MethodVariable(String name, String doc, boolean expand, Method method, Object object) {
             super(name, doc, expand);
@@ -508,8 +508,8 @@ public class VarExporter {
     }
 
     private static class EntryVariable extends Variable {
-        private WeakReference<Object> valueRef;
-        private Variable parent;
+        private final WeakReference<Object> valueRef;
+        private final Variable parent;
 
         public EntryVariable(Map.Entry entry, Variable parent) {
             super(parent.getName() + "#" + entry.getKey(), null, false);
