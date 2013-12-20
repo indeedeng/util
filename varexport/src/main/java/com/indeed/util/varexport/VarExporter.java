@@ -382,15 +382,16 @@ public class VarExporter {
 
     @SuppressWarnings("unchecked")
     private void addVariable(Variable variable) {
+        final Variable prev;
         synchronized (variables) {
-            Variable prev = variables.put(variable.getName(), variable);
-            if (prev != null) {
-                log.warn("In namespace '" + namespace + "': Exporting variable named " + variable.getName() +
-                        " hides a previously exported variable");
-            } else {
-                if (log.isDebugEnabled()) {
-                    log.debug("In namespace '" + namespace + "': Added variable " + variable.getName());
-                }
+            prev = variables.put(variable.getName(), variable);
+        }
+        if (prev != null) {
+            log.warn("In namespace '" + namespace + "': Exporting variable named " + variable.getName() +
+                    " hides a previously exported variable");
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("In namespace '" + namespace + "': Added variable " + variable.getName());
             }
         }
         if (parent != null && parent != this) {
