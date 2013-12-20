@@ -127,7 +127,11 @@ public class VarExporter {
         Class c = obj.getClass();
         for (Field field : c.getFields()) {
             Export export = field.getAnnotation(Export.class);
-            loadMemberVariable(field, export, obj, true, prefix, null);
+            if (Modifier.isStatic(field.getModifiers())) {
+                loadMemberVariable(field, export, c, true, prefix, null);
+            } else {
+                loadMemberVariable(field, export, obj, true, prefix, null);
+            }
         }
         Set<Class<?>> classAndInterfaces = Sets.newHashSet();
         getAllInterfaces(c, classAndInterfaces);
@@ -135,7 +139,11 @@ public class VarExporter {
         for (Class<?> cls : classAndInterfaces) {
             for (Method method : cls.getMethods()) {
                 Export export = method.getAnnotation(Export.class);
-                loadMemberVariable(method, export, obj, true, prefix, null);
+                if (Modifier.isStatic(method.getModifiers())) {
+                    loadMemberVariable(method, export, c, true, prefix, null);
+                } else {
+                    loadMemberVariable(method, export, obj, true, prefix, null);
+                }
             }
         }
     }
