@@ -127,11 +127,7 @@ public class VarExporter {
         Class c = obj.getClass();
         for (Field field : c.getFields()) {
             Export export = field.getAnnotation(Export.class);
-            if (Modifier.isStatic(field.getModifiers())) {
-                loadMemberVariable(field, export, c, true, prefix, null);
-            } else {
-                loadMemberVariable(field, export, obj, true, prefix, null);
-            }
+            loadMemberVariable(field, export, obj, true, prefix, null);
         }
         Set<Class<?>> classAndInterfaces = Sets.newHashSet();
         getAllInterfaces(c, classAndInterfaces);
@@ -139,11 +135,7 @@ public class VarExporter {
         for (Class<?> cls : classAndInterfaces) {
             for (Method method : cls.getMethods()) {
                 Export export = method.getAnnotation(Export.class);
-                if (Modifier.isStatic(method.getModifiers())) {
-                    loadMemberVariable(method, export, c, true, prefix, null);
-                } else {
-                    loadMemberVariable(method, export, obj, true, prefix, null);
-                }
+                loadMemberVariable(method, export, obj, true, prefix, null);
             }
         }
     }
@@ -208,7 +200,7 @@ public class VarExporter {
         if (!Modifier.isStatic(member.getModifiers())) {
             throw new UnsupportedOperationException(member + " is not static in " + c.getName());
         }
-        export((Object)c, member, prefix, name);
+        export((Object) c, member, prefix, name);
     }
 
     public void export(LazilyManagedVariable lazilyManagedVariable) {
@@ -301,13 +293,11 @@ public class VarExporter {
     /** @return an iterator over the exported variables */
     public Iterable<Variable> getVariables() {
         final ImmutableList.Builder<Variable> builder = ImmutableList.builder();
-        visitVariables(
-                new Visitor() {
-                    public void visit(Variable var) {
-                        builder.add(var);
-                    }
-                }
-        );
+        visitVariables(new Visitor() {
+            public void visit(Variable var) {
+                builder.add(var);
+            }
+        });
         return builder.build();
     }
 
