@@ -12,6 +12,7 @@ import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -74,7 +75,7 @@ public class VarExporter {
 
     private final String namespace;
 
-    private final Map<String, Variable> variables = Collections.synchronizedMap(Maps.<String, Variable>newTreeMap());
+    private final Map<String, Variable> variables = Maps.newTreeMap();
 
     private VarExporter parent = null;
 
@@ -247,7 +248,11 @@ public class VarExporter {
                 return sub;
             }
         }
-        return variables.get(variableName);
+        final Variable<T> v;
+        synchronized (variables) {
+            v = variables.get(variableName);
+        }
+        return v;
     }
 
     /**
@@ -255,8 +260,22 @@ public class VarExporter {
      * @param visitor visitor to receive visit callbacks
      */
     public void visitVariables(Visitor visitor) {
-        // protects against ConcurrentModificationException because .toArray() is synchronized
-        final Variable[] variablesCopy = variables.values().toArray(new Variable[variables.size()]);
+        // build a collection of live variables in a synchronized block
+        final List<Variable> variablesCopy;
+        synchronized (variables) {
+            variablesCopy = Lists.newArrayListWithExpectedSize(variables.size());
+            final Iterator<Variable> iterator = variables.values().iterator();
+            while (iterator.hasNext()) {
+                final Variable v = iterator.next();
+                if (v.isLive()) {
+                    variablesCopy.add(v);
+                } else {
+                    // remove-on-read of variables that are no longer live
+                    // javadoc says this removes from the mapping from the map
+                    iterator.remove();
+                }
+            }
+        }
 
         for (Variable v : variablesCopy) {
             if (v.isExpandable()) {
@@ -274,7 +293,7 @@ public class VarExporter {
                 visitor.visit(v);
             }
         }
-        if (variablesCopy.length > 0 && startTime != null) {
+        if (variablesCopy.size() > 0 && startTime != null) {
             visitor.visit(startTime);
         }
     }
@@ -324,7 +343,9 @@ public class VarExporter {
 
     /** Remove all exported variables. Does not remove variables exported to a parent namespace */
     public void reset() {
-        variables.clear();
+        synchronized (variables) {
+            variables.clear();
+        }
     }
 
     private String[] getSubVariableTokens(String variableName) {
@@ -336,7 +357,10 @@ public class VarExporter {
     }
 
     private Variable getSubVariable(String variableName, String subVariableName) {
-        Variable container = variables.get(variableName);
+        final Variable container;
+        synchronized (variables) {
+            container = variables.get(variableName);
+        }
         if (container != null && container.isExpandable()) {
             Map<?, ?> map = container.expand();
             try {
@@ -356,7 +380,10 @@ public class VarExporter {
 
     @SuppressWarnings("unchecked")
     private void addVariable(Variable variable) {
-        Variable prev = variables.put(variable.getName(), variable);
+        final Variable prev;
+        synchronized (variables) {
+            prev = variables.put(variable.getName(), variable);
+        }
         if (prev != null) {
             log.warn("In namespace '" + namespace + "': Exporting variable named " + variable.getName() +
                     " hides a previously exported variable");
@@ -415,16 +442,21 @@ public class VarExporter {
     }
 
     private static class FieldVariable<T> extends Variable<T> {
-        private Field field;
-        private Object object;
+        private final Field field;
+        private final WeakReference<Object> objectRef;
 
         public FieldVariable(String name, String doc, boolean expand, Field field, Object object) {
             super(name, doc, expand);
             this.field = field;
-            this.object = object;
+            this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(field.getType()) && !ImmutableMap.class.isAssignableFrom(field.getType())) {
                 log.warn("Variable " + name + " is not an ImmutableMap, which may result in sporadic errors");
             }
+        }
+
+        @Override
+        protected boolean isLive() {
+            return objectRef.get() != null; // true if object has not been GC'd
         }
 
         protected boolean canExpand() {
@@ -433,6 +465,10 @@ public class VarExporter {
 
         @SuppressWarnings("unchecked")
         public T getValue() {
+            final Object object = objectRef.get();
+            if (object == null) {
+                return null;
+            }
             try {
                 return (T) field.get(object);
             } catch (IllegalAccessException e) {
@@ -442,16 +478,21 @@ public class VarExporter {
     }
 
     private static class MethodVariable<T> extends Variable<T> {
-        private Method method;
-        private Object object;
+        private final Method method;
+        private final WeakReference<Object> objectRef;
 
         public MethodVariable(String name, String doc, boolean expand, Method method, Object object) {
             super(name, doc, expand);
             this.method = method;
-            this.object = object;
+            this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(method.getReturnType()) && !ImmutableMap.class.isAssignableFrom(method.getReturnType())) {
                 log.warn("Variable " + name + " is not an ImmutableMap, which may result in sporadic errors");
             }
+        }
+
+        @Override
+        protected boolean isLive() {
+            return objectRef.get() != null; // true if object has not been GC'd
         }
 
         protected boolean canExpand() {
@@ -460,6 +501,10 @@ public class VarExporter {
 
         @SuppressWarnings("unchecked")
         public T getValue() {
+            final Object object = objectRef.get();
+            if (object == null) {
+                return null;
+            }
             try {
                 return (T) method.invoke(object);
             } catch (IllegalAccessException e) {
@@ -471,13 +516,14 @@ public class VarExporter {
     }
 
     private static class EntryVariable extends Variable {
-        private Object value;
-        private Variable parent;
+        private final WeakReference<Object> valueRef;
+        private final Variable parent;
 
         public EntryVariable(Map.Entry entry, Variable parent) {
             super(parent.getName() + "#" + entry.getKey(), null, false);
-            this.value = entry.getValue();
+            this.valueRef = new WeakReference<Object>(entry.getValue());
             this.parent = parent;
+            final Object value = valueRef.get();
             if (value != null &&
                     Map.class.isAssignableFrom(value.getClass()) &&
                     !ImmutableMap.class.isAssignableFrom(value.getClass())) {
@@ -486,8 +532,18 @@ public class VarExporter {
             }
         }
 
+        @Override
+        protected boolean isLive() {
+            return valueRef.get() != null;
+        }
+
         protected boolean canExpand() {
-            return Map.class.isAssignableFrom(value.getClass()) && getValue() != null;
+            final Object value = valueRef.get();
+            if (value != null) {
+                return Map.class.isAssignableFrom(value.getClass()) && getValue() != null;
+            } else {
+                return false;
+            }
         }
 
         @Override
@@ -501,7 +557,7 @@ public class VarExporter {
         }
 
         public Object getValue() {
-            return value;
+            return valueRef.get();
         }
     }
 
@@ -553,6 +609,11 @@ public class VarExporter {
         public ProxyVariable(String name, Variable<T> variable) {
             super(name, variable.getDoc(), variable.isExpandable());
             this.variable = variable;
+        }
+
+        @Override
+        protected boolean isLive() {
+            return variable.isLive();
         }
 
         @Override

@@ -85,6 +85,12 @@ public class LazilyManagedVariable<T> extends Variable<T> {
         lastUpdated = clock.get();
     }
 
+    /** Managed variables are always considered "live" */
+    @Override
+    protected boolean isLive() {
+        return true;
+    }
+
     protected boolean canExpand() {
         return Map.class.isAssignableFrom(c);
     }

@@ -60,6 +60,9 @@ public abstract class Variable<T> {
         return !Strings.isNullOrEmpty(getDoc());
     }
 
+    /** return true as long as the variable is "live" and should continue to be valid/usable */
+    protected abstract boolean isLive();
+
     protected abstract boolean canExpand();
 
     public abstract T getValue();
