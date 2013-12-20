@@ -6,12 +6,12 @@ import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -125,7 +125,7 @@ public class VarExporter {
     public void export(Object obj, String prefix) {
         Class c = obj.getClass();
         for (Field field : c.getFields()) {
-            final ExportData export = getExportData(field);
+            Export export = field.getAnnotation(Export.class);
             loadMemberVariable(field, export, obj, true, prefix, null);
         }
         Set<Class<?>> classAndInterfaces = Sets.newHashSet();
@@ -133,7 +133,7 @@ public class VarExporter {
         classAndInterfaces.add(c);
         for (Class<?> cls : classAndInterfaces) {
             for (Method method : cls.getMethods()) {
-                final ExportData export = getExportData(method);
+                Export export = method.getAnnotation(Export.class);
                 loadMemberVariable(method, export, obj, true, prefix, null);
             }
         }
@@ -157,13 +157,13 @@ public class VarExporter {
     public void export(Class c, String prefix) {
         for (Field field : c.getFields()) {
             if (Modifier.isStatic(field.getModifiers())) {
-                ExportData export = getExportData(field);
+                Export export = field.getAnnotation(Export.class);
                 loadMemberVariable(field, export, c, true, prefix, null);
             }
         }
         for (Method method : c.getMethods()) {
             if (Modifier.isStatic(method.getModifiers())) {
-                ExportData export = getExportData(method);
+                Export export = method.getAnnotation(Export.class);
                 loadMemberVariable(method, export, c, true, prefix, null);
             }
         }
@@ -179,9 +179,9 @@ public class VarExporter {
      * @param name Name to use for export (optional, will be ignored if Export annotation used)
      */
     public void export(Object obj, Member member, String prefix, String name) {
-        ExportData export = null;
+        Export export = null;
         if (member instanceof AnnotatedElement) {
-            export = getExportData((AnnotatedElement) member);
+            export = ((AnnotatedElement) member).getAnnotation(Export.class);
         }
         loadMemberVariable(member, export, obj, false, prefix, name);
     }
@@ -363,7 +363,7 @@ public class VarExporter {
     }
 
     @SuppressWarnings("unchecked")
-    private void loadMemberVariable(Member member, ExportData export, Object obj, boolean requireAnnotation, String prefix, String name) {
+    private void loadMemberVariable(Member member, Export export, Object obj, boolean requireAnnotation, String prefix, String name) {
         if (!requireAnnotation || export != null) {
             Variable variable = variableFromMember(export, prefix, name, member, obj);
             if (export != null && export.cacheTimeoutMs() > 0) {
@@ -373,7 +373,7 @@ public class VarExporter {
         }
     }
 
-    private String getVarName(ExportData export, String supplied, Member member) {
+    private String getVarName(Export export, String supplied, Member member) {
         if (export != null && export.name() != null && export.name().length() > 0) {
             return export.name();
         } else if (supplied != null && supplied.length() > 0) {
@@ -383,7 +383,7 @@ public class VarExporter {
         }
     }
 
-    private Variable variableFromMember(ExportData export, String prefix, String suppliedName, Member member, Object obj) {
+    private Variable variableFromMember(Export export, String prefix, String suppliedName, Member member, Object obj) {
         final String name = (prefix != null ? prefix : "") + getVarName(export, suppliedName, member);
         final String doc = export != null ? export.doc() : "";
         final boolean expand = export != null ? export.expand() : false;
@@ -404,22 +404,6 @@ public class VarExporter {
             .setDoc("global start time of variable exporter")
             .setValue(timestampFormat.format(date))
             .build();
-    }
-
-    private static ExportData getExportData(final AnnotatedElement element) {
-        ExportData data = null;
-        final Export export = element.getAnnotation(Export.class);
-        if (export != null) {
-            return new ExplicitAnnotationExportData(export);
-        } else {
-            for (Annotation annotation : element.getAnnotations()) {
-                data = LegacyAnnotationExportData.fromLegacy(element, annotation);
-                if (data != null) {
-                    break;
-                }
-            }
-        }
-        return data;
     }
 
     private static class FieldVariable<T> extends Variable<T> {

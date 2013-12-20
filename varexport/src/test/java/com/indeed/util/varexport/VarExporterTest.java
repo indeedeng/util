@@ -67,33 +67,6 @@ public class VarExporterTest {
         private boolean prv = false;
     }
 
-    private static class LegacyExampleClass {
-        @LegacyExport(name="lex1field", doc="Example variable 1")
-        public int ex1 = 1;
-
-        @LegacyExport(name="lex1method")
-        public int getEx1() { return ex1; }
-
-        @LegacyExport(name="lstatic1field", doc="Static field example 1")
-        public static long static1 = System.currentTimeMillis();
-
-        @LegacyExport(name="lstatic1method")
-        public static long getStatic1() { return static1 + 1; }
-
-        @LegacyExport
-        public static int myNameIsEarl = 0;
-
-        public int notExported = 0;
-
-        public int getNotExported() { return notExported; }
-
-        public static int staticNotExported = 0;
-
-        public static int getStaticNotExported() { return staticNotExported; }
-
-        private boolean prv = false;
-    }
-
     private static class ExampleSubclass extends ExampleClass {
         @Export(name="subm1")
         public int getZero() { return 0; }
@@ -251,18 +224,6 @@ public class VarExporterTest {
         instance.ex1++;
         assertEquals(2, exporter.getValue("ex1field"));
         assertEquals(2, exporter.getValue("ex1method"));
-    }
-
-    @Test
-    public void testExportLegacyInstance() {
-        LegacyExampleClass instance = new LegacyExampleClass();
-        exporter.export(instance, "");
-        assertExportedNames(exporter, "lex1field", "lex1method", "lstatic1field", "lstatic1method", "myNameIsEarl");
-        assertEquals(1, exporter.getValue("lex1field"));
-        assertEquals(1, exporter.getValue("lex1method"));
-        instance.ex1++;
-        assertEquals(2, exporter.getValue("lex1field"));
-        assertEquals(2, exporter.getValue("lex1method"));
     }
 
     @Test
