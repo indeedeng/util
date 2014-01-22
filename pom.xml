@@ -29,5 +29,6 @@
     <modules>
         <module>varexport</module>
         <module>util-core</module>
+        <module>urlparsing</module>
     </modules>
 </project>

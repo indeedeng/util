@@ -1,0 +1,30 @@
+VM options - -Xmx64M -XX:+PrintGCDetails -verbose:gc -XX:-DoEscapeAnalysis
+This file is the output from running benchmarking code included in the test/ folder.
+
+Indeed QueryStringParser
+------------------------------------------
+Parsed 1000000 url params in 2.236 s
+PS Scavenge	130 gc collections in 	156 milliseconds
+
+
+StringSplitKeyValueParser
+--------------------------------------------
+Parsed 1000000 url params in 12.50 s
+PS Scavenge	522 gc collections in 	773 milliseconds
+PS MarkSweep	0 gc collections in 	0 milliseconds
+
+
+ParseUtils.parseFloat and parseLong
+------------------------------------------
+# of ints = 1000000 parseInt time 56.99 ms
+# of floats = 1000000 parseFloat time 73.35 ms
+
+
+Integer.parseFloat and parseLong
+------------------------------------------
+# of ints = 1000000 parseInt time 109.6 ms
+# of floats = 1000000 parseFloat time 140.8 ms
+
+
+
+
