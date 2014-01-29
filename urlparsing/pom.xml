@@ -1,0 +1,44 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.indeed</groupId>
+        <artifactId>util-parent</artifactId>
+        <version>1.0.4-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>util-urlparsing</artifactId>
+    <name>urlparsing</name>
+    <description>
+        Utility methods to effeciently parse url param key value pairs
+    </description>
+
+    <scm> <!-- prevent Maven from trying to override with subproject suffix -->
+        <url>${project.parent.scm.url}</url>
+        <connection>${project.parent.scm.connection}</connection>
+        <developerConnection>${project.parent.scm.developerConnection}</developerConnection>
+    </scm>
+
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+         <dependency>
+            <groupId>it.unimi.dsi</groupId>
+            <artifactId>fastutil</artifactId>
+             <version>6.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit-dep</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+    </dependencies>
+</project>
+

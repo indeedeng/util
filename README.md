@@ -8,6 +8,10 @@ General Java utilities and helper classes
 
 Utility that enables you to expose runtime variables from a running Java application
 
+## [util-urlparsing](https://github.com/indeedeng/util/tree/master/urlparsing)
+
+Utility to efficiently parse key value pairs from query strings in URLs. Also includes fast number parsing and url decoding utilities.
+
 # License
 
 [Apache License Version 2.0](https://github.com/indeedeng/util/blob/master/LICENSE)
