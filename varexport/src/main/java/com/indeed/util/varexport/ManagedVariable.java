@@ -3,8 +3,10 @@ package com.indeed.util.varexport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * To be used instead of {@link com.indeed.util.varexport.Export} or the introspection methods
@@ -29,6 +31,7 @@ public class ManagedVariable<T> extends Variable<T> {
         private String name = null;
         private String doc = "";
         private boolean expand = false;
+        private Set<String> tags = ImmutableSet.of();
         private T value = null;
 
         private Builder() {
@@ -54,11 +57,19 @@ public class ManagedVariable<T> extends Variable<T> {
             return this;
         }
 
+        public Builder<T> setTags(Set<String> tags) {
+            this.tags = tags;
+            return this;
+        }
+
         public ManagedVariable<T> build() {
             if (name == null) {
                 throw new RuntimeException("name must not be null for ManagedVariable");
             }
-            return new ManagedVariable<T>(name, doc, expand, value);
+            if (tags == null) {
+                throw new RuntimeException("tags must not be null for ManagedVariable");
+            }
+            return new ManagedVariable<T>(name, tags, doc, expand, value);
         }
     }
 
@@ -72,8 +83,8 @@ public class ManagedVariable<T> extends Variable<T> {
     private T value;
     private Long lastUpdated = clock.get();
 
-    private ManagedVariable(String name, String doc, boolean expand, T value) {
-        super(name, doc, expand);
+    private ManagedVariable(String name, Set<String> tags, String doc, boolean expand, T value) {
+        super(name, tags, doc, expand);
         this.value = value;
     }
 

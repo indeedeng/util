@@ -3,6 +3,7 @@ package com.indeed.util.varexport;
 
 
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Set;
 import java.util.Map;
 
@@ -22,12 +23,14 @@ public abstract class Variable<T> {
 
     private static Set<Character> nameValueSpecialCharacters = ImmutableSet.of(':', '=');
 
-    private String name;
-    private String doc;
-    private boolean expand;
+    private final String name;
+    private final String doc;
+    private final boolean expand;
+    private final Set<String> tags;
 
-    public Variable(String name, String doc, boolean expand) {
+    public Variable(String name, Set<String> tags, String doc, boolean expand) {
         this.name = name;
+        this.tags = tags;
         this.doc = doc;
         this.expand = expand;
     }
@@ -38,6 +41,10 @@ public abstract class Variable<T> {
 
     public String getDoc() {
         return doc != null ? doc : "";
+    }
+
+    public Set<String> getTags() {
+        return tags;
     }
 
     /** @return epoch millis when value was last updated, null if value is current */

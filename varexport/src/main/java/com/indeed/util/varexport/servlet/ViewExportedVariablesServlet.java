@@ -1,8 +1,11 @@
 // Copyright 2009 Indeed
 package com.indeed.util.varexport.servlet;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.indeed.util.varexport.VarExporter;
 import com.indeed.util.varexport.Variable;
+import com.indeed.util.varexport.VariableHost;
+import com.indeed.util.varexport.VariableVisitor;
 
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
@@ -60,6 +63,21 @@ public class ViewExportedVariablesServlet extends HttpServlet {
 
     }
 
+    @VisibleForTesting
+    protected void setVarTextTemplate(Template varTextTemplate) {
+        this.varTextTemplate = varTextTemplate;
+    }
+
+    @VisibleForTesting
+    protected void setVarHtmlTemplate(Template varHtmlTemplate) {
+        this.varHtmlTemplate = varHtmlTemplate;
+    }
+
+    @VisibleForTesting
+    protected void setBrowseNamespaceTemplate(Template browseNamespaceTemplate) {
+        this.browseNamespaceTemplate = browseNamespaceTemplate;
+    }
+
     @Override
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
@@ -109,7 +127,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             } else {
                 displayType = DisplayType.PLAINTEXT;
             }
-            showVariables(request.getRequestURI(), response, request.getParameter("ns"), doc, displayType, vars);
+            showVariables(request.getRequestURI(), response, request.getParameter("ns"), request.getParameter("tag"), doc, displayType, vars);
         }
     }
 
@@ -152,15 +170,26 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         showVariables(uri, response, namespace, includeDoc, displayType, vars);
     }
 
+    /** @deprecated use version that takes tag */
+    @Deprecated
     protected void showVariables(String uri, HttpServletResponse response, String namespace, boolean includeDoc, DisplayType displayType,
                                  String... vars)
             throws IOException {
+        showVariables(uri, response, namespace, null, includeDoc, displayType, vars);
+    }
+                
+    protected void showVariables(String uri, HttpServletResponse response, String namespace, String tag, boolean includeDoc, DisplayType displayType,
+                                 String... vars)
+            throws IOException {
 
-        // null ns will result in loading the global namespace:
-        if (Strings.isNullOrEmpty(namespace)) {
-            namespace = null;
+        final VariableHost exporter;
+        if (!Strings.isNullOrEmpty(tag)) {
+            exporter = VarExporter.withTag(tag);
+        } else if (!Strings.isNullOrEmpty(namespace)) {
+            exporter = VarExporter.forNamespace(namespace);
+        } else {
+            exporter = VarExporter.global();
         }
-        VarExporter exporter = VarExporter.forNamespace(namespace);
         final PrintWriter out = response.getWriter();
         response.setContentType(displayType.mimeType);
 
@@ -178,7 +207,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         out.close();
     }
 
-    private void showUsingTemplate(VarExporter exporter, String uri, String namespace, boolean includeDoc, Template template,
+    private void showUsingTemplate(VariableHost exporter, String uri, String namespace, boolean includeDoc, Template template,
                                    PrintWriter out, String... vars) throws IOException {
         String name = (namespace == null ? "Global" : namespace);
 
@@ -201,7 +230,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         } else {
             varList = Lists.newArrayListWithExpectedSize(vars != null ? vars.length : 256);
             if (vars == null || vars.length == 0) {
-                exporter.visitVariables(new VarExporter.Visitor() {
+                exporter.visitVariables(new VariableVisitor() {
                     public void visit(Variable var) {
                         addVariable(var, varList);
                     }

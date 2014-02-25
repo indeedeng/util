@@ -17,6 +17,9 @@ public @interface Export {
     /** @return Documentation about the variable */
     public String doc() default "";
 
+    /** @return global tags for the variable */
+    public String[] tags() default {};
+
     /** @return true if variables implementing {@link java.util.Map} should be expanded into multiple variables */
     public boolean expand() default false;
 
