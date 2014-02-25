@@ -3,8 +3,10 @@ package com.indeed.util.varexport;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
+import com.google.common.collect.ImmutableSet;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * To be used instead of {@link com.indeed.util.varexport.Export} or the introspection methods
@@ -30,6 +32,7 @@ public class LazilyManagedVariable<T> extends Variable<T> {
         private String name = null;
         private String doc = "";
         private boolean expand = false;
+        private Set<String> tags = ImmutableSet.of();
         private Supplier<T> valueSupplier = null;
 
         private Builder(final Class<T> c) {
@@ -56,11 +59,19 @@ public class LazilyManagedVariable<T> extends Variable<T> {
             return this;
         }
 
+        public Builder<T> setTags(Set<String> tags) {
+            this.tags = tags;
+            return this;
+        }
+
         public LazilyManagedVariable<T> build() {
             if (name == null) {
                 throw new RuntimeException("name must not be null for ManagedVariable");
             }
-            return new LazilyManagedVariable<T>(name, doc, expand, c, valueSupplier);
+            if (tags == null) {
+                throw new RuntimeException("tags must not be null for ManagedVariable");
+            }
+            return new LazilyManagedVariable<T>(name, tags, doc, expand, c, valueSupplier);
         }
     }
 
@@ -75,8 +86,8 @@ public class LazilyManagedVariable<T> extends Variable<T> {
     private final Supplier<T> valueSupplier;
     private Long lastUpdated = clock.get();
 
-    LazilyManagedVariable(final String name, final String doc, final boolean expand, final Class<T> c, final Supplier<T> valueSupplier) {
-        super(name, doc, expand);
+    private LazilyManagedVariable(final String name, final Set<String> tags, final String doc, final boolean expand, final Class<T> c, final Supplier<T> valueSupplier) {
+        super(name, tags, doc, expand);
         this.c = c;
         this.valueSupplier = valueSupplier;
     }

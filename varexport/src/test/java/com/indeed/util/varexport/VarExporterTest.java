@@ -41,10 +41,10 @@ import static org.junit.Assert.assertThat;
 public class VarExporterTest {
 
     private static class ExampleClass {
-        @Export(name="ex1field", doc="Example variable 1")
+        @Export(name="ex1field", doc="Example variable 1", tags = { "IAmAwesome" })
         public int ex1 = 1;
 
-        @Export(name="ex1method")
+        @Export(name="ex1method", tags = { "Fail" })
         public int getEx1() { return ex1; }
 
         @Export(name="static1field", doc="Static field example 1")
@@ -53,7 +53,7 @@ public class VarExporterTest {
         @Export(name="static1method")
         public static long getStatic1() { return static1 + 1; }
 
-        @Export
+        @Export(tags= { "IAmAwesome", "Fail" })
         public static int myNameIsEarl = 0;
 
         public int notExported = 0;
@@ -191,7 +191,7 @@ public class VarExporterTest {
 
     private static Collection<String> getExportedNames(VarExporter exporter) {
         final List<String> names = Lists.newLinkedList();
-        exporter.visitVariables(new VarExporter.Visitor() {
+        exporter.visitVariables(new VariableVisitor() {
             public void visit(Variable var) {
                 names.add(var.getName());
             }
@@ -224,6 +224,40 @@ public class VarExporterTest {
         instance.ex1++;
         assertEquals(2, exporter.getValue("ex1field"));
         assertEquals(2, exporter.getValue("ex1method"));
+    }
+
+    private void assertHasTags(Set<String> tags, String... expectedTagNames) {
+        assertEquals(expectedTagNames.length, tags.size());
+        assertThat(tags, Matchers.containsInAnyOrder(expectedTagNames));
+    }
+
+    private void assertVariableNamesForTag(String tag, String... expectedNames) {
+        final List<String> variableNames = Lists.newLinkedList();
+        VarExporter.withTag(tag).visitVariables(
+                new VariableVisitor() {
+                    public void visit(Variable var) {
+                        variableNames.add(var.getName());
+                    }
+                }
+        );
+        assertThat(variableNames, Matchers.containsInAnyOrder(expectedNames));
+    }
+
+    @Test
+    public void testTags() {
+        ExampleClass instance = new ExampleClass();
+        exporter.export(instance, "");
+        assertHasTags(exporter.getVariable("myNameIsEarl").getTags(), "IAmAwesome", "Fail");
+        assertHasTags(exporter.getVariable("ex1field").getTags(), "IAmAwesome");
+        assertHasTags(exporter.getVariable("ex1method").getTags(), "Fail");
+
+        assertVariableNamesForTag("IAmAwesome", "myNameIsEarl", "ex1field");
+        assertVariableNamesForTag("Fail", "myNameIsEarl", "ex1method");
+
+        exporter.reset();
+
+        assertVariableNamesForTag("IAmAwesome");
+        assertVariableNamesForTag("Fail");
     }
 
     @Test
@@ -414,8 +448,10 @@ public class VarExporterTest {
         exporter.dump(new PrintWriter(out, true), true);
         String dump = out.toString();
         assertNotNull(dump);
-        assertThat(Lists.newArrayList(dump.split("\n")),
-                   Matchers.contains("", "myNameIsEarl=0", "", "# Static field example 1", "static1field=0", "", "static1method=1"));
+        assertThat(
+                Lists.newArrayList(dump.split("\n")),
+                Matchers.contains("", "myNameIsEarl=0", "", "# Static field example 1", "static1field=0", "", "static1method=1")
+        );
     }
 
     @Test
@@ -425,7 +461,7 @@ public class VarExporterTest {
         alt.export(instance, "");
         alt.export(instance, ExampleClass.class.getField("notExported"), "", null);
         final AtomicInteger count = new AtomicInteger(0);
-        VarExporter.visitNamespaceVariables("alt", new VarExporter.Visitor() {
+        VarExporter.visitNamespaceVariables("alt", new VariableVisitor() {
             public void visit(Variable var) {
                 count.incrementAndGet();
             }
@@ -562,8 +598,8 @@ public class VarExporterTest {
         StringWriter out = new StringWriter();
         exporter.dump(new PrintWriter(out, true), false);
         assertThat(
-            Lists.newArrayList(out.toString().split("\n")),
-            Matchers.contains("blowoutMap=null", "map=null"));
+                Lists.newArrayList(out.toString().split("\n")), Matchers.contains("blowoutMap=null", "map=null")
+        );
     }
 
     @Test
@@ -644,6 +680,8 @@ public class VarExporterTest {
         try {
             ExampleWithCaching example = new ExampleWithCaching();
             alt.export(example, "");
+            assertVariableCount(alt, 3);
+            assertVariableCount(exporter, 3);
             VarExporter.CachingVariable<Integer> variable =
                     (VarExporter.CachingVariable<Integer>) alt.<Integer>getVariable("val");
             variable.setClock(testClock);
@@ -665,6 +703,16 @@ public class VarExporterTest {
         }
     }
 
+    private void assertVariableCount(VarExporter exporter, int expected) {
+        final AtomicInteger count = new AtomicInteger(0);
+        exporter.visitVariables(new VariableVisitor() {
+            public void visit(Variable var) {
+                count.incrementAndGet();
+            }
+        });
+        assertEquals(expected, count.get());
+    }
+
     @Test
     public void testParentGlobal() {
         VarExporter alt = VarExporter.forNamespace("foo");
@@ -673,9 +721,13 @@ public class VarExporterTest {
             Assert.assertFalse(alt.getVariables().iterator().hasNext());
             VarExporter.forNamespace("foo").export(ExampleClass.class, "");
             assertExportedNames(alt, "static1field", "static1method", "myNameIsEarl");
+            assertVariableCount(alt, 3);
             assertExportedNames(exporter, "foo-static1field", "foo-static1method", "foo-myNameIsEarl");
+            assertVariableCount(exporter, 3);
         } finally {
             alt.reset();
+            assertVariableCount(alt, 0);
+            assertVariableCount(exporter, 0);
         }
     }
 

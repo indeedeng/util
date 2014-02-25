@@ -1,7 +1,10 @@
 // Copyright 2009 Indeed
 package com.indeed.util.varexport;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.hamcrest.Matchers;
@@ -13,6 +16,7 @@ import org.junit.Test;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author jack@indeed.com (Jack Humphrey)
@@ -59,6 +63,76 @@ public class ManagedVariableTest {
         Assert.assertThat(Lists.newArrayList(out.toString().split("\n")),
                           Matchers.containsInAnyOrder("", "#  (last update: 100)", "var1=999")
         );
+    }
+
+    final Function<VariableHost, Integer> countVars = new Function<VariableHost, Integer>() {
+        @Override
+        public Integer apply(VariableHost variableHost) {
+            final AtomicInteger count = new AtomicInteger(0);
+            variableHost.visitVariables(new VariableVisitor() {
+                @Override
+                public void visit(Variable var) {
+                    count.incrementAndGet();
+                }
+            });
+            return count.intValue();
+        }
+    };
+
+    @Test
+    public void testManagedVariable_tags() {
+        ManagedVariable<Integer> var1 = ManagedVariable.<Integer>builder()
+                .setName("var1").setValue(524).setTags(ImmutableSet.of("MVT1", "MVT2")).build();
+        ManagedVariable<Integer> var2 = ManagedVariable.<Integer>builder()
+                .setName("var2").setValue(207).setTags(ImmutableSet.of("MVT2", "MVT3")).build();
+        Assert.assertEquals(524, (int) var1.getValue());
+        exporter.export(var1);
+        exporter.export(var2);
+
+        VariableHost tagged1 = VarExporter.withTag("MVT1");
+        VariableHost tagged2 = VarExporter.withTag("MVT2");
+        VariableHost tagged3 = VarExporter.withTag("MVT3");
+
+        Assert.assertEquals((Integer) 1, countVars.apply(tagged1));
+        Assert.assertEquals((Integer) 2, countVars.apply(tagged2));
+        Assert.assertEquals((Integer) 1, countVars.apply(tagged3));
+
+        Assert.assertEquals(var1, tagged1.getVariable("var1"));
+        Assert.assertNull(tagged1.getVariable("var2"));
+
+        Assert.assertEquals(var1, tagged2.getVariable("var1"));
+        Assert.assertEquals(var2, tagged2.getVariable("var2"));
+
+        Assert.assertNull(tagged3.getVariable("var1"));
+        Assert.assertEquals(var2, tagged3.getVariable("var2"));
+    }
+
+    @Test
+    public void testLazilyManagedVariable_tags() {
+        LazilyManagedVariable<Integer> var1 = LazilyManagedVariable.<Integer>builder(Integer.class)
+                .setName("var1").setValue(Suppliers.ofInstance(524)).setTags(ImmutableSet.of("LMVT1", "LMVT2")).build();
+        LazilyManagedVariable<Integer> var2 = LazilyManagedVariable.<Integer>builder(Integer.class)
+                .setName("var2").setValue(Suppliers.ofInstance(207)).setTags(ImmutableSet.of("LMVT2", "LMVT3")).build();
+        Assert.assertEquals(524, (int) var1.getValue());
+        exporter.export(var1);
+        exporter.export(var2);
+
+        VariableHost tagged1 = VarExporter.withTag("LMVT1");
+        VariableHost tagged2 = VarExporter.withTag("LMVT2");
+        VariableHost tagged3 = VarExporter.withTag("LMVT3");
+
+        Assert.assertEquals((Integer) 1, countVars.apply(tagged1));
+        Assert.assertEquals((Integer) 2, countVars.apply(tagged2));
+        Assert.assertEquals((Integer) 1, countVars.apply(tagged3));
+
+        Assert.assertEquals(var1, tagged1.getVariable("var1"));
+        Assert.assertNull(tagged1.getVariable("var2"));
+
+        Assert.assertEquals(var1, tagged2.getVariable("var1"));
+        Assert.assertEquals(var2, tagged2.getVariable("var2"));
+
+        Assert.assertNull(tagged3.getVariable("var1"));
+        Assert.assertEquals(var2, tagged3.getVariable("var2"));
     }
 
     @Test
