@@ -467,7 +467,9 @@ public class VarExporter implements VariableHost {
         final Set<String> noTags = ImmutableSet.of();
         final ProxyVariable v = new ProxyVariable(childNamespace + "-" + variable.getName(), variable, noTags);
         addVariable(v);
-        childVariables.add(v.getName());
+        synchronized (childVariables) {
+            childVariables.add(v.getName());
+        }
     }
 
     @SuppressWarnings("unchecked")
