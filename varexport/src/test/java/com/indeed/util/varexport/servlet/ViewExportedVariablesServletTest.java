@@ -7,17 +7,20 @@ import com.indeed.util.varexport.ManagedVariable;
 import com.indeed.util.varexport.VarExporter;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import static org.junit.Assert.*;
-import static org.easymock.classextension.EasyMock.*;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.List;
+
+import static org.easymock.classextension.EasyMock.createMock;
+import static org.easymock.classextension.EasyMock.expect;
+import static org.easymock.classextension.EasyMock.expectLastCall;
+import static org.easymock.classextension.EasyMock.replay;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author jack@indeed.com (Jack Humphrey)
@@ -27,7 +30,7 @@ public class ViewExportedVariablesServletTest {
     private ViewExportedVariablesServlet setupServlet() throws IOException {
         final Configuration config = new Configuration();
         config.setObjectWrapper(new DefaultObjectWrapper());
-        config.setDirectoryForTemplateLoading(new File("src/main/resources"));
+        config.setClassForTemplateLoading(this.getClass(), "/");
 
         final ViewExportedVariablesServlet servlet = new ViewExportedVariablesServlet();
         servlet.setVarTextTemplate(config.getTemplate("vars-text.ftl"));
@@ -55,7 +58,9 @@ public class ViewExportedVariablesServletTest {
         List<String> actualLines = Lists.newArrayListWithCapacity(rawLines.length);
         for (String rawLine : rawLines) {
             rawLine = rawLine.trim();
-            if (!Strings.isNullOrEmpty(rawLine) && !rawLine.startsWith("#")) {
+            if (!Strings.isNullOrEmpty(rawLine) &&
+                !rawLine.startsWith("#") &&
+                !rawLine.startsWith("exporter-start-time=")) {
                 actualLines.add(rawLine);
             }
         }
