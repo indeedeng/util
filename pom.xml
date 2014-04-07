@@ -27,8 +27,12 @@
     </scm>
 
     <modules>
-        <module>varexport</module>
-        <module>util-core</module>
+        <module>compress</module>
+        <module>io</module>
+        <module>mmap</module>
+        <module>serialization</module>
         <module>urlparsing</module>
+        <module>util-core</module>
+        <module>varexport</module>
     </modules>
 </project>
