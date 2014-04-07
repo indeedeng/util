@@ -1,4 +1,4 @@
-#include "com_indeed_squall_mmap_Stat.h"
+#include "com_indeed_util_mmap_Stat.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -41,7 +41,7 @@ void copy_to_addr(struct stat* statbuf, void* addr) {
 	*((uint64_t*)(addr+84)) = statbuf->st_ctime;
 }
 
-JNIEXPORT jint JNICALL Java_com_indeed_squall_mmap_Stat_stat(JNIEnv* env, jclass class, jstring jpath, jlong addr) {
+JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_Stat_stat(JNIEnv* env, jclass class, jstring jpath, jlong addr) {
 	struct stat statbuf;
 	char* path;
 	int err;
@@ -55,7 +55,7 @@ JNIEXPORT jint JNICALL Java_com_indeed_squall_mmap_Stat_stat(JNIEnv* env, jclass
 	return 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_indeed_squall_mmap_Stat_lstat(JNIEnv* env, jclass class, jstring jpath, jlong addr) {
+JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_Stat_lstat(JNIEnv* env, jclass class, jstring jpath, jlong addr) {
 	struct stat statbuf;
 	char* path;
 	int err;
@@ -69,7 +69,7 @@ JNIEXPORT jint JNICALL Java_com_indeed_squall_mmap_Stat_lstat(JNIEnv* env, jclas
 	return 0;
 }
 
-JNIEXPORT jint JNICALL Java_com_indeed_squall_mmap_Stat_fstat(JNIEnv* env, jclass class, jint fd, jlong addr) {
+JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_Stat_fstat(JNIEnv* env, jclass class, jint fd, jlong addr) {
 	struct stat statbuf;
 	int err;
 	err = fstat(fd, &statbuf);
