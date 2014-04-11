@@ -46,7 +46,7 @@ public final class TestWeirdStuff extends TestCase {
         PosixFileOperations.rmrf(tmpDir);
     }
 
-    public void testTruncatedFileSquallMMap() throws IOException {
+    public void testTruncatedFileIndeedMMap() throws IOException {
         writeFile();
         MMapBuffer buffer = new MMapBuffer(mmapFile, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
         Memory memory = buffer.memory();

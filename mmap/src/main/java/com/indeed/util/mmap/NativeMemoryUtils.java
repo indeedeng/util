@@ -11,7 +11,7 @@ final class NativeMemoryUtils {
     private static final Logger log = Logger.getLogger(NativeMemoryUtils.class);
 
     static {
-        LoadSquallMMap.loadLibrary();
+        LoadIndeedMMap.loadLibrary();
     }
 
     //copied from java.nio.Bits

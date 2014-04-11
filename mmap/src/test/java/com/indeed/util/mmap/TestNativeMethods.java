@@ -20,7 +20,7 @@ public class TestNativeMethods extends TestCase {
 
     @Override
     protected void setUp() throws Exception {
-        file = File.createTempFile("squall-mmap-test", ".bin");
+        file = File.createTempFile("indeed-mmap-test", ".bin");
     }
 
     @Override

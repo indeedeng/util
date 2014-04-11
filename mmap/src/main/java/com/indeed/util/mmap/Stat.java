@@ -57,7 +57,7 @@ public final class Stat {
     }
 
     static {
-        LoadSquallMMap.loadLibrary();
+        LoadIndeedMMap.loadLibrary();
     }
 
     public static Stat stat(String file) throws IOException {

@@ -27,8 +27,8 @@ public final class NativeBuffer implements BufferResource {
     private static final boolean MAP_ANONYMOUS_DEV_ZERO;
 
     static {
-        MAP_ANONYMOUS_DEV_ZERO = Boolean.getBoolean("squall.mmap.map.anonymous.dev.zero");
-        final String thresholdString = System.getProperty("squall.mmap.threshold");
+        MAP_ANONYMOUS_DEV_ZERO = Boolean.getBoolean("indeed.mmap.map.anonymous.dev.zero");
+        final String thresholdString = System.getProperty("indeed.mmap.threshold");
         long mmapThreshold;
         if (thresholdString == null) {
             mmapThreshold = 256*1024;
@@ -55,7 +55,7 @@ public final class NativeBuffer implements BufferResource {
     }
 
     static {
-        LoadSquallMMap.loadLibrary();
+        LoadIndeedMMap.loadLibrary();
     }
 
     private final long address;

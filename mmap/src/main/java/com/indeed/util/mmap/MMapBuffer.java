@@ -32,7 +32,7 @@ public final class MMapBuffer implements BufferResource {
     static final int MAP_ANONYMOUS = 4;
 
     static {
-        LoadSquallMMap.loadLibrary();
+        LoadIndeedMMap.loadLibrary();
         try {
             FD_FIELD = FileDescriptor.class.getDeclaredField("fd");
             FD_FIELD.setAccessible(true);

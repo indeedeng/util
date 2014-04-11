@@ -22,12 +22,12 @@ public final class LoadIndeedMMap {
             try {
                 final String osName = System.getProperty("os.name");
                 final String arch = System.getProperty("os.arch");
-                final String resourcePath = "/native/" + osName + "-" + arch + "/libsquallmmap.so.1.0.1";
+                final String resourcePath = "/native/" + osName + "-" + arch + "/libindeedmmap.so.1.0.1";
                 final InputStream is = MMapBuffer.class.getResourceAsStream(resourcePath);
                 if (is == null) {
-                    throw new FileNotFoundException("unable to find libsquallmmap.so.1.0.1 at resource path "+resourcePath);
+                    throw new FileNotFoundException("unable to find libindeedmmap.so.1.0.1 at resource path "+resourcePath);
                 }
-                final File tempFile = File.createTempFile("libsquallmmap", ".so");
+                final File tempFile = File.createTempFile("libindeedmmap", ".so");
                 final OutputStream os = new FileOutputStream(tempFile);
                 ByteStreams.copy(is, os);
                 os.close();
@@ -36,8 +36,8 @@ public final class LoadIndeedMMap {
                 // noinspection ResultOfMethodCallIgnored
                 tempFile.delete();
             } catch (Throwable e) {
-                log.warn("unable to load libsquallmmap using class loader, looking in java.library.path", e);
-                System.loadLibrary("squallmmap"); // if this fails it throws UnsatisfiedLinkError
+                log.warn("unable to load libindeedmmap using class loader, looking in java.library.path", e);
+                System.loadLibrary("indeedmmap"); // if this fails it throws UnsatisfiedLinkError
             }
             loaded = true;
         }
