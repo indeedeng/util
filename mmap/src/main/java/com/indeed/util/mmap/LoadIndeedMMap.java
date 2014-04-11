@@ -12,8 +12,8 @@ import java.io.OutputStream;
 /**
  * @author jplaisance
  */
-public final class LoadSquallMMap {
-    private static final Logger log = Logger.getLogger(LoadSquallMMap.class);
+public final class LoadIndeedMMap {
+    private static final Logger log = Logger.getLogger(LoadIndeedMMap.class);
 
     private static boolean loaded = false;
 
