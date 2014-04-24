@@ -159,7 +159,7 @@ Drop in to your `web.xml`. Example (URL path /debug/v):
 
 ## Dependencies
 
-- guava (15 ok)
+- guava (16.0.1 ok)
 - log4j
 - servlet API (optional)
 - freemarker (optional for servlet)

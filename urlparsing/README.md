@@ -133,7 +133,7 @@ QueryStringParser.parseQueryString(queryString, queryStringParser, foo, "%", ":"
 ```
 ## Dependencies
 
-- guava (15 ok)
+- guava (16.0.1 ok)
 - log4j
 - it.unimi.dsi's fastutil
 - junit-dep (4.X)
