@@ -12,6 +12,22 @@ Utility that enables you to expose runtime variables from a running Java applica
 
 Utility to efficiently parse key value pairs from query strings in URLs. Also includes fast number parsing and url decoding utilities.
 
+## [util-compress](https://github.com/indeedeng/util/tree/master/util-compress)
+
+Utility for compressing and uncompressing data. Includes snappy and gzip.
+
+## [util-io](https://github.com/indeedeng/util/tree/master/util-io)
+
+Utility for performing IO, including many interfaces implemented elsewhere.
+
+## [util-mmap](https://github.com/indeedeng/util/tree/master/util-mmap)
+
+Utility for performing mmap operations and direct memory access.
+
+## [util-serialization](https://github.com/indeedeng/util/tree/master/util-serialization)
+
+Utility for serializing and deserializing data to and from binary and string formats.
+
 # License
 
 [Apache License Version 2.0](https://github.com/indeedeng/util/blob/master/LICENSE)
