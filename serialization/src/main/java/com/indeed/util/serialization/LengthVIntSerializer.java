@@ -7,6 +7,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 /**
+ * Serializer that writes 0-254 as one byte. Any value greater than 254 or less than 0 is written as 5 bytes.
+ *
  * @author jplaisance
  */
 public final class LengthVIntSerializer implements Serializer<Integer> {
