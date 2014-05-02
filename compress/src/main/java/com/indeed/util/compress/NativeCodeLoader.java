@@ -13,9 +13,9 @@ public final class NativeCodeLoader {
 
     static {
         if (!"64".equals(System.getProperty("sun.arch.data.model"))) {
-            throw new RuntimeException("common compress only works on the 64 bit jvm");
+            throw new RuntimeException("Indeed compress only works on the 64 bit jvm");
         }
-        NativeLibraryUtils.loadLibrary("commoncompress");
+        NativeLibraryUtils.loadLibrary("indeedcompress");
         nativeCodeLoaded = true;
     }
 
