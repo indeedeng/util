@@ -5,8 +5,6 @@ util-compress is a library for compressing and uncompressing data. Includes snap
 
 A binary is included for Linux-amd64. It will not work on 32-bit platforms. Other platforms will need to compile from source and may not compile or work as-is.
 
-##
-
 ## Compiling native code on 64-bit linux
 
 ```
