@@ -26,7 +26,19 @@
         <developerConnection>scm:git:git@github.com:indeedeng/util.git</developerConnection>
     </scm>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.6</version>
+      </plugin>
+    </plugins>
+
+	</build>
+
     <modules>
+	<module>zk</module>
         <module>compress</module>
         <module>io</module>
         <module>mmap</module>
