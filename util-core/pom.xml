@@ -9,7 +9,6 @@
 
     <artifactId>util-core</artifactId>
     <name>indeed-util-core</name>
-    <version>1.10.0-SNAPSHOT</version>
     <description>
         Basic utility functions shared by all Indeed projects
     </description>
@@ -24,7 +23,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>util-varexport</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -43,11 +42,6 @@
             <groupId>junit</groupId>
             <artifactId>junit-dep</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-        	<groupId>javax.mail</groupId>
-        	<artifactId>mail</artifactId>
-        	<version>1.4.7</version>
         </dependency>
     </dependencies>
 </project>
