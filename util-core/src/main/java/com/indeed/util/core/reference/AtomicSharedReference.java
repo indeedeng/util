@@ -1,8 +1,7 @@
 package com.indeed.util.core.reference;
 
 import com.google.common.base.Function;
-import com.google.common.io.Closeables;
-//import com.indeed.common.util.io.Closeables2;
+import com.indeed.util.core.io.Closeables2;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nullable;
@@ -96,8 +95,7 @@ public final class AtomicSharedReference<T> {
      * Unsets the reference, closing with Closeables2.closeQuietly().
      */
     public synchronized void unsetQuietly() {
-        //if (ref != null) Closeables2.closeQuietly(ref, log);
-        if (ref != null) Closeables.closeQuietly(ref);
+        if (ref != null) Closeables2.closeQuietly(ref, log);
         ref = null;
     }
 
@@ -171,8 +169,7 @@ public final class AtomicSharedReference<T> {
                 return f.apply(localRef.get());
             }
         } finally {
-            //if (localRef != null) Closeables2.closeQuietly(localRef, log);
-            if (localRef != null) Closeables.closeQuietly(localRef);
+            if (localRef != null) Closeables2.closeQuietly(localRef, log);
         }
     }
 }
