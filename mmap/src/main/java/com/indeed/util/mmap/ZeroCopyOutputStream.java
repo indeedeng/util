@@ -164,6 +164,10 @@ public final class ZeroCopyOutputStream extends OutputStream implements DataOutp
     public DirectMemory memory() {
         return memory.slice(0, currentAddress);
     }
+    
+    public NativeBuffer getBuffer() {
+        return this.buffer;
+    }
 
     public void writeTo(OutputStream outputStream) throws IOException {
         final MemoryInputStream in = new MemoryInputStream(memory());
@@ -174,4 +178,5 @@ public final class ZeroCopyOutputStream extends OutputStream implements DataOutp
     public InputStream getInputStream() {
         return new MemoryInputStream(memory());
     }
+    
 }
