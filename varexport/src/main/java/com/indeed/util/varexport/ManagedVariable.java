@@ -24,17 +24,23 @@ import java.util.Set;
 public class ManagedVariable<T> extends Variable<T> {
 
     public static <T> Builder<T> builder() {
-        return new Builder<T>();
+        return new Builder<T>("");
+    }
+
+    public static <T> Builder<T> builder(String namespace) {
+        return new Builder<T>(namespace);
     }
     
     public static class Builder<T> {
+        private final String namespace;
         private String name = null;
         private String doc = "";
         private boolean expand = false;
         private Set<String> tags = ImmutableSet.of();
         private T value = null;
 
-        private Builder() {
+        private Builder(String namespace) {
+            this.namespace = namespace;
         }
 
         public Builder<T> setName(String name) {
@@ -69,7 +75,7 @@ public class ManagedVariable<T> extends Variable<T> {
             if (tags == null) {
                 throw new RuntimeException("tags must not be null for ManagedVariable");
             }
-            return new ManagedVariable<T>(name, tags, doc, expand, value);
+            return new ManagedVariable<T>(name, tags, doc, expand, value, namespace);
         }
     }
 
@@ -83,8 +89,8 @@ public class ManagedVariable<T> extends Variable<T> {
     private T value;
     private Long lastUpdated = clock.get();
 
-    private ManagedVariable(String name, Set<String> tags, String doc, boolean expand, T value) {
-        super(name, tags, doc, expand);
+    private ManagedVariable(String name, Set<String> tags, String doc, boolean expand, T value, String namespace) {
+        super(name, tags, doc, expand, namespace);
         this.value = value;
     }
 

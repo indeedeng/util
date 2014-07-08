@@ -5,10 +5,10 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.hamcrest.Matchers;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -34,6 +34,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * @author jack@indeed.com (Jack Humphrey)
@@ -258,6 +259,44 @@ public class VarExporterTest {
 
         assertVariableNamesForTag("IAmAwesome");
         assertVariableNamesForTag("Fail");
+    }
+
+    @Test
+    public void testTagWithNamespace() throws Exception {
+        final VarExporter global = VarExporter.global();
+        final VarExporter local = VarExporter.forNamespace("local");
+        final VarExporter other = VarExporter.forNamespace("other");
+        final ExampleClass instance = new ExampleClass();
+        local.includeInGlobal().export(instance, "");
+        other.includeInGlobal().export(instance, "");
+
+        assertHasTags(global.getVariable("local-myNameIsEarl").getTags());
+        assertEquals("", global.getVariable("local-myNameIsEarl").getNamespace());
+        assertEquals("", global.getVariable("other-myNameIsEarl").getNamespace());
+
+        final Variable<Object> localVariable = local.getVariable("myNameIsEarl");
+        assertHasTags(localVariable.getTags(), "IAmAwesome", "Fail");
+        assertEquals("local", localVariable.getNamespace());
+
+        assertEquals("other", other.getVariable("myNameIsEarl").getNamespace());
+
+        final AtomicInteger locals = new AtomicInteger(0);
+        final AtomicInteger others = new AtomicInteger(0);
+        // assert that all of the IAmAwesome tag variables are in the local or other namespace
+        VarExporter.withTag("IAmAwesome").visitVariables(new VariableVisitor() {
+            @Override
+            public void visit(final Variable var) {
+                if ("local".equals(var.getNamespace())) {
+                    locals.incrementAndGet();
+                } else if ("other".equals(var.getNamespace())) {
+                    others.incrementAndGet();
+                } else {
+                    fail("Saw namespace " + var.getNamespace() + " when not expecting it");
+                }
+            }
+        });
+        assertEquals(2, locals.get());
+        assertEquals(2, others.get());
     }
 
     @Test

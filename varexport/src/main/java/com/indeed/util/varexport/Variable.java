@@ -2,16 +2,14 @@
 package com.indeed.util.varexport;
 
 
-import java.io.PrintWriter;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.Map;
-
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.escape.Escaper;
+
+import java.io.PrintWriter;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Variable exported by {@link com.indeed.util.varexport.VarExporter}.
@@ -25,14 +23,16 @@ public abstract class Variable<T> {
 
     private final String name;
     private final String doc;
+    private final String namespace;
     private final boolean expand;
     private final Set<String> tags;
 
-    public Variable(String name, Set<String> tags, String doc, boolean expand) {
+    public Variable(String name, Set<String> tags, String doc, boolean expand, String namespace) {
         this.name = name;
         this.tags = tags;
         this.doc = doc;
         this.expand = expand;
+        this.namespace = namespace;
     }
 
     public String getName() {
@@ -46,6 +46,8 @@ public abstract class Variable<T> {
     public Set<String> getTags() {
         return tags;
     }
+
+    public String getNamespace() { return namespace; }
 
     /** @return epoch millis when value was last updated, null if value is current */
     public Long getLastUpdated() {

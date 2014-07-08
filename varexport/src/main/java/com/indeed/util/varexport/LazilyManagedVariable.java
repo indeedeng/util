@@ -24,19 +24,25 @@ import java.util.Set;
 public class LazilyManagedVariable<T> extends Variable<T> {
 
     public static <T> Builder<T> builder(final Class<T> c) {
-        return new Builder<T>(c);
+        return new Builder<T>(c, "");
+    }
+
+    public static <T> Builder<T> builder(final Class<T> c, String namespace) {
+        return new Builder<T>(c, namespace);
     }
     
     public static class Builder<T> {
         private final Class<T> c;
+        private final String namespace;
         private String name = null;
         private String doc = "";
         private boolean expand = false;
         private Set<String> tags = ImmutableSet.of();
         private Supplier<T> valueSupplier = null;
 
-        private Builder(final Class<T> c) {
+        private Builder(final Class<T> c, final String namespace) {
             this.c = c;
+            this.namespace = namespace;
         }
 
         public Builder<T> setName(final String name) {
@@ -71,7 +77,7 @@ public class LazilyManagedVariable<T> extends Variable<T> {
             if (tags == null) {
                 throw new RuntimeException("tags must not be null for ManagedVariable");
             }
-            return new LazilyManagedVariable<T>(name, tags, doc, expand, c, valueSupplier);
+            return new LazilyManagedVariable<T>(name, tags, doc, expand, c, valueSupplier, namespace);
         }
     }
 
@@ -86,8 +92,8 @@ public class LazilyManagedVariable<T> extends Variable<T> {
     private final Supplier<T> valueSupplier;
     private Long lastUpdated = clock.get();
 
-    private LazilyManagedVariable(final String name, final Set<String> tags, final String doc, final boolean expand, final Class<T> c, final Supplier<T> valueSupplier) {
-        super(name, tags, doc, expand);
+    private LazilyManagedVariable(final String name, final Set<String> tags, final String doc, final boolean expand, final Class<T> c, final Supplier<T> valueSupplier, final String namespace) {
+        super(name, tags, doc, expand, namespace);
         this.c = c;
         this.valueSupplier = valueSupplier;
     }
