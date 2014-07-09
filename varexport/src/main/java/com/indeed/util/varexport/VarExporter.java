@@ -329,12 +329,12 @@ public class VarExporter implements VariableHost {
                 Map<?, ?> map = v.expand();
                 try {
                     for (final Map.Entry entry : map.entrySet()) {
-                        visitor.visit(new EntryVariable(entry, v));
+                        visitor.visit(new EntryVariable(entry, v, namespace));
                     }
                 } catch (ConcurrentModificationException e) {
                     log.warn("Failed to iterate map entry set for variable " + v.getName(), e);
                     Map.Entry<String, String> errorEntry = new AbstractMap.SimpleEntry<String, String>("error", e.getMessage());
-                    visitor.visit(new EntryVariable(errorEntry, v));
+                    visitor.visit(new EntryVariable(errorEntry, v, namespace));
                 }
             } else {
                 visitor.visit(v);
@@ -450,7 +450,7 @@ public class VarExporter implements VariableHost {
                 for (Map.Entry entry : map.entrySet()) {
                     Object key = entry.getKey();
                     if (String.valueOf(key).equals(subVariableName)) {
-                        return new EntryVariable(entry, container);
+                        return new EntryVariable(entry, container, namespace);
                     }
                 }
             } catch (ConcurrentModificationException e) {
@@ -465,7 +465,7 @@ public class VarExporter implements VariableHost {
     private void addChildVariable(String childNamespace, Variable variable) {
         // there is no need to propagate tags from the child
         final Set<String> noTags = ImmutableSet.of();
-        final ProxyVariable v = new ProxyVariable(childNamespace + "-" + variable.getName(), variable, noTags);
+        final ProxyVariable v = new ProxyVariable(childNamespace + "-" + variable.getName(), variable, noTags, namespace);
         addVariable(v);
         synchronized (childVariables) {
             childVariables.add(v.getName());
@@ -509,7 +509,7 @@ public class VarExporter implements VariableHost {
         if (!requireAnnotation || export != null) {
             Variable variable = variableFromMember(export, prefix, name, member, obj);
             if (export != null && export.cacheTimeoutMs() > 0) {
-                variable = new CachingVariable(variable, export.cacheTimeoutMs());
+                variable = new CachingVariable(variable, export.cacheTimeoutMs(), namespace);
             }
             loadTagsForVariable(variable);
             addVariable(variable);
@@ -533,9 +533,9 @@ public class VarExporter implements VariableHost {
         final Set<String> tags = ImmutableSet.copyOf(export != null ? export.tags() : new String[0]);
         final boolean expand = export != null ? export.expand() : false;
         if (member instanceof Field) {
-            return new FieldVariable(name, doc, tags, expand, (Field) member, obj);
+            return new FieldVariable(name, doc, tags, expand, (Field) member, obj, namespace);
         } else if (member instanceof Method) {
-            return new MethodVariable(name, doc, tags, expand, (Method) member, obj);
+            return new MethodVariable(name, doc, tags, expand, (Method) member, obj, namespace);
         } else {
             throw new UnsupportedOperationException(member.getClass() + " not supported by export");
         }
@@ -555,8 +555,8 @@ public class VarExporter implements VariableHost {
         private final Field field;
         private final WeakReference<Object> objectRef;
 
-        public FieldVariable(String name, String doc, Set<String> tags, boolean expand, Field field, Object object) {
-            super(name, tags, doc, expand);
+        public FieldVariable(String name, String doc, Set<String> tags, boolean expand, Field field, Object object, String namespace) {
+            super(name, tags, doc, expand, namespace);
             this.field = field;
             this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(field.getType()) && !ImmutableMap.class.isAssignableFrom(field.getType())) {
@@ -591,8 +591,8 @@ public class VarExporter implements VariableHost {
         private final Method method;
         private final WeakReference<Object> objectRef;
 
-        public MethodVariable(String name, String doc, Set<String> tags, boolean expand, Method method, Object object) {
-            super(name, tags, doc, expand);
+        public MethodVariable(String name, String doc, Set<String> tags, boolean expand, Method method, Object object, String namespace) {
+            super(name, tags, doc, expand, namespace);
             this.method = method;
             this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(method.getReturnType()) && !ImmutableMap.class.isAssignableFrom(method.getReturnType())) {
@@ -630,8 +630,8 @@ public class VarExporter implements VariableHost {
         private final Variable parent;
 
         @SuppressWarnings("unchecked")
-        public EntryVariable(Map.Entry entry, Variable parent) {
-            super(parent.getName() + "#" + entry.getKey(), parent.getTags(), null, false);
+        public EntryVariable(Map.Entry entry, Variable parent, String namespace) {
+            super(parent.getName() + "#" + entry.getKey(), parent.getTags(), null, false, namespace);
             this.valueRef = new WeakReference<Object>(entry.getValue());
             this.parent = parent;
             final Object value = valueRef.get();
@@ -685,8 +685,8 @@ public class VarExporter implements VariableHost {
             }
         };
 
-        public CachingVariable(Variable<T> variable, long timeout) {
-            super(variable.getName(), variable, variable.getTags());
+        public CachingVariable(Variable<T> variable, long timeout, String namespace) {
+            super(variable.getName(), variable, variable.getTags(), namespace);
             this.timeout = timeout;
         }
 
@@ -717,8 +717,8 @@ public class VarExporter implements VariableHost {
     protected static class ProxyVariable<T> extends Variable<T> {
         private final Variable<T> variable;
 
-        public ProxyVariable(String name, Variable<T> variable, Set<String> tags) {
-            super(name, tags, variable.getDoc(), variable.isExpandable());
+        public ProxyVariable(String name, Variable<T> variable, Set<String> tags, String namespace) {
+            super(name, tags, variable.getDoc(), variable.isExpandable(), namespace);
             this.variable = variable;
         }
 
