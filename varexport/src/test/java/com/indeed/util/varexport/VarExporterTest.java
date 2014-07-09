@@ -31,9 +31,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -259,6 +262,18 @@ public class VarExporterTest {
 
         assertVariableNamesForTag("IAmAwesome");
         assertVariableNamesForTag("Fail");
+    }
+
+    @Test
+    public void testNamespaceIsNull() throws Exception {
+        // the namespace is stored in the map at key NULL
+        // but null/global/"" are all considered the same namespace
+        assertSame(VarExporter.forNamespace(""), VarExporter.forNamespace(null));
+        assertSame(VarExporter.global(), VarExporter.forNamespace(null));
+        assertSame(VarExporter.global(), VarExporter.forNamespace(""));
+
+        assertTrue(Lists.newArrayList(VarExporter.getNamespaces()).contains(null));
+        assertFalse(Lists.newArrayList(VarExporter.getNamespaces()).contains(""));
     }
 
     @Test
