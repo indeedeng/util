@@ -9,7 +9,7 @@
 
     <groupId>com.indeed</groupId>
     <artifactId>util-parent</artifactId>
-    <version>1.0.10-SNAPSHOT</version>
+    <version>1.0.10-internal</version>
     <packaging>pom</packaging>
 
     <licenses>
