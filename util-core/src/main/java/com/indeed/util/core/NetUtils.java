@@ -72,18 +72,30 @@ public class NetUtils {
      * Make a best effort to determine the IP address of this machine
      */
     public static String determineIpAddress() throws SocketException {
+        SocketException caughtException = null;
         for (final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
-            final NetworkInterface nextInterface = networkInterfaces.nextElement();
-            if (! nextInterface.isLoopback() && ! nextInterface.isVirtual() && ! nextInterface.isPointToPoint()) {
-                for (final Enumeration<InetAddress> addresses = nextInterface.getInetAddresses(); addresses.hasMoreElements(); ) {
-                    final InetAddress inetAddress = addresses.nextElement();
-                    final byte[] address = inetAddress.getAddress();
-                    if ((address.length == 4) //  we don't need no steenking IPv6
+            try {
+                final NetworkInterface nextInterface = networkInterfaces.nextElement();
+                if (! nextInterface.isLoopback() && ! nextInterface.isVirtual() && ! nextInterface.isPointToPoint()) {
+                    for (final Enumeration<InetAddress> addresses = nextInterface.getInetAddresses(); addresses.hasMoreElements(); ) {
+                        final InetAddress inetAddress = addresses.nextElement();
+                        final byte[] address = inetAddress.getAddress();
+                        if ((address.length == 4) //  we don't need no steenking IPv6
                                 && (address[0] != 127 || address[1] != 0)) {    //  don't want localhost IP
-                        return inetAddress.getHostAddress();
+                            return inetAddress.getHostAddress();
+                        }
                     }
                 }
+            } catch (SocketException ex) {
+                // We're not going to extract an IP address from this interface, so move on to the next one.
+                // If we find a qualifying interface, we won't care that some other interface gave us problems.
+                // If we don't find one, this exception might be informative.
+                caughtException = ex;
             }
+        }
+
+        if (caughtException != null) {
+            throw caughtException;
         }
         return null;
     }
