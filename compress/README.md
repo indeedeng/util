@@ -7,6 +7,8 @@ A binary is included for Linux-amd64. It will not work on 32-bit platforms. Othe
 
 ## Compiling native code on 64-bit linux
 
+**Requires libsnappy-dev**
+
 ```
 # from the util-compress project root
 rm src/main/native/com_indeed_util_compress_*.h
