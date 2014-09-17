@@ -13,7 +13,7 @@ rm src/main/native/com_indeed_util_compress_*.h
 
 javah -classpath target/classes -d src/main/native/ com.indeed.util.compress.snappy.SnappyCompressor com.indeed.util.compress.snappy.SnappyDecompressor com.indeed.util.compress.zlib.ZlibCompressor com.indeed.util.compress.zlib.ZlibDecompressor
 
-cd src/native
+cd src/main/native
 
 gcc -c -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -O3 -fPIC -std=c99 *.c
 
