@@ -10,7 +10,12 @@ A binary is included for Linux-amd64. It will not work on 32-bit platforms. Othe
 **Requires libsnappy-dev**
 
 ```
-# from the util-compress project root
+# start at the util root
+mvn compile
+
+# move down into compress subject
+cd compress
+
 rm src/main/native/com_indeed_util_compress_*.h
 
 javah -classpath target/classes -d src/main/native/ com.indeed.util.compress.snappy.SnappyCompressor com.indeed.util.compress.snappy.SnappyDecompressor com.indeed.util.compress.zlib.ZlibCompressor com.indeed.util.compress.zlib.ZlibDecompressor
