@@ -5,6 +5,8 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.indeed.util.varexport.external.PublicClass;
+
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -810,5 +812,12 @@ public class VarExporterTest {
         VarExporter.global().includeInGlobal().export(ExampleClass.class, "");
         VarExporter.global().setParentNamespace(VarExporter.global()).export(ExampleClass.class, "");
         VarExporter.forNamespace("foo").setParentNamespace(VarExporter.forNamespace("foo")).export(ExampleClass.class, "");
+    }
+
+    @Test
+    public void testPackageClassExport() {
+        final PublicClass obj = new PublicClass();
+        final VarExporter exporter = VarExporter.forNamespace("external");
+        assertEquals(obj.getDependencyStatus(), exporter.getValue("status"));
     }
 }
