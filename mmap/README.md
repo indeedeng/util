@@ -11,22 +11,10 @@ The latest util-mmap JAR file can be downloaded via Maven ([link](http://search.
 
 The library depends on [Unix mmap](http://www.gnu.org/software/libc/manual/html_node/Memory_002dmapped-I_002fO.html)
 for its underlying functionality, so it uses JNI. The published JAR file contains 
-native builds for i386 and amd64. This example installs the amd64 library in /usr/lib:
-
-```
-$ jar xvf util-mmap-1.0.12.jar native
-  created: native/
-  created: native/Linux-i386/
-  created: native/Linux-amd64/
- inflated: native/Linux-i386/libindeedmmap.so.1.0.1
- inflated: native/Linux-amd64/libindeedmmap.so.1.0.1
-
-$ sudo cp -p native/Linux-amd64/libindeedmmap.so.1.0.1 /usr/lib/
-
-$ sudo ln -sf /usr/lib/libindeedmmap.so.1.0.1 /usr/lib/libindeedmmap.so
-```
-
-You may also build the native code yourself, see instructions below.
+native builds for linux i386 and amd64. The Java code in the library loads the 
+correct linux native shared object (.so) files from the JAR file at runtime based
+on `os.name` and `os.arch` system properties. If you need to run on an unsupported OS, you'll
+need to rebuild the native code; see the instructions in the Building section below.
 
 ## Usage
 
@@ -64,7 +52,9 @@ lrwxrwxrwx 1 root root 66 Feb 25 12:52 /usr/lib/libindeedmmap.so ->
   /home/user/util/mmap/src/main/native/libindeedmmap.so.1.0.1
 ```
 
-Distributing a new build binary in the JAR file requires pushing it
+The installation step assumes that `/usr/lib/` is in your `java.library.path`.
+You can also repackage the shared library in the JAR file, or request that we
+distribute a new build binary in the JAR file requires pushing it
 into the GitHub repository under src/main/resources/native/*platform*/.
 
 ### Known limitations
