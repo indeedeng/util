@@ -1,6 +1,6 @@
 # indeedeng/util
 
-## [util-core](https://github.com/indeedeng/util/tree/master/core)
+## [util-core](https://github.com/indeedeng/util/tree/master/util-core)
 
 General Java utilities and helper classes
 
