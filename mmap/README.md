@@ -65,8 +65,8 @@ lrwxrwxrwx 1 root root 66 Feb 25 12:52 /usr/lib/libindeedmmap.so ->
 
 The installation step assumes that `/usr/lib/` is in your `java.library.path`.
 You can also repackage the shared library in the JAR file, or request that we
-distribute a new build binary in the JAR file requires pushing it
-into the GitHub repository under `src/main/resources/native/*platform*/`.
+distribute a new build binary in the JAR file by pushing it
+to the GitHub repository under `src/main/resources/native/*platform*/`.
 
 ## Known limitations
 
