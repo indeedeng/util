@@ -9,17 +9,28 @@ uses it for managing data access.
 The latest util-mmap JAR file can be downloaded via Maven ([link](http://search.maven.org/#browse%7C-1269434767),
 [link](http://mvnrepository.com/artifact/com.indeed/util-mmap)).
 
+```
+<dependencies>
+    <dependency>
+        <groupId>com.indeed</groupId>
+        <artifactId>util-mmap</artifactId>
+        <version>LATEST</version>
+    </dependency>
+    <!-- ... -->
+</dependencies>
+```
+
 The library depends on [Unix mmap](http://www.gnu.org/software/libc/manual/html_node/Memory_002dmapped-I_002fO.html)
 for its underlying functionality, so it uses JNI. The published JAR file contains 
-native builds for linux i386 and amd64. The Java code in the library loads the 
-correct linux native shared object (.so) files from the JAR file at runtime based
+native builds for Linux `i386` and `amd64`. The Java code in the library loads the 
+correct Linux native shared object (.so) file from the JAR file at runtime based
 on `os.name` and `os.arch` system properties. If you need to run on an unsupported OS, you'll
-need to rebuild the native code; see the instructions in the Building section below.
+need to rebuild the native code. See the instructions in [Building](#building).
 
 ## Usage
 
 A good starting point for using util-mmap is the [MMapBuffer class](https://eng-git.ausoff.indeed.net/opensource/util/blob/master/mmap/src/main/java/com/indeed/util/mmap/MMapBuffer.java).
-This example maps in a large file containing an array of longs, written in little-endian order:
+The following example maps in a large file containing an array of longs, written in little-endian order.
 
 ```
 final MMapBuffer buffer = new MMapBuffer(
@@ -33,8 +44,8 @@ final long firstValue = longArray.get(0);
 
 ## Building
 
-You can build the native code for util-mmap yourself using the provided Perl
-scripts, which are Linux-specific and depend on gcc:
+You can build the native code for util-mmap yourself with the provided Perl
+scripts, which are Linux-specific and depend on GCC:
 
 ```
 $ cd util/mmap/src/main/native/
@@ -55,14 +66,14 @@ lrwxrwxrwx 1 root root 66 Feb 25 12:52 /usr/lib/libindeedmmap.so ->
 The installation step assumes that `/usr/lib/` is in your `java.library.path`.
 You can also repackage the shared library in the JAR file, or request that we
 distribute a new build binary in the JAR file requires pushing it
-into the GitHub repository under src/main/resources/native/*platform*/.
+into the GitHub repository under `src/main/resources/native/*platform*/`.
 
-### Known limitations
+## Known limitations
 
 The native code base has not been verified on other variants of Unix. For example,
 there are known problems compiling for Darwin (OS X). Contributions welcome.
 
-# License
+## License
 
 [Apache License Version 2.0](https://github.com/indeedeng/util/blob/master/LICENSE)
 
