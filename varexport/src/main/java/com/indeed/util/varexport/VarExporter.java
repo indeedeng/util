@@ -558,6 +558,7 @@ public class VarExporter implements VariableHost {
         public FieldVariable(String name, String doc, Set<String> tags, boolean expand, Field field, Object object, String namespace) {
             super(name, tags, doc, expand, namespace);
             this.field = field;
+            field.setAccessible(true);
             this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(field.getType()) && !ImmutableMap.class.isAssignableFrom(field.getType())) {
                 log.warn("Variable " + name + " is not an ImmutableMap, which may result in sporadic errors");
@@ -594,6 +595,7 @@ public class VarExporter implements VariableHost {
         public MethodVariable(String name, String doc, Set<String> tags, boolean expand, Method method, Object object, String namespace) {
             super(name, tags, doc, expand, namespace);
             this.method = method;
+            method.setAccessible(true);
             this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(method.getReturnType()) && !ImmutableMap.class.isAssignableFrom(method.getReturnType())) {
                 log.warn("Variable " + name + " is not an ImmutableMap, which may result in sporadic errors");
