@@ -17,36 +17,36 @@ public final class VIntUtils {
 
     public static int writeVInt(OutputStream out, int i) throws IOException {
         if (i < 0) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((((i>>>14)&0x7F) | 0x80));
-            out.write((((i>>>21)&0x7F) | 0x80));
-            out.write((((i>>>28)&0x7F) | 0x80));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(((i>>>14)&0x7F) | 0x80);
+            out.write(((i>>>21)&0x7F) | 0x80);
+            out.write(i>>>28);
             return 5;
         } else if (i < 1 << 7) {
             out.write(i);
             return 1;
         } else if (i < 1 << 14) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((i>>>7));
+            out.write((i&0x7F) | 0x80);
+            out.write(i>>>7);
             return 2;
         } else if (i < 1 << 21) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((i>>>14));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(i>>>14);
             return 3;
         } else if (i < 1 << 28) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((((i>>>14)&0x7F) | 0x80));
-            out.write((i>>>21));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(((i>>>14)&0x7F) | 0x80);
+            out.write(i>>>21);
             return 4;
         } else {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((((i>>>14)&0x7F) | 0x80));
-            out.write((((i>>>21)&0x7F) | 0x80));
-            out.write((i>>>28));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(((i>>>14)&0x7F) | 0x80);
+            out.write(((i>>>21)&0x7F) | 0x80);
+            out.write(i>>>28);
             return 5;
         }
     }
@@ -73,36 +73,36 @@ public final class VIntUtils {
 
     public static int writeVInt(DataOutput out, int i) throws IOException {
         if (i < 0) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((((i>>>14)&0x7F) | 0x80));
-            out.write((((i>>>21)&0x7F) | 0x80));
-            out.write((((i>>>28)&0x7F) | 0x80));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(((i>>>14)&0x7F) | 0x80);
+            out.write(((i>>>21)&0x7F) | 0x80);
+            out.write(i>>>28);
             return 5;
         } else if (i < 1 << 7) {
             out.write(i);
             return 1;
         } else if (i < 1 << 14) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((i>>>7));
+            out.write((i&0x7F) | 0x80);
+            out.write(i>>>7);
             return 2;
         } else if (i < 1 << 21) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((i>>>14));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(i>>>14);
             return 3;
         } else if (i < 1 << 28) {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((((i>>>14)&0x7F) | 0x80));
-            out.write((i>>>21));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(((i>>>14)&0x7F) | 0x80);
+            out.write(i>>>21);
             return 4;
         } else {
-            out.write(((i&0x7F) | 0x80));
-            out.write((((i>>>7)&0x7F) | 0x80));
-            out.write((((i>>>14)&0x7F) | 0x80));
-            out.write((((i>>>21)&0x7F) | 0x80));
-            out.write((i>>>28));
+            out.write((i&0x7F) | 0x80);
+            out.write(((i>>>7)&0x7F) | 0x80);
+            out.write(((i>>>14)&0x7F) | 0x80);
+            out.write(((i>>>21)&0x7F) | 0x80);
+            out.write(i>>>28);
             return 5;
         }
     }
