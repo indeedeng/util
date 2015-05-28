@@ -395,6 +395,26 @@ public class VarExporter implements VariableHost {
      */
     @SuppressWarnings("unchecked")
     @VisibleForTesting
+    public static void resetGlobal() {
+        tagsLock.writeLock().lock();
+        try {
+            tags.clear();
+        } finally {
+            tagsLock.writeLock().unlock();
+        }
+
+        resetNamespaces();
+    }
+
+    private static synchronized void resetNamespaces() {
+        namespaces.clear();
+    }
+
+    /**
+     * @deprecated please just use {@link #resetGlobal()} instead to reset the entirety of VarExporter
+     */
+    @SuppressWarnings("unchecked")
+    @Deprecated
     public void reset() {
         // remove tag mappings
         tagsLock.writeLock().lock();

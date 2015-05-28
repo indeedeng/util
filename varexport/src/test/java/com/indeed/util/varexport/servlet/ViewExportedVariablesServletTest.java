@@ -7,7 +7,12 @@ import com.indeed.util.varexport.ManagedVariable;
 import com.indeed.util.varexport.VarExporter;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.hamcrest.Matchers;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletResponse;
@@ -91,7 +96,6 @@ public class ViewExportedVariablesServletTest {
     public void testManagedVariables() throws IOException {
         final ManagedVariable<String> var1 = ManagedVariable.<String>builder().setName("test1").setValue("1").build();
         final ManagedVariable<String> var2 = ManagedVariable.<String>builder().setName("test2").setValue("2").build();
-        VarExporter.global().reset();
         VarExporter.global().export(var1);
         VarExporter.global().export(var2);
         final ViewExportedVariablesServlet servlet = setupServlet();
@@ -100,7 +104,6 @@ public class ViewExportedVariablesServletTest {
 
     @Test
     public void testTags() throws IOException {
-        VarExporter.global().reset();
         VarExporter.global().export(new TagExamples(), "");
         final ViewExportedVariablesServlet servlet = setupServlet();
         assertLines(getOutput(servlet, "", "VEVST1"), "ex1field=1", "ex2method=2");
@@ -109,4 +112,15 @@ public class ViewExportedVariablesServletTest {
         assertLines(getOutput(servlet, "", "nothing"), "null");
     }
 
+    @Before
+    public void setUp() throws Exception {
+        VarExporter.resetGlobal();
+    }
+
+    @BeforeClass
+    public static void initClass() {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.ERROR);
+        Logger.getLogger("com.indeed").setLevel(Level.ERROR);
+    }
 }

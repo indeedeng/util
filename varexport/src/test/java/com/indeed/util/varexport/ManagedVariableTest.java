@@ -7,10 +7,14 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.PrintWriter;
@@ -33,13 +37,20 @@ public class ManagedVariableTest {
     @Before
     public void setUp() throws Exception {
         VarExporter.startTime = null;
+        VarExporter.resetGlobal();
         exporter = VarExporter.global();
-        exporter.reset();
+    }
+
+    @BeforeClass
+    public static void initClass() {
+        BasicConfigurator.configure();
+        Logger.getRootLogger().setLevel(Level.ERROR);
+        Logger.getLogger("com.indeed").setLevel(Level.ERROR);
     }
 
     @After
     public void tearDown() throws Exception {
-        exporter.reset();
+        VarExporter.resetGlobal();
     }
 
     @Test

@@ -14,6 +14,7 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.PrintWriter;
@@ -181,18 +182,22 @@ public class VarExporterTest {
 
     @Before
     public void setUp() throws Exception {
+        VarExporter.resetGlobal();
         exporter = VarExporter.global();
-        exporter.reset();
 
         VarExporter.startTime = null;
+    }
 
+    @BeforeClass
+    public static void initClass() {
         BasicConfigurator.configure();
         Logger.getRootLogger().setLevel(Level.ERROR);
+        Logger.getLogger("com.indeed").setLevel(Level.ERROR);
     }
 
     @After
     public void tearDown() throws Exception {
-        exporter.reset();
+        VarExporter.resetGlobal();
     }
 
     private static Collection<String> getExportedNames(VarExporter exporter) {
@@ -210,14 +215,13 @@ public class VarExporterTest {
         Assert.assertThat(exportedNames, Matchers.containsInAnyOrder(names));
     }
 
-    //@Test
+    @Test
     public void testForNamespace() {
         VarExporter alt = VarExporter.forNamespace("foo");
         Assert.assertFalse(alt.getVariables().iterator().hasNext());
         VarExporter.forNamespace("foo").export(ExampleClass.class, "");
         assertExportedNames(alt, "static1field", "static1method", "myNameIsEarl");
         assertExportedNames(exporter);
-        alt.reset();
     }
 
     @Test
@@ -249,7 +253,7 @@ public class VarExporterTest {
         assertThat(variableNames, Matchers.containsInAnyOrder(expectedNames));
     }
 
-    //@Test
+    @Test
     public void testTags() {
         ExampleClass instance = new ExampleClass();
         exporter.export(instance, "");
@@ -259,11 +263,6 @@ public class VarExporterTest {
 
         assertVariableNamesForTag("IAmAwesome", "myNameIsEarl", "ex1field");
         assertVariableNamesForTag("Fail", "myNameIsEarl", "ex1method");
-
-        exporter.reset();
-
-        assertVariableNamesForTag("IAmAwesome");
-        assertVariableNamesForTag("Fail");
     }
 
     @Test
@@ -278,7 +277,7 @@ public class VarExporterTest {
         assertFalse(Lists.newArrayList(VarExporter.getNamespaces()).contains(""));
     }
 
-    //@Test
+    @Test
     public void testTagWithNamespace() throws Exception {
         final VarExporter global = VarExporter.global();
         final VarExporter local = VarExporter.forNamespace("local");
@@ -523,7 +522,6 @@ public class VarExporterTest {
             }
         });
         assertEquals(6, count.get());
-        alt.reset();
     }
 
     @Test
@@ -733,30 +731,27 @@ public class VarExporterTest {
     @Test
     public void testCachingInNamespace() {
         final VarExporter alt = VarExporter.forNamespace("foo").includeInGlobal();
-        try {
-            ExampleWithCaching example = new ExampleWithCaching();
-            alt.export(example, "");
-            assertVariableCount(alt, 3);
-            assertVariableCount(exporter, 3);
-            VarExporter.CachingVariable<Integer> variable =
-                    (VarExporter.CachingVariable<Integer>) alt.<Integer>getVariable("val");
-            variable.setClock(testClock);
 
-            curTime = 1000L;
-            assertEquals(0, alt.getValue("val"));
-            example.valRef.set(1);
-            curTime = 11001L;
-            assertEquals(1, alt.getValue("val"));
-            example.valRef.set(2);
-            curTime = 15000L;
-            assertEquals(1, exporter.getValue("foo-val"));
-            assertEquals(1, alt.getValue("val"));
-            curTime = 25000L;
-            assertEquals(2, exporter.getValue("foo-val"));
-            assertEquals(2, alt.getValue("val"));
-        } finally {
-            alt.reset();
-        }
+        ExampleWithCaching example = new ExampleWithCaching();
+        alt.export(example, "");
+        assertVariableCount(alt, 3);
+        assertVariableCount(exporter, 3);
+        VarExporter.CachingVariable<Integer> variable =
+                (VarExporter.CachingVariable<Integer>) alt.<Integer>getVariable("val");
+        variable.setClock(testClock);
+
+        curTime = 1000L;
+        assertEquals(0, alt.getValue("val"));
+        example.valRef.set(1);
+        curTime = 11001L;
+        assertEquals(1, alt.getValue("val"));
+        example.valRef.set(2);
+        curTime = 15000L;
+        assertEquals(1, exporter.getValue("foo-val"));
+        assertEquals(1, alt.getValue("val"));
+        curTime = 25000L;
+        assertEquals(2, exporter.getValue("foo-val"));
+        assertEquals(2, alt.getValue("val"));
     }
 
     private void assertVariableCount(VarExporter exporter, int expected) {
@@ -773,18 +768,13 @@ public class VarExporterTest {
     public void testParentGlobal() {
         VarExporter alt = VarExporter.forNamespace("foo");
         assertEquals(alt, alt.includeInGlobal());
-        try {
-            Assert.assertFalse(alt.getVariables().iterator().hasNext());
-            VarExporter.forNamespace("foo").export(ExampleClass.class, "");
-            assertExportedNames(alt, "static1field", "static1method", "myNameIsEarl");
-            assertVariableCount(alt, 3);
-            assertExportedNames(exporter, "foo-static1field", "foo-static1method", "foo-myNameIsEarl");
-            assertVariableCount(exporter, 3);
-        } finally {
-            alt.reset();
-            assertVariableCount(alt, 0);
-            assertVariableCount(exporter, 0);
-        }
+
+        Assert.assertFalse(alt.getVariables().iterator().hasNext());
+        VarExporter.forNamespace("foo").export(ExampleClass.class, "");
+        assertExportedNames(alt, "static1field", "static1method", "myNameIsEarl");
+        assertVariableCount(alt, 3);
+        assertExportedNames(exporter, "foo-static1field", "foo-static1method", "foo-myNameIsEarl");
+        assertVariableCount(exporter, 3);
     }
 
     @Test
@@ -793,17 +783,13 @@ public class VarExporterTest {
         assertEquals(foo, foo.setParentNamespace(VarExporter.global()));
         VarExporter bar = VarExporter.forNamespace("bar");
         assertEquals(bar, bar.setParentNamespace(foo));
-        try {
-            Assert.assertFalse(bar.getVariables().iterator().hasNext());
-            VarExporter.forNamespace("bar").export(new ExampleClass(), "");
-            VarExporter.forNamespace("bar").export(ManagedVariable.<Long>builder().setName("mv").build());
-            assertExportedNames(bar, "static1field", "static1method", "myNameIsEarl", "ex1method", "ex1field", "mv");
-            assertExportedNames(foo, "bar-static1field", "bar-static1method", "bar-myNameIsEarl", "bar-ex1method", "bar-ex1field", "bar-mv");
-            assertExportedNames(exporter, "foo-bar-static1field", "foo-bar-static1method", "foo-bar-myNameIsEarl", "foo-bar-ex1method", "foo-bar-ex1field", "foo-bar-mv");
-        } finally {
-            foo.reset();
-            bar.reset();
-        }
+
+        Assert.assertFalse(bar.getVariables().iterator().hasNext());
+        VarExporter.forNamespace("bar").export(new ExampleClass(), "");
+        VarExporter.forNamespace("bar").export(ManagedVariable.<Long>builder().setName("mv").build());
+        assertExportedNames(bar, "static1field", "static1method", "myNameIsEarl", "ex1method", "ex1field", "mv");
+        assertExportedNames(foo, "bar-static1field", "bar-static1method", "bar-myNameIsEarl", "bar-ex1method", "bar-ex1field", "bar-mv");
+        assertExportedNames(exporter, "foo-bar-static1field", "foo-bar-static1method", "foo-bar-myNameIsEarl", "foo-bar-ex1method", "foo-bar-ex1field", "foo-bar-mv");
     }
 
     @Test
