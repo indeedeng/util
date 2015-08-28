@@ -2,7 +2,6 @@ package com.indeed.util.mmap;
 
 import com.google.common.io.Files;
 import com.google.common.io.LittleEndianDataOutputStream;
-import com.indeed.util.core.shell.PosixFileOperations;
 import junit.framework.TestCase;
 import org.apache.log4j.Logger;
 
@@ -29,6 +28,7 @@ public final class TestWeirdStuff extends TestCase {
     @Override
     public void setUp() throws Exception {
         tmpDir = Files.createTempDir();
+        tmpDir.deleteOnExit();
     }
 
     private void writeFile() throws IOException {
@@ -39,11 +39,6 @@ public final class TestWeirdStuff extends TestCase {
             out.writeInt(i);
         }
         out.close();
-    }
-
-    @Override
-    public void tearDown() throws Exception {
-        PosixFileOperations.rmrf(tmpDir);
     }
 
     public void testTruncatedFileIndeedMMap() throws IOException {

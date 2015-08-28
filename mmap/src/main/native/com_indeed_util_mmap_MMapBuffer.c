@@ -4,6 +4,13 @@
 #include <errno.h>
 #include "com_indeed_util_mmap_MMapBuffer.h"
 
+// MAP_ANON for OSX
+#ifndef MAP_ANONYMOUS
+  #ifdef MAP_ANON
+    #define MAP_ANONYMOUS MAP_ANON
+  #endif
+#endif
+
 int get_c_flags(int flags) {
     int c_flags = 0;
     if (flags & com_indeed_util_mmap_MMapBuffer_MAP_SHARED) {
@@ -57,7 +64,12 @@ JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_MMapBuffer_munmap (JNIEnv* env,
  */
 JNIEXPORT jlong JNICALL Java_com_indeed_util_mmap_MMapBuffer_mremap (JNIEnv* env, jclass class, jlong address, jlong oldSize, jlong newSize) {
     void* map_addr;
+#ifdef MREMAP_MAYMOVE
     map_addr = mremap((void*)address, oldSize, newSize, MREMAP_MAYMOVE);
+#else
+    // mremap not supported on OSX
+    return com_indeed_util_mmap_MMapBuffer_MAP_FAILED;
+#endif
     if (map_addr == MAP_FAILED) {
         return com_indeed_util_mmap_MMapBuffer_MAP_FAILED;
     }
