@@ -1,4 +1,5 @@
 #include <string.h>
+#include <sys/types.h>
 #include <sys/mman.h>
 #include <errno.h>
 #include "com_indeed_util_mmap_NativeMemoryUtils.h"
@@ -69,7 +70,7 @@ JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_NativeMemoryUtils_munlock0 (JNI
  */
 JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_NativeMemoryUtils_mincore(JNIEnv* env, jclass class, jlong addr, jlong length, jlong vec) {
     int err;
-    err = mincore((void*)addr, length, (unsigned char*)vec);
+    err = mincore((caddr_t)addr, length, (char*)vec);
     if (err != 0) {
         err = errno;
         if (err == ENOMEM) return com_indeed_util_mmap_NativeMemoryUtils_ENOMEM;

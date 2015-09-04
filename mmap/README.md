@@ -22,8 +22,8 @@ The latest util-mmap JAR file can be downloaded via Maven ([link](http://search.
 
 The library depends on [Unix mmap](http://www.gnu.org/software/libc/manual/html_node/Memory_002dmapped-I_002fO.html)
 for its underlying functionality, so it uses JNI. The published JAR file contains 
-native builds for Linux `i386` and `amd64`. The Java code in the library loads the 
-correct Linux native shared object (.so) file from the JAR file at runtime based
+native builds for Linux `i386`, `amd64`, and OS X `x86_64`. The Java code in the library loads the 
+correct Linux native shared object (.so, .dylib) file from the JAR file at runtime based
 on `os.name` and `os.arch` system properties. If you need to run on an unsupported OS, you'll
 need to rebuild the native code. See the instructions in [Building](#building).
 
@@ -44,19 +44,18 @@ final long firstValue = longArray.get(0);
 
 ## Building
 
-You can build the native code for util-mmap yourself with the provided Perl
-scripts, which are Linux-specific and depend on GCC:
+You can build the native code for util-mmap yourself with the provided Makefile, which are Linux/OS X-specific and depend on GCC:
 
 ```
 $ cd util/mmap/src/main/native/
 
-$ ./compile.pl
+$ make
 
 $ ls *.o *.so.*
 com_indeed_util_mmap_MMapBuffer.o	  com_indeed_util_mmap_Stat.o
 com_indeed_util_mmap_NativeMemoryUtils.o  libindeedmmap.so.1.0.1
 
-$ sudo ./install.pl
+$ sudo make install
 
 $ ls -l /usr/lib/libindeedmmap.so
 lrwxrwxrwx 1 root root 66 Feb 25 12:52 /usr/lib/libindeedmmap.so -> 
@@ -71,7 +70,7 @@ to the GitHub repository under `src/main/resources/native/*platform*/`.
 ## Known limitations
 
 The native code base has not been verified on other variants of Unix. For example,
-there are known problems compiling for Darwin (OS X). Contributions welcome.
+mremap is unsupported for Darwin (OS X). Contributions welcome.
 
 ## License
 
