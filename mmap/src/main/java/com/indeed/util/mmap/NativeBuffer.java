@@ -144,7 +144,7 @@ public final class NativeBuffer implements BufferResource {
 
     private NativeBuffer createNewAndClose(long newSize) {
         final NativeBuffer ret = new NativeBuffer(newSize, memory.getOrder());
-        ret.memory().putBytes(0, memory, 0, memory.length());
+        ret.memory().putBytes(0, memory, 0, Math.min(memory.length(), newSize));
         closeQuietly(this);
         return ret;
     }
