@@ -26,6 +26,8 @@ public final class NativeBuffer implements BufferResource {
 
     private static final boolean MAP_ANONYMOUS_DEV_ZERO;
 
+    private static final boolean OS_TYPE_IS_MAC;
+
     static {
         MAP_ANONYMOUS_DEV_ZERO = Boolean.getBoolean("indeed.mmap.map.anonymous.dev.zero");
         final String thresholdString = System.getProperty("indeed.mmap.threshold");
@@ -52,6 +54,8 @@ public final class NativeBuffer implements BufferResource {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+
+        OS_TYPE_IS_MAC = System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0;
     }
 
     static {
@@ -138,20 +142,30 @@ public final class NativeBuffer implements BufferResource {
         NativeMemoryUtils.munlock(address+position, length);
     }
 
+    private NativeBuffer createNewAndClose(long newSize) {
+        final NativeBuffer ret = new NativeBuffer(newSize, memory.getOrder());
+        ret.memory().putBytes(0, memory, 0, Math.min(memory.length(), newSize));
+        closeQuietly(this);
+        return ret;
+    }
+
     public NativeBuffer realloc(long newSize) {
         if (mmapped && newSize >= MMAP_THRESHOLD) {
-            final long newAddress = MMapBuffer.mremap(address, memory.length(), newSize);
-            if (newAddress == MMapBuffer.MAP_FAILED) {
-                throw new RuntimeException("anonymous mmap failed with error "+MMapBuffer.errno());
+            if (OS_TYPE_IS_MAC) {
+                // MAC does not support mremap
+                return createNewAndClose(newSize);
             }
-            return new NativeBuffer(newAddress, new DirectMemory(newAddress, newSize, memory.getOrder()), true);
+            else {
+                final long newAddress = MMapBuffer.mremap(address, memory.length(), newSize);
+                if (newAddress == MMapBuffer.MAP_FAILED) {
+                    throw new RuntimeException("anonymous mremap failed with error " + MMapBuffer.errno());
+                }
+                return new NativeBuffer(newAddress, new DirectMemory(newAddress, newSize, memory.getOrder()), true);
+            }
         } else if (!mmapped && newSize < MMAP_THRESHOLD) {
             return realloc0(newSize);
         } else {
-            final NativeBuffer ret = new NativeBuffer(newSize, memory.getOrder());
-            ret.memory().putBytes(0, memory, 0, memory.length());
-            closeQuietly(this);
-            return ret;
+            return createNewAndClose(newSize);
         }
     }
 
