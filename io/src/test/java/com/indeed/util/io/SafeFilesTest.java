@@ -2,6 +2,7 @@
 package com.indeed.util.io;
 
 import com.google.common.base.Charsets;
+import com.google.common.base.Throwables;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -16,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.Set;
 
 /**
  * @author rboyer
@@ -25,6 +28,18 @@ public class SafeFilesTest {
     public TemporaryFolder tempDir = new TemporaryFolder();
     private Path root;
 
+    private static void checkFilePermissions(Path path) {
+        try {
+            final Set<PosixFilePermission> posixFilePermissions = java.nio.file.Files.getPosixFilePermissions(path);
+            Assert.assertTrue(posixFilePermissions.contains(PosixFilePermission.OWNER_READ));
+            Assert.assertTrue(posixFilePermissions.contains(PosixFilePermission.OWNER_WRITE));
+            Assert.assertTrue(posixFilePermissions.contains(PosixFilePermission.GROUP_READ));
+            Assert.assertTrue(posixFilePermissions.contains(PosixFilePermission.OTHERS_READ));
+        } catch (IOException e) {
+            throw Throwables.propagate(e);
+        }
+    }
+
     // these all use the same underlying method, so we don't really have to test all variations
     @Test
     public void write_direct_ok() throws IOException {
@@ -33,6 +48,7 @@ public class SafeFilesTest {
         final byte[] wrote = "hello world".getBytes(Charsets.UTF_8);
 
         SafeFiles.write(wrote, path);
+        checkFilePermissions(path);
 
         final byte[] read = com.google.common.io.Files.toByteArray(path.toFile());
 
@@ -52,6 +68,7 @@ public class SafeFilesTest {
             out.flush();
             out.commit();
         }
+        checkFilePermissions(path);
 
         final byte[] read = com.google.common.io.Files.toByteArray(path.toFile());
 
@@ -128,6 +145,7 @@ public class SafeFilesTest {
         final Path origPath = root.resolve("orig.txt");
         final Path newPath = root.resolve("new.txt");
         SafeFiles.write(data, origPath);
+        checkFilePermissions(origPath);
 
         Assert.assertTrue(java.nio.file.Files.exists(origPath));
         Assert.assertFalse(java.nio.file.Files.exists(newPath));
@@ -153,6 +171,7 @@ public class SafeFilesTest {
         final Path origPath = dir1.resolve("orig.txt");
         final Path newPath = dir2.resolve("new.txt");
         SafeFiles.write(data, origPath);
+        checkFilePermissions(origPath);
 
         Assert.assertTrue(java.nio.file.Files.exists(origPath));
         Assert.assertFalse(java.nio.file.Files.exists(newPath));
