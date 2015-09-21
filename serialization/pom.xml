@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.indeed</groupId>
         <artifactId>util-parent</artifactId>
-        <version>1.0.15</version>
+        <version>1.0.16-SNAPSHOT</version>
     </parent>
 
     <artifactId>util-serialization</artifactId>
