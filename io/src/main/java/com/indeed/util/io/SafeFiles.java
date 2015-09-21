@@ -23,6 +23,7 @@ import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermissions;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -210,7 +211,12 @@ public final class SafeFiles {
     public static SafeOutputStream createAtomicFile(final Path path) throws IOException {
         final Path dir = path.getParent();
         final Path name = path.getFileName();
-        final Path tempFile = Files.createTempFile(dir, name.toString(), ".tmp");
+        final Path tempFile = Files.createTempFile(
+                dir,
+                name.toString(),
+                ".tmp",
+                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--"))
+        );
 
         FileChannel fc = null;
         try {
