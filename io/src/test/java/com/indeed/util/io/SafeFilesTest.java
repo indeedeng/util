@@ -16,8 +16,10 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.file.Path;
+import java.nio.file.*;
+import java.nio.file.Files;
 import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
 
 /**
@@ -30,11 +32,27 @@ public class SafeFilesTest {
 
     private static void checkFilePermissions(Path path) {
         try {
+            final Path tempFile = java.nio.file.Files.createTempFile("tmp", "tmp", PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwxrwxrwx")));
+            final Set<PosixFilePermission> inverseUmask;
+            try {
+                inverseUmask = Files.getPosixFilePermissions(tempFile);
+            } finally {
+                java.nio.file.Files.delete(tempFile);
+            }
+
             final Set<PosixFilePermission> posixFilePermissions = java.nio.file.Files.getPosixFilePermissions(path);
-            Assert.assertTrue("owner read permission not set", posixFilePermissions.contains(PosixFilePermission.OWNER_READ));
-            Assert.assertTrue("owner write permission not set", posixFilePermissions.contains(PosixFilePermission.OWNER_WRITE));
-            Assert.assertTrue("group read permission not set", posixFilePermissions.contains(PosixFilePermission.GROUP_READ));
-            Assert.assertTrue("other read permission not set", posixFilePermissions.contains(PosixFilePermission.OTHERS_READ));
+            if (inverseUmask.contains(PosixFilePermission.OWNER_READ)) {
+                Assert.assertTrue("owner read permission not set", posixFilePermissions.contains(PosixFilePermission.OWNER_READ));
+            }
+            if (inverseUmask.contains(PosixFilePermission.OWNER_WRITE)) {
+                Assert.assertTrue("owner write permission not set", posixFilePermissions.contains(PosixFilePermission.OWNER_WRITE));
+            }
+            if (inverseUmask.contains(PosixFilePermission.GROUP_READ)) {
+                Assert.assertTrue("group read permission not set", posixFilePermissions.contains(PosixFilePermission.GROUP_READ));
+            }
+            if (inverseUmask.contains(PosixFilePermission.OTHERS_READ)) {
+                Assert.assertTrue("other read permission not set", posixFilePermissions.contains(PosixFilePermission.OTHERS_READ));
+            }
         } catch (IOException e) {
             throw Throwables.propagate(e);
         }
