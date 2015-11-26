@@ -121,10 +121,10 @@ public class VarExporterTest {
         @Export(name="map", expand=true, cacheTimeoutMs=1L)
         public Map<String, Map<String, String>> map = Maps.newHashMap();
         {
-            map.put("m1", Maps.<String, String>newHashMap());
+            map.put("m1", Maps.<String, String>newLinkedHashMap());
             map.get("m1").put("1", "one");
             map.get("m1").put("2", "two");
-            map.put("m2", Maps.<String, String>newHashMap());
+            map.put("m2", Maps.<String, String>newLinkedHashMap());
             map.get("m2").put("one", "1");
             map.get("m2").put("two", "2");
         }
@@ -679,7 +679,7 @@ public class VarExporterTest {
         // NOTE: multi-level maps are not yet supported
         assertThat(
             Lists.newArrayList(out.toString().split("\n")),
-            Matchers.contains("map#nullvalue=null", "map#m1={2\\=two, 1\\=one}", "map#m2={two\\=2, one\\=1}"));
+            Matchers.contains("map#nullvalue=null", "map#m1={1\\=one, 2\\=two}", "map#m2={one\\=1, two\\=2}"));
         assertNotNull(exporter.getValue("map"));
         assertNotNull(exporter.getValue("map#m1"));
         assertNull(exporter.getValue("map#m1#2"));
