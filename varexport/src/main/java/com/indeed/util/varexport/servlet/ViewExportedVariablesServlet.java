@@ -2,6 +2,7 @@
 package com.indeed.util.varexport.servlet;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Joiner;
 import com.indeed.util.varexport.VarExporter;
 import com.indeed.util.varexport.Variable;
 import com.indeed.util.varexport.VariableHost;
@@ -21,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Collections;
+import java.util.Set;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +34,8 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.TreeMultimap;
 import org.apache.log4j.Logger;
 
 /**
@@ -42,7 +46,9 @@ import org.apache.log4j.Logger;
  */
 public class ViewExportedVariablesServlet extends HttpServlet {
 
-    private static Logger log = Logger.getLogger(ViewExportedVariablesServlet.class);
+    private static final Logger log = Logger.getLogger(ViewExportedVariablesServlet.class);
+
+    private static final Joiner COMMA_JOINER = Joiner.on(',');
 
     private Template varTextTemplate;
     private Template varHtmlTemplate;
@@ -64,25 +70,25 @@ public class ViewExportedVariablesServlet extends HttpServlet {
     }
 
     @VisibleForTesting
-    protected void setVarTextTemplate(Template varTextTemplate) {
+    protected void setVarTextTemplate(final Template varTextTemplate) {
         this.varTextTemplate = varTextTemplate;
     }
 
     @VisibleForTesting
-    protected void setVarHtmlTemplate(Template varHtmlTemplate) {
+    protected void setVarHtmlTemplate(final Template varHtmlTemplate) {
         this.varHtmlTemplate = varHtmlTemplate;
     }
 
     @VisibleForTesting
-    protected void setBrowseNamespaceTemplate(Template browseNamespaceTemplate) {
+    protected void setBrowseNamespaceTemplate(final Template browseNamespaceTemplate) {
         this.browseNamespaceTemplate = browseNamespaceTemplate;
     }
 
     @Override
-    public void init(ServletConfig servletConfig) throws ServletException {
+    public void init(final ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
 
-        Configuration config = new Configuration();
+        final Configuration config = new Configuration();
         config.setObjectWrapper(new DefaultObjectWrapper());
         final String templateLoadPath = servletConfig.getInitParameter("templateLoadPath");
         if (templateLoadPath != null && new File(templateLoadPath).isDirectory()) {
@@ -110,7 +116,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
         response.setCharacterEncoding("UTF-8");
 
         if ("1".equals(request.getParameter("browse"))) {
@@ -131,12 +137,12 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         }
     }
 
-    private void showNamespaces(String uri, HttpServletResponse response) throws IOException {
-        List<String> namespaces = VarExporter.getNamespaces();
+    private void showNamespaces(final String uri, final HttpServletResponse response) throws IOException {
+        final List<String> namespaces = VarExporter.getNamespaces();
         namespaces.remove(null);
         Collections.sort(namespaces);
 
-        Map<String, String> parents = Maps.newHashMapWithExpectedSize(namespaces.size());
+        final Map<String, String> parents = Maps.newHashMapWithExpectedSize(namespaces.size());
         for (String namespace : namespaces) {
             VarExporter parent = VarExporter.forNamespace(namespace).getParentNamespace();
             if (parent == null) {
@@ -148,7 +154,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
 
         response.setContentType("text/html");
         final PrintWriter out = response.getWriter();
-        Map<String, Object> root = new HashMap<String, Object>();
+        final Map<String, Object> root = new HashMap<String, Object>();
         root.put("urlPath", uri);
         root.put("namespaces", namespaces);
         root.put("parents", parents);
@@ -163,25 +169,40 @@ public class ViewExportedVariablesServlet extends HttpServlet {
 
     /** @deprecated use version that takes DisplayType enum */
     @Deprecated
-    protected void showVariables(String uri, HttpServletResponse response, String namespace, boolean includeDoc, boolean html,
-                                 String... vars)
-            throws IOException {
+    protected void showVariables(
+            final String uri,
+            final HttpServletResponse response,
+            final String namespace,
+            final boolean includeDoc,
+            final boolean html,
+            final String... vars
+    ) throws IOException {
         final DisplayType displayType = html ? DisplayType.HTML : DisplayType.PLAINTEXT;
         showVariables(uri, response, namespace, includeDoc, displayType, vars);
     }
 
     /** @deprecated use version that takes tag */
     @Deprecated
-    protected void showVariables(String uri, HttpServletResponse response, String namespace, boolean includeDoc, DisplayType displayType,
-                                 String... vars)
-            throws IOException {
+    protected void showVariables(
+            final String uri,
+            final HttpServletResponse response,
+            final String namespace,
+            final boolean includeDoc,
+            final DisplayType displayType,
+            final String... vars
+    ) throws IOException {
         showVariables(uri, response, namespace, null, includeDoc, displayType, vars);
     }
                 
-    protected void showVariables(String uri, HttpServletResponse response, String namespace, String tag, boolean includeDoc, DisplayType displayType,
-                                 String... vars)
-            throws IOException {
-
+    protected void showVariables(
+            final String uri,
+            final HttpServletResponse response,
+            final String namespace,
+            final String tag,
+            final boolean includeDoc,
+            final DisplayType displayType,
+            final String... vars
+    ) throws IOException {
         final VariableHost exporter;
         if (!Strings.isNullOrEmpty(tag)) {
             exporter = VarExporter.withTag(tag);
@@ -195,10 +216,10 @@ public class ViewExportedVariablesServlet extends HttpServlet {
 
         switch(displayType) {
             case HTML:
-                showUsingTemplate(exporter, uri, namespace, includeDoc, varHtmlTemplate, out, vars);
+                showUsingTemplate(exporter, uri, namespace, includeDoc, varHtmlTemplate, true, out, vars);
                 break;
             case PLAINTEXT:
-                showUsingTemplate(exporter, uri, namespace, includeDoc, varTextTemplate, out, vars);
+                showUsingTemplate(exporter, uri, namespace, includeDoc, varTextTemplate, false, out, vars);
                 break;
             // TODO: support json -- exporter JSON is currently broken
         }
@@ -207,12 +228,20 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         out.close();
     }
 
-    private void showUsingTemplate(VariableHost exporter, String uri, String namespace, boolean includeDoc, Template template,
-                                   PrintWriter out, String... vars) throws IOException {
-        String name = (namespace == null ? "Global" : namespace);
+    private void showUsingTemplate(
+            final VariableHost exporter,
+            final String uri,
+            final String namespace,
+            final boolean includeDoc,
+            final Template template,
+            final boolean withIndex,
+            final PrintWriter out,
+            final String... vars
+    ) throws IOException {
+        final String name = (namespace == null ? "Global" : namespace);
 
-        Map<String, Object> root = new HashMap<String, Object>();
-        DateFormat df = SimpleDateFormat.getDateTimeInstance();
+        final Map<String, Object> root = new HashMap<String, Object>();
+        final DateFormat df = SimpleDateFormat.getDateTimeInstance();
         root.put("urlPath", uri);
         root.put("name", name);
         root.put("date", df.format(new Date()));
@@ -220,7 +249,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
 
         final List<Variable> varList;
         if (vars != null && vars.length == 1) {
-            Variable v = exporter.getVariable(vars[0]);
+            final Variable v = exporter.getVariable(vars[0]);
             if (v != null) {
                 varList = Lists.newArrayListWithExpectedSize(1);
                 addVariable(v, varList);
@@ -245,6 +274,10 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             }
         }
         root.put("vars", varList);
+        if (withIndex) {
+            final String varsIndex = buildIndex(varList);
+            root.put("varsIndex", varsIndex);
+        }
 
         try {
             template.process(root, out);
@@ -253,7 +286,57 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         }
     }
 
-    private void addVariable(Variable v, List<Variable> out) {
+    private String buildIndex(final List<Variable> varList) {
+        final SetMultimap<String, Integer> uniGram = buildNGramIndex(varList, 1);
+        final SetMultimap<String, Integer> biGram = buildNGramIndex(varList, 2);
+        final SetMultimap<String, Integer> triGram = buildNGramIndex(varList, 3);
+        final StringBuilder json = new StringBuilder();
+        json.append('{').append('\n');
+        json.append("\"uniGram\":").append('\n');
+        appendTo(json, uniGram).append(',').append('\n');
+        json.append("\"biGram\":").append('\n');
+        appendTo(json, biGram).append(',').append('\n');;
+        json.append("\"triGram\":").append('\n');
+        appendTo(json, triGram);
+        json.append('}');
+        return json.toString();
+    }
+
+    private <K> StringBuilder appendTo(final StringBuilder json, final SetMultimap<K, Integer> map) {
+        json.append('{').append('\n');
+        boolean isFirst = true;
+        for (final K key : map.keySet()) {
+            final Set<Integer> values = map.get(key);
+            if (isFirst) {
+                isFirst = false;
+            } else {
+                json.append(',').append('\n');
+            }
+            json.append('"').append(key.toString()).append('"').append(':');
+            json.append('[');
+            COMMA_JOINER.appendTo(json, values);
+            json.append(']');
+        }
+        json.append('\n').append('}');
+        return json;
+    }
+
+    private SetMultimap<String, Integer> buildNGramIndex(final List<Variable> varList, final int n) {
+        final TreeMultimap<String, Integer> uniGram = TreeMultimap.create();
+        for (int index = 0; index < varList.size(); index++) {
+            final Variable var = varList.get(index);
+            final String[] indexableNames = var.getIndexableNames();
+            for (final String indexableName : indexableNames) {
+                for (int i = 0; i < indexableName.length() - n + 1; i++) {
+                    final String key = indexableName.substring(i, i + n);
+                    uniGram.put(key, index);
+                }
+            }
+        }
+        return uniGram;
+    }
+
+    private void addVariable(final Variable v, final List<Variable> out) {
         try {
             v.toString();
             out.add(v);
