@@ -1,7 +1,7 @@
 package com.indeed.util.mmap;
 
 import com.google.common.annotations.VisibleForTesting;
-import org.apache.log4j.Logger;
+import com.google.common.io.Closeables;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -16,8 +16,6 @@ import java.nio.channels.FileChannel;
  * @author jplaisance
  */
 public final class MMapBuffer implements BufferResource {
-
-    private static final Logger log = Logger.getLogger(MMapBuffer.class);
 
     private static final Field FD_FIELD;
     public static final int PAGE_SIZE = 4096;
@@ -44,59 +42,73 @@ public final class MMapBuffer implements BufferResource {
     private final long address;
     private final DirectMemory memory;
 
+    private static RandomAccessFile open(File file, FileChannel.MapMode mapMode) throws FileNotFoundException {
+        if (!file.exists() && mapMode == FileChannel.MapMode.READ_ONLY) {
+            throw new FileNotFoundException(file + " does not exist");
+        }
+        final String openMode;
+        if (mapMode == FileChannel.MapMode.READ_ONLY) {
+            openMode = "r";
+        } else if (mapMode == FileChannel.MapMode.READ_WRITE) {
+            openMode = "rw";
+        } else {
+            throw new IllegalArgumentException("only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
+        }
+        return new RandomAccessFile(file, openMode);
+    }
+
     public MMapBuffer(File file, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
         this(file, 0, file.length(), mapMode, order);
     }
 
     public MMapBuffer(File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
-        if (!file.exists() && mapMode == FileChannel.MapMode.READ_ONLY) {
-            throw new FileNotFoundException(file + " does not exist");
-        }
+        this(open(file, mapMode), file, offset, length, mapMode, order, true);
+    }
 
-        if (offset < 0) throw new IllegalArgumentException("error mapping [" + file + "]: offset must be >= 0");
-        if (length <= 0) {
-            if (length < 0) throw new IllegalArgumentException("error mapping [" + file + "]: length must be >= 0");
-            address = 0;
-            memory = new DirectMemory(0, 0, order);
-        } else {
-            final String openMode;
-            int prot;
-            if (mapMode == FileChannel.MapMode.READ_ONLY) {
-                openMode = "r";
-                prot = READ_ONLY;
-            } else if (mapMode == FileChannel.MapMode.READ_WRITE) {
-                openMode = "rw";
-                prot = READ_WRITE;
+    public MMapBuffer(RandomAccessFile raf, File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+        this(raf, file, offset, length, mapMode, order, false);
+    }
+
+    public MMapBuffer(RandomAccessFile raf, File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order, boolean closeFile) throws IOException {
+        try {
+            if (offset < 0) throw new IllegalArgumentException("error mapping [" + file + "]: offset must be >= 0");
+            if (length <= 0) {
+                if (length < 0) throw new IllegalArgumentException("error mapping [" + file + "]: length must be >= 0");
+                address = 0;
+                memory = new DirectMemory(0, 0, order);
             } else {
-                throw new IllegalArgumentException("only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
-            }
-            RandomAccessFile raf = new RandomAccessFile(file, openMode);
-            if (raf.length() < offset+length) {
-                if (mapMode == FileChannel.MapMode.READ_WRITE) {
-                    raf.setLength(offset+length);
-                    raf.close();
-                    raf = new RandomAccessFile(file, openMode);
+                final int prot;
+                if (mapMode == FileChannel.MapMode.READ_ONLY) {
+                    prot = READ_ONLY;
+                } else if (mapMode == FileChannel.MapMode.READ_WRITE) {
+                    prot = READ_WRITE;
                 } else {
-                    throw new IllegalArgumentException("cannot open file [" + file + "] in read only mode with offset+length > file.length()");
+                    throw new IllegalArgumentException("only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
                 }
+                if (raf.length() < offset+length) {
+                    if (mapMode == FileChannel.MapMode.READ_WRITE) {
+                        raf.setLength(offset+length);
+                    } else {
+                        throw new IllegalArgumentException("cannot open file [" + file + "] in read only mode with offset+length > file.length()");
+                    }
+                }
+                final int fd;
+                try {
+                    fd = FD_FIELD.getInt(raf.getFD());
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+                address = mmap(length, prot, MAP_SHARED, fd, offset);
+                if (address == MAP_FAILED) {
+                    final int errno = errno();
+                    throw new IOException("mmap(" + file.getAbsolutePath() + ", " + offset + ", " + length + ", " + mapMode + ") failed [Errno " + errno + "]");
+                }
+                memory = new DirectMemory(address, length, order);
             }
-            int fd;
-            try {
-                fd = FD_FIELD.getInt(raf.getFD());
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+        } finally {
+            if (closeFile) {
+                Closeables.close(raf, true);
             }
-            address = mmap(length, prot, MAP_SHARED, fd, offset);
-            try {
-                raf.close();
-            } catch (IOException e) {
-                //ignore
-            }
-            if (address == MAP_FAILED) {
-                int errno = errno();
-                throw new IOException("mmap(" + file.getAbsolutePath() + ", " + offset + ", " + length + ", " + mapMode + ") failed [Errno " + errno + "]");
-            }
-            memory = new DirectMemory(address, length, order);
         }
     }
 
