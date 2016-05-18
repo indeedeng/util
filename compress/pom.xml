@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.indeed</groupId>
         <artifactId>util-parent</artifactId>
-        <version>1.0.20</version>
+        <version>1.0.21-SNAPSHOT</version>
     </parent>
 
     <artifactId>util-compress</artifactId>
