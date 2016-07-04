@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 import com.google.common.io.Closeables;
 
 import java.io.File;
@@ -11,6 +12,9 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author jplaisance
@@ -38,6 +42,8 @@ public final class MMapBuffer implements BufferResource {
             throw new RuntimeException(e);
         }
     }
+
+    private static final AtomicReference<Tracker> OPEN_BUFFERS_TRACKER = new AtomicReference<>();
 
     private final long address;
     private final DirectMemory memory;
@@ -110,6 +116,11 @@ public final class MMapBuffer implements BufferResource {
                 Closeables.close(raf, true);
             }
         }
+
+        final Tracker tracker = OPEN_BUFFERS_TRACKER.get();
+        if (tracker != null) {
+            tracker.mmapBufferOpened(this);
+        }
     }
 
     static native long mmap(long length, int prot, int flags, int fd, long offset);
@@ -121,6 +132,8 @@ public final class MMapBuffer implements BufferResource {
     private static native int msync(long address, long length);
 
     private static native int madvise(long address, long length);
+
+    private static native int madviseDontNeed(long address, long length);
 
     static native int errno();
 
@@ -181,9 +194,88 @@ public final class MMapBuffer implements BufferResource {
         if (address != 0) {
             if (munmap(address, memory.length()) != 0) throw new IOException("munmap failed [Errno " + errno() + "]");
         }
+
+        final Tracker tracker = OPEN_BUFFERS_TRACKER.get();
+        if (tracker != null) {
+            tracker.mmapBufferClosed(this);
+        }
     }
     
     public DirectMemory memory() {
         return memory;
+    }
+
+    /**
+     * @return true, if open buffers tracking is enabled, else false
+     *
+     * DO NOT USE THIS unless you know what you're doing.
+     */
+    @Deprecated
+    public static boolean isTrackingEnabled() {
+        return OPEN_BUFFERS_TRACKER.get() != null;
+    }
+
+    /**
+     * Enables/disables open buffers tracking.
+     *
+     * DO NOT USE THIS unless you know what you're doing.
+     */
+    @Deprecated
+    public static void setTrackingEnabled(final boolean enabled) {
+        if (enabled) {
+            OPEN_BUFFERS_TRACKER.compareAndSet(null, new Tracker());
+        } else {
+            OPEN_BUFFERS_TRACKER.set(null);
+        }
+    }
+
+    /**
+     * If open buffers tracking is enabled, calls madvise with MADV_DONTNEED for all tracked buffers.
+     * This can reduce resident set size of the process. See madvise(2) for more info.
+     *
+     * DO NOT USE THIS unless you know what you're doing.
+     */
+    @Deprecated
+    public static void madviseDontNeedTrackedBuffers() {
+        final Tracker tracker = OPEN_BUFFERS_TRACKER.get();
+        if (tracker == null) {
+            return;
+        }
+
+        for (final MMapBuffer b : tracker.getTrackedBuffers()) {
+            // Deliberately ignoring the return value here.
+            // A buffer could be already closed at this point.
+
+            //noinspection deprecation
+            madviseDontNeed(b.memory.getAddress(), b.memory.length());
+        }
+    }
+
+    @VisibleForTesting
+    static Tracker getTracker() {
+        return OPEN_BUFFERS_TRACKER.get();
+    }
+
+    @VisibleForTesting
+    static class Tracker {
+        private final Map<MMapBuffer, Void> mmapBufferSet = new IdentityHashMap<>();
+
+        void mmapBufferOpened(final MMapBuffer buffer) {
+            synchronized (mmapBufferSet) {
+                mmapBufferSet.put(buffer, null);
+            }
+        }
+
+        void mmapBufferClosed(final MMapBuffer buffer) {
+            synchronized (mmapBufferSet) {
+                mmapBufferSet.remove(buffer);
+            }
+        }
+
+        Iterable<MMapBuffer> getTrackedBuffers() {
+            synchronized (mmapBufferSet) {
+                return Lists.newArrayList(mmapBufferSet.keySet());
+            }
+        }
     }
 }
