@@ -244,8 +244,13 @@ public final class MMapBuffer implements BufferResource {
         }
 
         for (final MMapBuffer b : tracker.getTrackedBuffers()) {
-            // Deliberately ignoring the return value here.
-            // A buffer could be already closed at this point.
+            // Buffers we're iterating over can be closed asynchronously.
+            // There's 3 possible scenarios:
+            // 1) a buffer is not closed - we do a successful madvise call
+            // 2) a buffer is closed - madvise call will fail (return -1 and set errno)
+            // 3) a buffer is closed and a new buffer is mapped at the same address -
+            //    we'll either successfully madvise MADV_DONTNEED on it, or fail depending on size of the new buffer.
+            // We're good with any of these scenarios.
 
             //noinspection deprecation
             madviseDontNeed(b.memory.getAddress(), b.memory.length());
