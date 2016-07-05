@@ -13,6 +13,7 @@ import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -272,7 +273,7 @@ public final class MMapBuffer implements BufferResource {
             }
         }
 
-        Iterable<MMapBuffer> getTrackedBuffers() {
+        List<MMapBuffer> getTrackedBuffers() {
             synchronized (mmapBufferSet) {
                 return Lists.newArrayList(mmapBufferSet.keySet());
             }
