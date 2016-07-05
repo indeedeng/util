@@ -232,7 +232,10 @@ public final class MMapBuffer implements BufferResource {
 
     /**
      * If open buffers tracking is enabled, calls madvise with MADV_DONTNEED for all tracked buffers.
-     * This can reduce resident set size of the process. See madvise(2) for more info.
+     * If open buffers tracking is disabled, does nothing.
+     *
+     * This can reduce resident set size of the process, but may significantly affect performance.
+     * See madvise(2) for more info.
      *
      * DO NOT USE THIS unless you know what you're doing.
      */
