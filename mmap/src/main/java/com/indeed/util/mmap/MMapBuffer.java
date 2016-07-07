@@ -1,7 +1,7 @@
 package com.indeed.util.mmap;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Lists;
+import com.google.common.base.Function;
 import com.google.common.io.Closeables;
 
 import java.io.File;
@@ -13,7 +13,6 @@ import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.IdentityHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -194,13 +193,13 @@ public final class MMapBuffer implements BufferResource {
 
     @Override
     public void close() throws IOException {
+        if (openBuffersTracker != null) {
+            openBuffersTracker.beforeMMapBufferClosed(this);
+        }
+
         //hack to deal with 0 byte files
         if (address != 0) {
             if (munmap(address, memory.length()) != 0) throw new IOException("munmap failed [Errno " + errno() + "]");
-        }
-
-        if (openBuffersTracker != null) {
-            openBuffersTracker.mmapBufferClosed(this);
         }
     }
     
@@ -233,18 +232,14 @@ public final class MMapBuffer implements BufferResource {
             return;
         }
 
-        for (final MMapBuffer b : openBuffersTracker.getTrackedBuffers()) {
-            // Buffers we're iterating over can be closed asynchronously.
-            // There's 3 possible scenarios:
-            // 1) a buffer is not closed - we do a successful madvise call
-            // 2) a buffer is closed - madvise call will fail (return -1 and set errno)
-            // 3) a buffer is closed and a new buffer is mapped at the same address -
-            //    we'll either successfully madvise MADV_DONTNEED on it, or fail depending on size of the new buffer.
-            // We're good with any of these scenarios.
-
-            //noinspection deprecation
-            madviseDontNeed(b.memory.getAddress(), b.memory.length());
-        }
+        openBuffersTracker.forEachOpenTrackedBuffer(new Function<MMapBuffer, Void>() {
+            @Override
+            public Void apply(final MMapBuffer b) {
+                //noinspection deprecation
+                madviseDontNeed(b.memory.getAddress(), b.memory.length());
+                return null;
+            }
+        });
     }
 
     @VisibleForTesting
@@ -254,7 +249,8 @@ public final class MMapBuffer implements BufferResource {
 
     @VisibleForTesting
     static class Tracker {
-        private final Map<MMapBuffer, Void> mmapBufferSet = new IdentityHashMap<>();
+        @VisibleForTesting
+        final Map<MMapBuffer, Void> mmapBufferSet = new IdentityHashMap<>();
 
         void mmapBufferOpened(final MMapBuffer buffer) {
             synchronized (mmapBufferSet) {
@@ -262,15 +258,17 @@ public final class MMapBuffer implements BufferResource {
             }
         }
 
-        void mmapBufferClosed(final MMapBuffer buffer) {
+        void beforeMMapBufferClosed(final MMapBuffer buffer) {
             synchronized (mmapBufferSet) {
                 mmapBufferSet.remove(buffer);
             }
         }
 
-        List<MMapBuffer> getTrackedBuffers() {
+        void forEachOpenTrackedBuffer(final Function<MMapBuffer, ?> action) {
             synchronized (mmapBufferSet) {
-                return Lists.newArrayList(mmapBufferSet.keySet());
+                for (final MMapBuffer buffer : mmapBufferSet.keySet()) {
+                    action.apply(buffer);
+                }
             }
         }
     }

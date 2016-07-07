@@ -1,6 +1,5 @@
 package com.indeed.util.mmap;
 
-import com.google.common.collect.Iterables;
 import org.junit.Test;
 
 import java.io.File;
@@ -60,19 +59,20 @@ public class TestMMapBuffer {
             MMapBuffer.setTrackingEnabled(true);
             assertTrue(MMapBuffer.isTrackingEnabled());
 
-            final MMapBuffer.Tracker tracker = MMapBuffer.openBuffersTracker;
-            assertNotNull(tracker);
+            assertNotNull(MMapBuffer.openBuffersTracker);
 
             final File tempFile = File.createTempFile("TestMMapBuffer", "");
             final MMapBuffer buffer = new MMapBuffer(tempFile, 0, 10, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
 
             try {
-                assertTrue("A new buffer should be tracked!", Iterables.contains(tracker.getTrackedBuffers(), buffer));
+                final boolean tracked = MMapBuffer.openBuffersTracker.mmapBufferSet.containsKey(buffer);
+                assertTrue("A new buffer should be tracked!", tracked);
             } finally {
                 buffer.close();
             }
 
-            assertFalse("Closed buffers should not be tracked!", Iterables.contains(tracker.getTrackedBuffers(), buffer));
+            final boolean tracked = MMapBuffer.openBuffersTracker.mmapBufferSet.containsKey(buffer);
+            assertFalse("Closed buffers should not be tracked!", tracked);
         } finally {
             MMapBuffer.setTrackingEnabled(false);
         }
