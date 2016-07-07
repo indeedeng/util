@@ -51,7 +51,7 @@ public class TestMMapBuffer {
     public void testTrackingDisabled() {
         MMapBuffer.setTrackingEnabled(false);
         assertFalse(MMapBuffer.isTrackingEnabled());
-        assertNull(MMapBuffer.getTracker());
+        assertNull(MMapBuffer.openBuffersTracker);
     }
 
     @Test
@@ -60,7 +60,7 @@ public class TestMMapBuffer {
             MMapBuffer.setTrackingEnabled(true);
             assertTrue(MMapBuffer.isTrackingEnabled());
 
-            final MMapBuffer.Tracker tracker = MMapBuffer.getTracker();
+            final MMapBuffer.Tracker tracker = MMapBuffer.openBuffersTracker;
             assertNotNull(tracker);
 
             final File tempFile = File.createTempFile("TestMMapBuffer", "");

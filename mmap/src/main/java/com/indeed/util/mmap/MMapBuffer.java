@@ -15,7 +15,6 @@ import java.nio.channels.FileChannel;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author jplaisance
@@ -44,7 +43,12 @@ public final class MMapBuffer implements BufferResource {
         }
     }
 
-    private static final AtomicReference<Tracker> OPEN_BUFFERS_TRACKER = new AtomicReference<>();
+    @VisibleForTesting
+    static Tracker openBuffersTracker;
+    static {
+        final boolean shouldTrack = "true".equals(System.getProperty("com.indeed.util.mmap.MMapBuffer.enableTracking"));
+        setTrackingEnabled(shouldTrack);
+    }
 
     private final long address;
     private final DirectMemory memory;
@@ -118,9 +122,8 @@ public final class MMapBuffer implements BufferResource {
             }
         }
 
-        final Tracker tracker = OPEN_BUFFERS_TRACKER.get();
-        if (tracker != null) {
-            tracker.mmapBufferOpened(this);
+        if (openBuffersTracker != null) {
+            openBuffersTracker.mmapBufferOpened(this);
         }
     }
 
@@ -196,9 +199,8 @@ public final class MMapBuffer implements BufferResource {
             if (munmap(address, memory.length()) != 0) throw new IOException("munmap failed [Errno " + errno() + "]");
         }
 
-        final Tracker tracker = OPEN_BUFFERS_TRACKER.get();
-        if (tracker != null) {
-            tracker.mmapBufferClosed(this);
+        if (openBuffersTracker != null) {
+            openBuffersTracker.mmapBufferClosed(this);
         }
     }
     
@@ -213,21 +215,7 @@ public final class MMapBuffer implements BufferResource {
      */
     @Deprecated
     public static boolean isTrackingEnabled() {
-        return OPEN_BUFFERS_TRACKER.get() != null;
-    }
-
-    /**
-     * Enables/disables open buffers tracking.
-     *
-     * DO NOT USE THIS unless you know what you're doing.
-     */
-    @Deprecated
-    public static void setTrackingEnabled(final boolean enabled) {
-        if (enabled) {
-            OPEN_BUFFERS_TRACKER.compareAndSet(null, new Tracker());
-        } else {
-            OPEN_BUFFERS_TRACKER.set(null);
-        }
+        return openBuffersTracker != null;
     }
 
     /**
@@ -241,12 +229,11 @@ public final class MMapBuffer implements BufferResource {
      */
     @Deprecated
     public static void madviseDontNeedTrackedBuffers() {
-        final Tracker tracker = OPEN_BUFFERS_TRACKER.get();
-        if (tracker == null) {
+        if (openBuffersTracker == null) {
             return;
         }
 
-        for (final MMapBuffer b : tracker.getTrackedBuffers()) {
+        for (final MMapBuffer b : openBuffersTracker.getTrackedBuffers()) {
             // Buffers we're iterating over can be closed asynchronously.
             // There's 3 possible scenarios:
             // 1) a buffer is not closed - we do a successful madvise call
@@ -261,8 +248,8 @@ public final class MMapBuffer implements BufferResource {
     }
 
     @VisibleForTesting
-    static Tracker getTracker() {
-        return OPEN_BUFFERS_TRACKER.get();
+    static void setTrackingEnabled(final boolean enabled) {
+        openBuffersTracker = enabled ? new Tracker() : null;
     }
 
     @VisibleForTesting
