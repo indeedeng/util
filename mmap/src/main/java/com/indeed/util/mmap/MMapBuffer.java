@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.io.Closeables;
 
 import java.io.File;
@@ -11,6 +12,8 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
  * @author jplaisance
@@ -37,6 +40,13 @@ public final class MMapBuffer implements BufferResource {
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @VisibleForTesting
+    static Tracker openBuffersTracker;
+    static {
+        final boolean shouldTrack = "true".equals(System.getProperty("com.indeed.util.mmap.MMapBuffer.enableTracking"));
+        setTrackingEnabled(shouldTrack);
     }
 
     private final long address;
@@ -110,6 +120,10 @@ public final class MMapBuffer implements BufferResource {
                 Closeables.close(raf, true);
             }
         }
+
+        if (openBuffersTracker != null) {
+            openBuffersTracker.mmapBufferOpened(this);
+        }
     }
 
     static native long mmap(long length, int prot, int flags, int fd, long offset);
@@ -121,6 +135,8 @@ public final class MMapBuffer implements BufferResource {
     private static native int msync(long address, long length);
 
     private static native int madvise(long address, long length);
+
+    private static native int madviseDontNeed(long address, long length);
 
     static native int errno();
 
@@ -177,6 +193,10 @@ public final class MMapBuffer implements BufferResource {
 
     @Override
     public void close() throws IOException {
+        if (openBuffersTracker != null) {
+            openBuffersTracker.beforeMMapBufferClosed(this);
+        }
+
         //hack to deal with 0 byte files
         if (address != 0) {
             if (munmap(address, memory.length()) != 0) throw new IOException("munmap failed [Errno " + errno() + "]");
@@ -185,5 +205,71 @@ public final class MMapBuffer implements BufferResource {
     
     public DirectMemory memory() {
         return memory;
+    }
+
+    /**
+     * @return true, if open buffers tracking is enabled, else false
+     *
+     * DO NOT USE THIS unless you know what you're doing.
+     */
+    @Deprecated
+    public static boolean isTrackingEnabled() {
+        return openBuffersTracker != null;
+    }
+
+    /**
+     * If open buffers tracking is enabled, calls madvise with MADV_DONTNEED for all tracked buffers.
+     * If open buffers tracking is disabled, does nothing.
+     *
+     * This can reduce resident set size of the process, but may significantly affect performance.
+     * See madvise(2) for more info.
+     *
+     * DO NOT USE THIS unless you know what you're doing.
+     */
+    @Deprecated
+    public static void madviseDontNeedTrackedBuffers() {
+        if (openBuffersTracker == null) {
+            return;
+        }
+
+        openBuffersTracker.forEachOpenTrackedBuffer(new Function<MMapBuffer, Void>() {
+            @Override
+            public Void apply(final MMapBuffer b) {
+                //noinspection deprecation
+                madviseDontNeed(b.memory.getAddress(), b.memory.length());
+                return null;
+            }
+        });
+    }
+
+    @VisibleForTesting
+    static void setTrackingEnabled(final boolean enabled) {
+        openBuffersTracker = enabled ? new Tracker() : null;
+    }
+
+    @VisibleForTesting
+    static class Tracker {
+        @VisibleForTesting
+        final Map<MMapBuffer, Void> mmapBufferSet = new IdentityHashMap<>();
+
+        void mmapBufferOpened(final MMapBuffer buffer) {
+            synchronized (mmapBufferSet) {
+                mmapBufferSet.put(buffer, null);
+            }
+        }
+
+        void beforeMMapBufferClosed(final MMapBuffer buffer) {
+            synchronized (mmapBufferSet) {
+                mmapBufferSet.remove(buffer);
+            }
+        }
+
+        void forEachOpenTrackedBuffer(final Function<MMapBuffer, ?> action) {
+            synchronized (mmapBufferSet) {
+                for (final MMapBuffer buffer : mmapBufferSet.keySet()) {
+                    action.apply(buffer);
+                }
+            }
+        }
     }
 }
