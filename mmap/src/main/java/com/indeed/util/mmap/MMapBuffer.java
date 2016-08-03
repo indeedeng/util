@@ -69,10 +69,6 @@ public final class MMapBuffer implements BufferResource {
         return new RandomAccessFile(file, openMode);
     }
 
-    private static RandomAccessFile open(Path path, FileChannel.MapMode mapMode) throws FileNotFoundException {
-        return open(path.toFile(), mapMode);
-    }
-
     public MMapBuffer(File file, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
         this(file, 0, file.length(), mapMode, order);
     }
@@ -93,11 +89,19 @@ public final class MMapBuffer implements BufferResource {
         this(raf, file, offset, length, mapMode, order, false);
     }
 
+    public MMapBuffer(RandomAccessFile raf, Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+        this(raf, path, offset, length, mapMode, order, false);
+    }
+
     public MMapBuffer(RandomAccessFile raf, File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order, boolean closeFile) throws IOException {
+        this(raf, file.toPath(), offset, length, mapMode, order, closeFile);
+    }
+
+    public MMapBuffer(RandomAccessFile raf, Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order, boolean closeFile) throws IOException {
         try {
-            if (offset < 0) throw new IllegalArgumentException("error mapping [" + file + "]: offset must be >= 0");
+            if (offset < 0) throw new IllegalArgumentException("error mapping [" + path + "]: offset must be >= 0");
             if (length <= 0) {
-                if (length < 0) throw new IllegalArgumentException("error mapping [" + file + "]: length must be >= 0");
+                if (length < 0) throw new IllegalArgumentException("error mapping [" + path + "]: length must be >= 0");
                 address = 0;
                 memory = new DirectMemory(0, 0, order);
             } else {
@@ -113,7 +117,7 @@ public final class MMapBuffer implements BufferResource {
                     if (mapMode == FileChannel.MapMode.READ_WRITE) {
                         raf.setLength(offset+length);
                     } else {
-                        throw new IllegalArgumentException("cannot open file [" + file + "] in read only mode with offset+length > file.length()");
+                        throw new IllegalArgumentException("cannot open file [" + path + "] in read only mode with offset+length > file.length()");
                     }
                 }
                 final int fd;
@@ -125,7 +129,7 @@ public final class MMapBuffer implements BufferResource {
                 address = mmap(length, prot, MAP_SHARED, fd, offset);
                 if (address == MAP_FAILED) {
                     final int errno = errno();
-                    throw new IOException("mmap(" + file.getAbsolutePath() + ", " + offset + ", " + length + ", " + mapMode + ") failed [Errno " + errno + "]");
+                    throw new IOException("mmap(" + path + ", " + offset + ", " + length + ", " + mapMode + ") failed [Errno " + errno + "]");
                 }
                 memory = new DirectMemory(address, length, order);
             }
