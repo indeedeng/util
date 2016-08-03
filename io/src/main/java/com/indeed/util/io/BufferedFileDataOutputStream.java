@@ -1,7 +1,6 @@
 package com.indeed.util.io;
 
 import com.google.common.io.LittleEndianDataOutputStream;
-import org.apache.log4j.Logger;
 
 import java.io.DataOutput;
 import java.io.DataOutputStream;
@@ -13,13 +12,14 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 /**
  * @author jplaisance
  */
 public final class BufferedFileDataOutputStream extends OutputStream implements SyncableDataOutput {
-
-    private static final Logger log = Logger.getLogger(BufferedFileDataOutputStream.class);
+    private static final int DEFAULT_BUFFER_SIZE = 131072;
 
     private final ByteBuffer buffer;
 
@@ -29,24 +29,49 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
 
     private final RandomAccessFile raf;
 
-    public BufferedFileDataOutputStream(File file) throws FileNotFoundException {
+    public BufferedFileDataOutputStream(final File file) throws FileNotFoundException {
         this(file, ByteOrder.BIG_ENDIAN);
     }
 
-    public BufferedFileDataOutputStream(File file, ByteOrder order) throws FileNotFoundException {
-        this(file, order, 131072);
+    public BufferedFileDataOutputStream(final File file, final ByteOrder order) throws FileNotFoundException {
+        this(file, order, DEFAULT_BUFFER_SIZE);
     }
 
-    public BufferedFileDataOutputStream(File file, ByteOrder order, int bufferSize) throws FileNotFoundException {
+    public BufferedFileDataOutputStream(final File file, final ByteOrder order, final int bufferSize) throws FileNotFoundException {
+        // for backwards compatiblity with file interface, we still use RandomAccessFile
         raf = new RandomAccessFile(file, "rw");
-        this.channel = raf.getChannel();
+        channel = raf.getChannel();
         buffer = ByteBuffer.allocate(bufferSize);
         if (order == ByteOrder.LITTLE_ENDIAN) {
             dataOut = new LittleEndianDataOutputStream(this);
         } else if (order == ByteOrder.BIG_ENDIAN) {
             dataOut = new DataOutputStream(this);
         } else {
-            throw new IllegalArgumentException(order+" is not ByteOrder.BIG_ENDIAN or ByteOrder.LITTLE_ENDIAN");
+            throw new IllegalArgumentException(order + " is not ByteOrder.BIG_ENDIAN or ByteOrder.LITTLE_ENDIAN");
+        }
+    }
+
+    public BufferedFileDataOutputStream(final Path path) throws IOException {
+        this(path, ByteOrder.BIG_ENDIAN);
+    }
+
+    public BufferedFileDataOutputStream(final Path path, final ByteOrder order) throws IOException {
+        this(path, order, DEFAULT_BUFFER_SIZE);
+    }
+
+    public BufferedFileDataOutputStream(final Path path, final ByteOrder order, final int bufferSize) throws IOException {
+        raf = null;
+        channel = FileChannel.open(path,
+                StandardOpenOption.CREATE,
+                StandardOpenOption.READ,
+                StandardOpenOption.WRITE);
+        buffer = ByteBuffer.allocate(bufferSize);
+        if (order == ByteOrder.LITTLE_ENDIAN) {
+            dataOut = new LittleEndianDataOutputStream(this);
+        } else if (order == ByteOrder.BIG_ENDIAN) {
+            dataOut = new DataOutputStream(this);
+        } else {
+            throw new IllegalArgumentException(order + " is not ByteOrder.BIG_ENDIAN or ByteOrder.LITTLE_ENDIAN");
         }
     }
 
@@ -55,21 +80,21 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
         if (buffer.remaining() == 0) {
             flush();
         }
-        buffer.put((byte)b);
+        buffer.put((byte) b);
     }
 
     @Override
     public void write(final byte[] b, final int off, final int len) throws IOException {
         int current = off;
-        final int end = off+len;
+        final int end = off + len;
         while (current < end) {
-            int size = Math.min(buffer.remaining(), end-current);
+            int size = Math.min(buffer.remaining(), end - current);
             if (size == 0) {
                 flush();
                 continue;
             }
             buffer.put(b, current, size);
-            current+=size;
+            current += size;
         }
     }
 
@@ -139,11 +164,13 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
     public void close() throws IOException {
         flush();
         channel.close();
-        raf.close();
+        if (raf != null) {
+            raf.close();
+        }
     }
 
     public long position() throws IOException {
-        return channel.position()+buffer.position();
+        return channel.position() + buffer.position();
     }
 
     @Override

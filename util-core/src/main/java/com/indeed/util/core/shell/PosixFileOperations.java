@@ -9,6 +9,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 
 /**
@@ -69,6 +74,24 @@ public final class PosixFileOperations {
             log.error("exception during exec", e);
             throw new IOException("exec failed", e);
         }
+    }
+
+    public static void rmrf(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+                super.visitFile(file, attrs);
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+                super.postVisitDirectory(dir, exc);
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     public static void cplr(File src, File dest) throws IOException {

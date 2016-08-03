@@ -12,6 +12,8 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -67,12 +69,24 @@ public final class MMapBuffer implements BufferResource {
         return new RandomAccessFile(file, openMode);
     }
 
+    private static RandomAccessFile open(Path path, FileChannel.MapMode mapMode) throws FileNotFoundException {
+        return open(path.toFile(), mapMode);
+    }
+
     public MMapBuffer(File file, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
         this(file, 0, file.length(), mapMode, order);
     }
 
     public MMapBuffer(File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
         this(open(file, mapMode), file, offset, length, mapMode, order, true);
+    }
+
+    public MMapBuffer(Path path, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+        this(path, 0, Files.size(path), mapMode, order);
+    }
+
+    public MMapBuffer(Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+        this(path.toFile(), offset, length, mapMode, order);
     }
 
     public MMapBuffer(RandomAccessFile raf, File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
