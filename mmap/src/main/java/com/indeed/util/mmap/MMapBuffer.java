@@ -54,9 +54,9 @@ public final class MMapBuffer implements BufferResource {
     private final long address;
     private final DirectMemory memory;
 
-    private static RandomAccessFile open(File file, FileChannel.MapMode mapMode) throws FileNotFoundException {
-        if (!file.exists() && mapMode == FileChannel.MapMode.READ_ONLY) {
-            throw new FileNotFoundException(file + " does not exist");
+    private static RandomAccessFile open(Path path, FileChannel.MapMode mapMode) throws FileNotFoundException {
+        if (Files.notExists(path) && mapMode == FileChannel.MapMode.READ_ONLY) {
+            throw new FileNotFoundException(path + " does not exist");
         }
         final String openMode;
         if (mapMode == FileChannel.MapMode.READ_ONLY) {
@@ -66,7 +66,7 @@ public final class MMapBuffer implements BufferResource {
         } else {
             throw new IllegalArgumentException("only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
         }
-        return new RandomAccessFile(file, openMode);
+        return new RandomAccessFile(path.toFile(), openMode);
     }
 
     public MMapBuffer(File file, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
@@ -74,7 +74,7 @@ public final class MMapBuffer implements BufferResource {
     }
 
     public MMapBuffer(File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
-        this(open(file, mapMode), file, offset, length, mapMode, order, true);
+        this(file.toPath(), offset, length, mapMode, order);
     }
 
     public MMapBuffer(Path path, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
@@ -82,7 +82,7 @@ public final class MMapBuffer implements BufferResource {
     }
 
     public MMapBuffer(Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
-        this(path.toFile(), offset, length, mapMode, order);
+        this(open(path, mapMode), path, offset, length, mapMode, order, true);
     }
 
     public MMapBuffer(RandomAccessFile raf, File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
