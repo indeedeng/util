@@ -111,6 +111,24 @@ public final class PosixFileOperations {
         }
     }
 
+    public static void cplr(final Path src, final Path dest) throws IOException {
+        Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+                super.preVisitDirectory(dir, attrs);
+                Files.createDirectory(dest.resolve(src.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+                super.visitFile(file, attrs);
+                Files.createLink(dest.resolve(src.relativize(file)), file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
     public static void recursiveCopy(File srcDir, File destDir) throws IOException {
         Process cpProc = Runtime.getRuntime().exec(new String[]{"cp", "-Lr", srcDir.getAbsolutePath(), destDir.getAbsolutePath()}, null);
         try {
@@ -126,6 +144,24 @@ public final class PosixFileOperations {
             log.error("exception during exec", e);
             throw new IOException("exec failed", e);
         }
+    }
+
+    public static void recursiveCopy(final Path src, final Path dest) throws IOException {
+        Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+                super.preVisitDirectory(dir, attrs);
+                Files.createDirectory(dest.resolve(src.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+                super.visitFile(file, attrs);
+                Files.copy(file, dest.resolve(src.relativize(file)));
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
     public static long du(File path) throws IOException {
