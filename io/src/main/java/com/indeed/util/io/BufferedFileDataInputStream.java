@@ -1,5 +1,6 @@
 package com.indeed.util.io;
 
+import com.google.common.io.Closer;
 import com.google.common.io.LittleEndianDataInputStream;
 
 import java.io.DataInput;
@@ -21,7 +22,7 @@ import java.nio.file.StandardOpenOption;
 public final class BufferedFileDataInputStream extends InputStream implements DataInput, Seekable {
     private static final int DEFAULT_BUFFER_SIZE = 131072;
 
-    private final RandomAccessFile raf;
+    private final Closer closer = Closer.create();
 
     private final FileChannel channel;
 
@@ -41,8 +42,11 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
 
     public BufferedFileDataInputStream(File file, ByteOrder order, int bufferSize) throws FileNotFoundException {
         // for backwards compatiblity with file interface, we still use RandomAccessFile
-        raf = new RandomAccessFile(file, "r");
+        final RandomAccessFile raf = new RandomAccessFile(file, "r");
+        closer.register(raf);
         channel = raf.getChannel();
+        closer.register(channel);
+
         buffer = ByteBuffer.allocate(bufferSize);
         buffer.limit(0);
         if (order == ByteOrder.BIG_ENDIAN) {
@@ -61,8 +65,9 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
     }
 
     public BufferedFileDataInputStream(Path path, ByteOrder order, int bufferSize) throws IOException {
-        raf = null;
         channel = FileChannel.open(path, StandardOpenOption.READ);
+        closer.register(channel);
+
         buffer = ByteBuffer.allocate(bufferSize);
         buffer.limit(0);
         if (order == ByteOrder.BIG_ENDIAN) {
@@ -122,10 +127,7 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
 
     @Override
     public void close() throws IOException {
-        channel.close();
-        if (raf != null) {
-            raf.close();
-        }
+        closer.close();
     }
 
     @Override

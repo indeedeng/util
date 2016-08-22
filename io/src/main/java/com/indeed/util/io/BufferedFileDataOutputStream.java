@@ -1,5 +1,6 @@
 package com.indeed.util.io;
 
+import com.google.common.io.Closer;
 import com.google.common.io.LittleEndianDataOutputStream;
 
 import java.io.DataOutput;
@@ -27,7 +28,7 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
 
     private final DataOutput dataOut;
 
-    private final RandomAccessFile raf;
+    private final Closer closer = Closer.create();
 
     public BufferedFileDataOutputStream(final File file) throws FileNotFoundException {
         this(file, ByteOrder.BIG_ENDIAN);
@@ -39,8 +40,11 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
 
     public BufferedFileDataOutputStream(final File file, final ByteOrder order, final int bufferSize) throws FileNotFoundException {
         // for backwards compatiblity with file interface, we still use RandomAccessFile
-        raf = new RandomAccessFile(file, "rw");
+        final RandomAccessFile raf = new RandomAccessFile(file, "rw");
+        closer.register(raf);
         channel = raf.getChannel();
+        closer.register(channel);
+
         buffer = ByteBuffer.allocate(bufferSize);
         if (order == ByteOrder.LITTLE_ENDIAN) {
             dataOut = new LittleEndianDataOutputStream(this);
@@ -60,11 +64,12 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
     }
 
     public BufferedFileDataOutputStream(final Path path, final ByteOrder order, final int bufferSize) throws IOException {
-        raf = null;
         channel = FileChannel.open(path,
                 StandardOpenOption.CREATE,
                 StandardOpenOption.READ,
                 StandardOpenOption.WRITE);
+        closer.register(channel);
+
         buffer = ByteBuffer.allocate(bufferSize);
         if (order == ByteOrder.LITTLE_ENDIAN) {
             dataOut = new LittleEndianDataOutputStream(this);
@@ -163,10 +168,7 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
     @Override
     public void close() throws IOException {
         flush();
-        channel.close();
-        if (raf != null) {
-            raf.close();
-        }
+        closer.close();
     }
 
     public long position() throws IOException {
