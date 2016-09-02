@@ -40,8 +40,7 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
 
     public BufferedFileDataOutputStream(final File file, final ByteOrder order, final int bufferSize) throws FileNotFoundException {
         // for backwards compatiblity with file interface, we still use RandomAccessFile
-        final RandomAccessFile raf = new RandomAccessFile(file, "rw");
-        closer.register(raf);
+        final RandomAccessFile raf = closer.register(new RandomAccessFile(file, "rw"));
         channel = raf.getChannel();
         closer.register(channel);
 

@@ -42,8 +42,7 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
 
     public BufferedFileDataInputStream(File file, ByteOrder order, int bufferSize) throws FileNotFoundException {
         // for backwards compatiblity with file interface, we still use RandomAccessFile
-        final RandomAccessFile raf = new RandomAccessFile(file, "r");
-        closer.register(raf);
+        final RandomAccessFile raf = closer.register(new RandomAccessFile(file, "r"));
         channel = raf.getChannel();
         closer.register(channel);
 
