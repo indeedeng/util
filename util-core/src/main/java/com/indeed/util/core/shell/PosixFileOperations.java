@@ -9,10 +9,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.channels.FileChannel;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 
@@ -111,6 +113,12 @@ public final class PosixFileOperations {
         }
     }
 
+    private static void fsyncDir(final Path dir) throws IOException {
+        try (FileChannel channel = FileChannel.open(dir, StandardOpenOption.READ)) {
+            channel.force(true);
+        }
+    }
+
     public static void cplr(final Path src, final Path dest) throws IOException {
         Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
             @Override
@@ -127,6 +135,8 @@ public final class PosixFileOperations {
                 return FileVisitResult.CONTINUE;
             }
         });
+
+        fsyncDir(dest);
     }
 
     public static void recursiveCopy(File srcDir, File destDir) throws IOException {
@@ -162,6 +172,8 @@ public final class PosixFileOperations {
                 return FileVisitResult.CONTINUE;
             }
         });
+
+        fsyncDir(dest);
     }
 
     public static long du(File path) throws IOException {

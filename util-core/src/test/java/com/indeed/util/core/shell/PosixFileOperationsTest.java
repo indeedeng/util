@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -132,12 +133,14 @@ public class PosixFileOperationsTest {
         writeToFile(dDir.resolve("file7"), "file7");
         writeToFile(dDir.resolve("file8"), "file8");
 
+        Files.createSymbolicLink(aDir.resolve("file1s"), Paths.get("file1"));
+
         {
             final CountFileVisitor countFileVisitor = new CountFileVisitor();
             Files.walkFileTree(rootDir, countFileVisitor);
 
             Assert.assertEquals(5, countFileVisitor.dirs); // root, a, b, c, d
-            Assert.assertEquals(8, countFileVisitor.files); // file1 - file8
+            Assert.assertEquals(9, countFileVisitor.files); // file1 - file8, file1s
         }
 
         {
@@ -147,6 +150,7 @@ public class PosixFileOperationsTest {
 
             Assert.assertEquals(
                     Arrays.asList(
+                            "file1",
                             "file1",
                             "file2",
                             "file3",
@@ -171,6 +175,7 @@ public class PosixFileOperationsTest {
                 Assert.assertEquals(
                         Arrays.asList(
                                 "file1",
+                                "file1",
                                 "file2",
                                 "file3",
                                 "file4",
@@ -181,6 +186,8 @@ public class PosixFileOperationsTest {
                         ),
                         concatFileVisitor.conents);
             }
+
+            Assert.assertTrue(Files.isSymbolicLink(aDirCopy.resolve("file1s")));
 
             // adding new contents, it should not be reflected in the copy
             writeToFile(aDir.resolve("file22"), "file22");
@@ -195,6 +202,7 @@ public class PosixFileOperationsTest {
 
                 Assert.assertEquals(
                         Arrays.asList(
+                                "file1",
                                 "file1",
                                 "file2",
                                 "file3",
@@ -220,6 +228,7 @@ public class PosixFileOperationsTest {
 
                 Assert.assertEquals(
                         Arrays.asList(
+                                "file1",
                                 "file1",
                                 "file2-modified",
                                 "file3",
