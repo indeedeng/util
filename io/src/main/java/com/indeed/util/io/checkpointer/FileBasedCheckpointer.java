@@ -9,9 +9,11 @@ import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 
 /**
  * @author tony
@@ -58,7 +60,8 @@ public class FileBasedCheckpointer<T> implements Checkpointer<T> {
 
     @Override
     public synchronized void setCheckpoint(T checkpoint) throws IOException {
-        final Path checkpointFilePathNext = checkpointFilePath.getParent().resolve(checkpointFilePath.getFileName() + ".next");
+        final Path checkpointFileDir = checkpointFilePath.getParent();
+        final Path checkpointFilePathNext = checkpointFileDir.resolve(checkpointFilePath.getFileName() + ".next");
         try (BufferedFileDataOutputStream out = new BufferedFileDataOutputStream(checkpointFilePathNext)) {
             out.write(stringifier.toString(checkpoint).getBytes(Charsets.UTF_8));
             out.sync();
@@ -66,6 +69,9 @@ public class FileBasedCheckpointer<T> implements Checkpointer<T> {
 
         try {
             Files.move(checkpointFilePathNext, checkpointFilePath, StandardCopyOption.REPLACE_EXISTING);
+            try (FileChannel dirChannel = FileChannel.open(checkpointFileDir, StandardOpenOption.READ)) {
+                dirChannel.force(true);
+            }
         } catch (final IOException e) {
             throw new IOException("failed to rename " + checkpointFilePathNext + " to " + checkpointFilePath, e);
         }
