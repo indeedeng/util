@@ -9,6 +9,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.channels.FileChannel;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 
 /**
@@ -71,6 +78,24 @@ public final class PosixFileOperations {
         }
     }
 
+    public static void rmrf(Path path) throws IOException {
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+                super.visitFile(file, attrs);
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
+                super.postVisitDirectory(dir, exc);
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+    }
+
     public static void cplr(File src, File dest) throws IOException {
         Process cpProc = Runtime.getRuntime().exec(new String[]{"cp", "-lr", src.getAbsolutePath(), dest.getAbsolutePath()}, null);
         try {
@@ -88,6 +113,32 @@ public final class PosixFileOperations {
         }
     }
 
+    private static void fsyncDir(final Path dir) throws IOException {
+        try (FileChannel channel = FileChannel.open(dir, StandardOpenOption.READ)) {
+            channel.force(true);
+        }
+    }
+
+    public static void cplr(final Path src, final Path dest) throws IOException {
+        Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+                super.preVisitDirectory(dir, attrs);
+                Files.createDirectory(dest.resolve(src.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+                super.visitFile(file, attrs);
+                Files.createLink(dest.resolve(src.relativize(file)), file);
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        fsyncDir(dest);
+    }
+
     public static void recursiveCopy(File srcDir, File destDir) throws IOException {
         Process cpProc = Runtime.getRuntime().exec(new String[]{"cp", "-Lr", srcDir.getAbsolutePath(), destDir.getAbsolutePath()}, null);
         try {
@@ -103,6 +154,26 @@ public final class PosixFileOperations {
             log.error("exception during exec", e);
             throw new IOException("exec failed", e);
         }
+    }
+
+    public static void recursiveCopy(final Path src, final Path dest) throws IOException {
+        Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+                super.preVisitDirectory(dir, attrs);
+                Files.createDirectory(dest.resolve(src.relativize(dir)));
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+                super.visitFile(file, attrs);
+                Files.copy(file, dest.resolve(src.relativize(file)));
+                return FileVisitResult.CONTINUE;
+            }
+        });
+
+        fsyncDir(dest);
     }
 
     public static long du(File path) throws IOException {
