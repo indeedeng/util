@@ -113,16 +113,16 @@ public class VarExporter implements VariableHost {
         return new VariableHost() {
             @Override
             public void visitVariables(VariableVisitor visitor) {
+                final Collection<Variable> matchedVars;
                 tagsLock.readLock().lock();
                 try {
                     final Collection<Variable> matched = tags.get(tag);
-                    if (matched != null) {
-                        for (Variable v : matched) {
-                            visitor.visit(v);
-                        }
-                    }
+                    matchedVars = (matched == null) ? new ArrayList<Variable>() : new ArrayList<>(matched);
                 } finally {
                     tagsLock.readLock().unlock();
+                }
+                for (final Variable v : matchedVars) {
+                    visitor.visit(v);
                 }
             }
 
