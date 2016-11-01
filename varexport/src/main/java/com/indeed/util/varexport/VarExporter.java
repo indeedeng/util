@@ -5,13 +5,13 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Supplier;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
 import org.apache.log4j.Logger;
 
@@ -39,7 +39,12 @@ public class VarExporter implements VariableHost {
     protected static ManagedVariable<String> startTime = createStartTimeVariable(new Date());
 
     private static final Map<String, VarExporter> namespaces = Maps.newHashMap();
-    private static final Multimap<String, Variable> tags = HashMultimap.create();
+    private static final Multimap<String, Variable> tags = Multimaps.newSetMultimap(new HashMap<String, Collection<Variable>>(), new Supplier<Set<Variable>>() {
+        @Override
+        public Set<Variable> get() {
+            return Sets.newCopyOnWriteArraySet();
+        }
+    });
     private static final ReentrantReadWriteLock tagsLock = new ReentrantReadWriteLock();
 
     private final Class<?> namespaceClass;
@@ -113,16 +118,17 @@ public class VarExporter implements VariableHost {
         return new VariableHost() {
             @Override
             public void visitVariables(VariableVisitor visitor) {
+                final Collection<Variable> matched;
                 tagsLock.readLock().lock();
                 try {
-                    final Collection<Variable> matched = tags.get(tag);
-                    if (matched != null) {
-                        for (Variable v : matched) {
-                            visitor.visit(v);
-                        }
-                    }
+                    matched = tags.get(tag);
                 } finally {
                     tagsLock.readLock().unlock();
+                }
+                if (matched != null) {
+                    for (final Variable v : matched) {
+                        visitor.visit(v);
+                    }
                 }
             }
 
