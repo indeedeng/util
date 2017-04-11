@@ -1,7 +1,7 @@
 package com.indeed.util.io;
 
+import com.google.common.io.Closer;
 import com.google.common.io.LittleEndianDataInputStream;
-import org.apache.log4j.Logger;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
@@ -13,15 +13,16 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 
 /**
  * @author jplaisance
  */
 public final class BufferedFileDataInputStream extends InputStream implements DataInput, Seekable {
+    private static final int DEFAULT_BUFFER_SIZE = 131072;
 
-    private static final Logger log = Logger.getLogger(BufferedFileDataInputStream.class);
-
-    private final RandomAccessFile raf;
+    private final Closer closer = Closer.create();
 
     private final FileChannel channel;
 
@@ -36,12 +37,36 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
     }
 
     public BufferedFileDataInputStream(File file, ByteOrder order) throws FileNotFoundException {
-        this(file, order, 131072);
+        this(file, order, DEFAULT_BUFFER_SIZE);
     }
 
     public BufferedFileDataInputStream(File file, ByteOrder order, int bufferSize) throws FileNotFoundException {
-        raf = new RandomAccessFile(file, "r");
+        // for backwards compatiblity with file interface, we still use RandomAccessFile
+        final RandomAccessFile raf = closer.register(new RandomAccessFile(file, "r"));
         channel = raf.getChannel();
+        closer.register(channel);
+
+        buffer = ByteBuffer.allocate(bufferSize);
+        buffer.limit(0);
+        if (order == ByteOrder.BIG_ENDIAN) {
+            dataInput = new DataInputStream(this);
+        } else {
+            dataInput = new LittleEndianDataInputStream(this);
+        }
+    }
+
+    public BufferedFileDataInputStream(Path path) throws IOException {
+        this(path, ByteOrder.BIG_ENDIAN);
+    }
+
+    public BufferedFileDataInputStream(Path path, ByteOrder order) throws IOException {
+        this(path, order, DEFAULT_BUFFER_SIZE);
+    }
+
+    public BufferedFileDataInputStream(Path path, ByteOrder order, int bufferSize) throws IOException {
+        channel = FileChannel.open(path, StandardOpenOption.READ);
+        closer.register(channel);
+
         buffer = ByteBuffer.allocate(bufferSize);
         buffer.limit(0);
         if (order == ByteOrder.BIG_ENDIAN) {
@@ -101,8 +126,7 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
 
     @Override
     public void close() throws IOException {
-        channel.close();
-        raf.close();
+        closer.close();
     }
 
     @Override

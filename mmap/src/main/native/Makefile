@@ -10,6 +10,7 @@ CFLAGS += -g -fPIC -O3 -Wall
 
 ifneq ($(ARCH), x86_64)
 	CFLAGS += -m32
+	LD_FLAGS += -m32
 endif
 
 ifeq ($(OS),darwin)

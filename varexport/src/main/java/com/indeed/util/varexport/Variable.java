@@ -10,6 +10,7 @@ import com.google.common.escape.Escaper;
 import java.io.PrintWriter;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * Variable exported by {@link com.indeed.util.varexport.VarExporter}.
@@ -21,14 +22,25 @@ public abstract class Variable<T> {
 
     private static Set<Character> nameValueSpecialCharacters = ImmutableSet.of(':', '=');
 
+    private static Pattern INDEXABLE_SPLITTER = Pattern.compile("[^a-z0-9]+");
+
     private final String name;
+    private final String[] indexableNames;
     private final String doc;
     private final String namespace;
     private final boolean expand;
     private final Set<String> tags;
 
+    private static String[] buildIndexableName(final String name) {
+        if (name == null) {
+            return new String[0];
+        }
+        return INDEXABLE_SPLITTER.split(name.toLowerCase());
+    }
+
     public Variable(String name, Set<String> tags, String doc, boolean expand, String namespace) {
         this.name = name;
+        this.indexableNames = buildIndexableName(name);
         this.tags = tags;
         this.doc = doc;
         this.expand = expand;
@@ -37,6 +49,10 @@ public abstract class Variable<T> {
 
     public String getName() {
         return name;
+    }
+
+    public String[] getIndexableNames() {
+        return indexableNames;
     }
 
     public String getDoc() {
@@ -165,7 +181,8 @@ public abstract class Variable<T> {
         // TODO: remove if guava ever adds SourceCodeEscapers
         public String escape(String input) {
             StringBuilder b = new StringBuilder();
-            for (Character c : input.toCharArray()) {
+            for (int i = 0; i < input.length(); i++) {
+                char c = input.charAt(i);
                 if (!CharMatcher.ASCII.matches(c)) {
                     b.append(escapeChar(c));
                 } else {

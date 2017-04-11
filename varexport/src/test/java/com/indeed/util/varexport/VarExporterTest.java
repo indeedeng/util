@@ -269,8 +269,8 @@ public class VarExporterTest {
     public void testNamespaceIsNull() throws Exception {
         // the namespace is stored in the map at key NULL
         // but null/global/"" are all considered the same namespace
-        assertSame(VarExporter.forNamespace(""), VarExporter.forNamespace(null));
-        assertSame(VarExporter.global(), VarExporter.forNamespace(null));
+        assertSame(VarExporter.forNamespace(""), VarExporter.forNamespace((String) null));
+        assertSame(VarExporter.global(), VarExporter.forNamespace((String) null));
         assertSame(VarExporter.global(), VarExporter.forNamespace(""));
 
         assertTrue(Lists.newArrayList(VarExporter.getNamespaces()).contains(null));
@@ -805,5 +805,51 @@ public class VarExporterTest {
         final PublicClass obj = new PublicClass();
         final VarExporter exporter = VarExporter.forNamespace("external");
         assertEquals(obj.getDependencyStatus(), exporter.getValue("status"));
+    }
+
+    @Test
+    public void testForNamespaceWithClass() {
+        final VarExporter exporter = VarExporter.forNamespace(ExampleClass.class, true);
+        assertSame(VarExporter.forNamespace("ExampleClass"), exporter);
+        assertNotNull(exporter.getNamespaceClass());
+        assertTrue(exporter.isDeclaredFieldsOnly());
+        exporter.export(new ExampleSubclass(), "");
+        assertExportedNames(exporter, "ex1field", "ex1method", "myNameIsEarl", "static1field", "static1method");
+        Assert.assertNull(exporter.getValue("subm1"));
+        assertEquals("ExampleClass", exporter.getVariable("ex1field").getNamespace());
+    }
+
+    @Test
+    public void testForNamespaceWithClass2() {
+        final VarExporter exporter = VarExporter.forNamespace(ExampleSubclass.class, false);
+        assertSame(VarExporter.forNamespace("ExampleSubclass"), exporter);
+        assertNotNull(exporter.getNamespaceClass());
+        assertFalse(exporter.isDeclaredFieldsOnly());
+        exporter.export(new ExampleSubclass(), "");
+        assertExportedNames(exporter, "ex1field", "ex1method", "myNameIsEarl", "static1field", "static1method", "subm1");
+        assertEquals("ExampleSubclass", exporter.getVariable("ex1field").getNamespace());
+    }
+
+    @Test
+    public void testForNamespaceWithClass3() {
+        final VarExporter exporter = VarExporter.forNamespace(ExampleSubclass.class, true);
+        assertSame(VarExporter.forNamespace("ExampleSubclass"), exporter);
+        assertNotNull(exporter.getNamespaceClass());
+        assertTrue(exporter.isDeclaredFieldsOnly());
+        exporter.export(new ExampleSubclass(), "");
+        assertExportedNames(exporter, "subm1");
+        assertEquals("ExampleSubclass", exporter.getVariable("subm1").getNamespace());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExportIncompatibleType() {
+        final VarExporter exporter = VarExporter.forNamespace(ExampleClass.class, true);
+        exporter.export(new ExampleNeedingEscaping(), "");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testExportIncompatibleType2() {
+        final VarExporter exporter = VarExporter.forNamespace(ExampleClass.class, true);
+        exporter.export(ExampleNeedingEscaping.class, "");
     }
 }

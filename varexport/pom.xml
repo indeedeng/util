@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.indeed</groupId>
         <artifactId>util-parent</artifactId>
-        <version>1.0.16-SNAPSHOT</version>
+        <version>1.0.24-SNAPSHOT</version>
     </parent>
 
     <artifactId>util-varexport</artifactId>
@@ -63,6 +63,11 @@
             <artifactId>tomcat-servlet-api</artifactId>
             <scope>provided</scope>
             <optional />
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 </project>

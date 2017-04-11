@@ -63,6 +63,14 @@ JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_MMapBuffer_madvise
 
 /*
  * Class:     com_indeed_util_mmap_MMapBuffer
+ * Method:    madviseDontNeed
+ * Signature: (JJ)I
+ */
+JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_MMapBuffer_madviseDontNeed
+  (JNIEnv *, jclass, jlong, jlong);
+
+/*
+ * Class:     com_indeed_util_mmap_MMapBuffer
  * Method:    errno
  * Signature: ()I
  */
