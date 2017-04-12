@@ -628,7 +628,7 @@ public class VarExporter implements VariableHost {
             field.setAccessible(true);
             this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(field.getType()) && !ImmutableMap.class.isAssignableFrom(field.getType())) {
-                log.warn("Variable " + name + " is not an ImmutableMap, which may result in sporadic errors");
+                log.warn("Variable " + getNamespaceAndName() + " is not an ImmutableMap, which may result in sporadic errors");
             }
         }
 
@@ -665,7 +665,7 @@ public class VarExporter implements VariableHost {
             method.setAccessible(true);
             this.objectRef = new WeakReference<Object>(object);
             if (Map.class.isAssignableFrom(method.getReturnType()) && !ImmutableMap.class.isAssignableFrom(method.getReturnType())) {
-                log.warn("Variable " + name + " is not an ImmutableMap, which may result in sporadic errors");
+                log.warn("Variable " + getNamespaceAndName() + " is not an ImmutableMap, which may result in sporadic errors");
             }
         }
 
@@ -707,7 +707,7 @@ public class VarExporter implements VariableHost {
             if (value != null &&
                     Map.class.isAssignableFrom(value.getClass()) &&
                     !ImmutableMap.class.isAssignableFrom(value.getClass())) {
-                log.warn("Variable " + parent.getName() + "#" + entry.getKey() +
+                log.warn("Variable " + getNamespaceAndName() + "#" + entry.getKey() +
                         " is not an ImmutableMap, which may result in sporadic errors");
             }
         }

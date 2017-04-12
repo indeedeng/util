@@ -92,6 +92,14 @@ public abstract class Variable<T> {
 
     public abstract T getValue();
 
+    public String getNamespaceAndName() {
+        if(Strings.isNullOrEmpty(namespace)) {
+            return name;
+        }
+
+        return namespace + "-" + name;
+    }
+
     /**
      * Write name and value (and optionally documentation) in {@link java.util.Properties} format.
      * @param out writer
