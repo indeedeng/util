@@ -50,6 +50,7 @@
 
     <properties>
         <fastutil.version>6.5.15</fastutil.version>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
 </project>
