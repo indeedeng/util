@@ -143,6 +143,10 @@ public class Quicksortables {
 
     /**
      * Sorts the specified sub-array of integers into ascending order.
+     * @param q The quicksortable to sort.
+     * @param off The offset to start at.
+     * @param k The length of q.
+     * @param len The number of elements to sort.
      */
     private static void sort1(Quicksortable q, int off, int k, int len) {
         // we don't care about anything >= to k
@@ -208,13 +212,18 @@ public class Quicksortables {
 
     /**
      * Swaps x[a .. (a+n-1)] with x[b .. (b+n-1)].
+     *
+     * @param q The quicksortable.
+     * @param a The first pointer to swap
+     * @param b The second pointer to swap
+     * @param n The number of elements to swap
      */
     private static void vecswap(Quicksortable q, int a, int b, int n) {
         for (int i = 0; i < n; i++, a++, b++)
             q.swap(a, b);
     }
 
-    /**
+    /*
      * Returns the index of the median of the three indexed integers.
      */
     private static int med3(Quicksortable q, int a, int b, int c) {
@@ -225,6 +234,9 @@ public class Quicksortables {
 
     /**
      * sorts the elements in q using the heapsort method
+     *
+     * @param q The quicksortable to heapsort.
+     * @param size The size of the quicksortable.
      */
     public static void heapSort(Quicksortable q, int size) {
         q = reverseQuicksortable(q);
@@ -234,6 +246,9 @@ public class Quicksortables {
 
     /**
      * sorts the heap stored in q
+     *
+     * @param q The quicksortable to heapsort.
+     * @param size The size of the quicksortable.
      */
     private static void sortheap(Quicksortable q, int size) {
         for (int i = size-1; i >= 1; i--) {
@@ -243,7 +258,13 @@ public class Quicksortables {
     }
 
     /**
-     * finds the lowest k elements of q and stores them in sorted order at the beginning of q by using a heap of size k
+     * finds the lowest k elements of q and stores them in sorted order
+     * at the beginning of q by using a heap of size k
+     *
+     * @param q The quicksortable to heapsort.
+     * @param k The number of elements to sort at the beginning of the
+     *          quicksortable.
+     * @param size The size of the quicksortable.
      */
     public static void partialSortUsingHeap(Quicksortable q, int k, int size) {
         Quicksortable revq = reverseQuicksortable(q);
@@ -258,7 +279,13 @@ public class Quicksortables {
     }
 
     /**
-     * finds the lowest k elements of q and stores them in sorted order at the beginning of q by turning q into a heap
+     * finds the lowest k elements of q and stores them in sorted order
+     * at the beginning of q by turning q into a heap.
+     *
+     * @param q The quicksortable to heapsort.
+     * @param k The number of elements to sort at the beginning of the
+     *          quicksortable.
+     * @param size The size of the quicksortable.
      */
     public static void partialHeapSort(Quicksortable q, int k, int size) {
         makeHeap(q, size);
@@ -273,6 +300,9 @@ public class Quicksortables {
 
     /**
      * Makes a heap with the elements [0, size) of q
+     *
+     * @param q The quicksortable to transform into a heap.
+     * @param size The size of the quicksortable.
      */
     public static void makeHeap(Quicksortable q, int size) {
         for (int i = (size-1)/2; i >= 0; i--) {
@@ -283,6 +313,9 @@ public class Quicksortables {
 
     /**
      * Pushes the last element, located in position 'size-1', into the heap stored in [0, size-2) of q
+     *
+     * @param q The quicksortable to heapify up.
+     * @param size The size of the quicksortable.
      */
     public static void pushHeap(Quicksortable q, int size) {
         heapifyUp(q, size-1);
@@ -290,6 +323,9 @@ public class Quicksortables {
 
     /**
      * Pops the lowest element off the heap and stores it in the last element
+     *
+     * @param q The quicksortable to heapify down.
+     * @param size The size of the quicksortable.
      */
     public static void popHeap(Quicksortable q, int size) {
         q.swap(0, size-1);

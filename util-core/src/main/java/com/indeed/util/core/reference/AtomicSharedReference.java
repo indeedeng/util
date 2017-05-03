@@ -9,10 +9,13 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * This class is a mutable reference to a refcounted object. To access the referenced object, call getCopy() which
- * returns a SharedReference<T> which has a get() method which will return the object. The SharedReference<T> returned
- * by getCopy() must be closed when you are done with it.
+ * This class is a mutable reference to a refcounted object. To access the
+ * referenced object, call {@link #getCopy()} which returns a
+ * {@link SharedReference} which has a {@link SharedReference#get()} method
+ * which will return the object. The shared reference returned by
+ * {@code getCopy()} must be closed when you are done with it.
  *
+ * @param <T> The type of object encapsulated by this shared reference.
  * @author jplaisance
  */
 public final class AtomicSharedReference<T> {
@@ -73,6 +76,8 @@ public final class AtomicSharedReference<T> {
 
     /**
      * Like set(), but quietly closes any previous reference.
+     *
+     * @param t the value to set the atomic reference to.
      */
     public synchronized void setQuietly(T t) {
         if ((ref != null) && (ref.get() == t)) return;  // If we've been told to set to the object we are already tracking, this is a no-op.
@@ -120,7 +125,7 @@ public final class AtomicSharedReference<T> {
      * Saving the value of T after this call returns is COMPLETELY UNSAFE.  Don't do it.
      *
      * @param f  lambda(T x)
-     * @param <Z> Return type; <? extends Object>
+     * @param <Z> Return type; &lt;? extends Object&gt;
      * @return result of f
      */
     public synchronized @Nullable <Z> Z map(Function<T, Z> f) {
@@ -137,7 +142,7 @@ public final class AtomicSharedReference<T> {
      * Saving the value of T after this call returns is COMPLETELY UNSAFE.  Don't do it.
      *
      * @param f  lambda(T x)
-     * @param <Z> Return type; <? extends Object>
+     * @param <Z> Return type; &lt;? extends Object&gt;
      * @return result of f
      * @throws IOException  if closing the local reference throws.
      */
@@ -155,18 +160,20 @@ public final class AtomicSharedReference<T> {
     }
 
     /**
-     * Just like mapWithCopy() except that this silently swallows any exception that calling close() on the copy might throw.
-     * @param f
-     * @param <Z>
-     * @return
+     * Just like mapWithCopy() except that this silently swallows any exception
+     * that calling close() on the copy might throw.
+     *
+     * @param function The function to apply to the value of the local reference.
+     * @param <Z> The type of object produced by the function.
+     * @return The value that was produced by the supplied {@code function}.
      */
-    public @Nullable <Z> Z mapWithCopyQuietly(Function<T, Z> f) {
+    public @Nullable <Z> Z mapWithCopyQuietly(Function<T, Z> function) {
         final @Nullable SharedReference<T> localRef = getCopy();
         try {
             if (localRef == null) {
-                return f.apply(null);
+                return function.apply(null);
             } else {
-                return f.apply(localRef.get());
+                return function.apply(localRef.get());
             }
         } finally {
             if (localRef != null) Closeables2.closeQuietly(localRef, log);

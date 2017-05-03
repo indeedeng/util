@@ -92,6 +92,8 @@ public class ThreadSafeBitSet implements Serializable {
 
     /**
      * this = this | other, bitwise
+     *
+     * @param other The bit set to or with.
      */
     public final void or(ThreadSafeBitSet other) {
         if (other.size != size) throw new IllegalArgumentException("BitSets must be of equal size");
@@ -102,6 +104,8 @@ public class ThreadSafeBitSet implements Serializable {
 
     /**
      * this = this ^ other, bitwise
+     *
+     * @param other The bit set to xor with.
      */
     public final void xor(ThreadSafeBitSet other) {
         if (other.size != size) throw new IllegalArgumentException("BitSets must be of equal size");

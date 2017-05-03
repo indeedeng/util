@@ -21,6 +21,8 @@ public final class StoppedClock implements WallClock {
 
     /**
      * Creates a new stopped clock frozen at the given moment in time.
+     *
+     * @param millis The current time to use for the stopped clock.
      */
     public StoppedClock(final long millis) {
         this.millis = new AtomicLong(millis);
@@ -28,13 +30,20 @@ public final class StoppedClock implements WallClock {
 
     /**
      * Reset this stopped clock to the given moment in time.
+     *
+     * @param millis The new time to set the stopped clock to.
      */
     public final void set(final long millis) {
         this.millis.set(millis);
     }
 
     /**
-     * Reset this stopped clock to a moment in time relative to its current frozen value.
+     * Add the specified amount of time to the current clock.
+     *
+     * @param value The numeric value to add to the clock after converting
+     *              based on the provided {@code timeUnit}.
+     * @param timeUnit The time unit that {@code value} is measured in.
+     * @return The time after being adjusted by the provided offset.
      */
     public final long plus(final long value, @Nonnull final TimeUnit timeUnit) {
         return this.millis.addAndGet(timeUnit.toMillis(value));
