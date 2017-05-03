@@ -3,44 +3,33 @@ package com.indeed.util.varexport.servlet;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
+import com.google.common.collect.*;
 import com.indeed.util.varexport.VarExporter;
 import com.indeed.util.varexport.Variable;
 import com.indeed.util.varexport.VariableHost;
 import com.indeed.util.varexport.VariableVisitor;
-
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
+import org.apache.log4j.Logger;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.File;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Collections;
-import java.util.Set;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-
-import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.SetMultimap;
-import com.google.common.collect.TreeMultimap;
-import org.apache.log4j.Logger;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
- * Servlet for displaying variables exported by {@link com.indeed.util.varexport.VarExporter}.
- * Will escape values for compatibility with loading into {@link java.util.Properties}.
+ * Servlet for displaying variables exported by {@link VarExporter}.
+ * Will escape values for compatibility with loading into {@link Properties}.
  *
  * @author jack@indeed.com (Jack Humphrey)
  */
@@ -62,7 +51,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         private final String paramValue;
         private final String mimeType;
 
-        private DisplayType(final String paramValue, final String mimeType) {
+        DisplayType(final String paramValue, final String mimeType) {
             this.paramValue = paramValue;
             this.mimeType = mimeType;
         }
@@ -167,7 +156,16 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         out.close();
     }
 
-    /** @deprecated use version that takes DisplayType enum */
+    /**
+     * @param uri The request URI.
+     * @param response The response we will stream the report to.
+     * @param namespace The namespace which we should be inspecting
+     * @param includeDoc True if we should include docs. False, otherwise.
+     * @param html True to display the report in HTML. False for PLAINTEXT.
+     * @param vars The variables that we want to view.
+     * @throws IOException If we cannot write to the response stream.
+     * @deprecated use version that takes DisplayType enum
+     */
     @Deprecated
     protected void showVariables(
             final String uri,
@@ -181,7 +179,16 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         showVariables(uri, response, namespace, includeDoc, displayType, vars);
     }
 
-    /** @deprecated use version that takes tag */
+    /**
+     * @param uri The request URI.
+     * @param response The response we will stream the report to.
+     * @param namespace The namespace which we should be inspecting
+     * @param includeDoc True if we should include docs. False, otherwise.
+     * @param displayType The type of display to produce.
+     * @param vars The variables that we want to view.
+     * @throws IOException If we cannot write to the response stream.
+     * @deprecated use version that takes tag
+     */
     @Deprecated
     protected void showVariables(
             final String uri,
@@ -193,7 +200,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
     ) throws IOException {
         showVariables(uri, response, namespace, null, includeDoc, displayType, vars);
     }
-                
+
     protected void showVariables(
             final String uri,
             final HttpServletResponse response,
