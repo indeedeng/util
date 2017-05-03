@@ -7,12 +7,13 @@ import java.util.Arrays;
  * Represents a multi-part version number internally as a 64-bit integer for fast
  * comparison. Can represent a numeric version number with up to four components:
  * majorVersion.minorVersion.patchVersion.buildNumber.
- * <li>
- *     <ul>majorVersion can be a positive integer between 0 and 32767 (inclusive)</ul>
- *     <ul>minorVersion can be a positive integer between 0 and 65535 (inclusive)</ul>
- *     <ul>patchVersion can be a positive integer between 0 and 65535 (inclusive)</ul>
- *     <ul>buildNumber can be a positive integer between 0 and 65535 (inclusive)</ul>
- * </li>
+ *
+ * <ul>
+ *     <li>majorVersion can be a positive integer between 0 and 32767 (inclusive)</li>
+ *     <li>minorVersion can be a positive integer between 0 and 65535 (inclusive)</li>
+ *     <li>patchVersion can be a positive integer between 0 and 65535 (inclusive)</li>
+ *     <li>buildNumber can be a positive integer between 0 and 65535 (inclusive)</li>
+ * </ul>
  *
  * <p>
  * Supports comparison using wild-card expressions, using the special character 'x'. The wild card
@@ -144,8 +145,11 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
      * be fully qualified (x.x.x.x) or use a wildcard (like 3.2.x) or an IllegalArgumentException will
      * be thrown. All numbers must parse as integers or a NumberFormatException will be thrown.
      * This method is typically for use in code when dealing with explicit string literals.
+     *
      * @param versionString fully-qualified or wild-card version string
-     * @throws java.lang.IllegalArgumentException if version string is not fully-qualified or a wild card, or if a
+     * @return The parsed version of the provided {@code versionString}
+     *
+     * @throws IllegalArgumentException if version string is not fully-qualified or a wild card, or if a
      * version number does not parse as an integer
      */
     public static ReleaseVersion fromString(String versionString) {
@@ -153,8 +157,15 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
     }
 
     /**
-     * Turn a version string into an object. Does lenient parsing: "1.2.rc1" will turn into "1.2.0.0", for
-     * example. Will not throw {@link java.lang.IllegalArgumentException}.
+     * Turn a version string into an object. Does lenient parsing: "1.2.rc1"
+     * will turn into "1.2.0.0", for example. Will not throw
+     * {@link IllegalArgumentException}.
+     *
+     * @param versionString The version string that we should attempt to
+     *                      parse into a release version.
+     * @param defaultVersion The default version to use in the event parsing
+     *                       of versionString fails.
+     * @return The parsed ReleaseVersion or the defaultVersion if parsing failed.
      */
     public static ReleaseVersion fromStringSafely(String versionString, ReleaseVersion defaultVersion) {
         try {
@@ -218,9 +229,12 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
         }
 
         /**
-         * @param versionString
-         * @param lenient if false, will throw exceptions if not proper version string
-         * @throws java.lang.IllegalArgumentException if version string is invalid and !lenient (if it can't
+         * @param versionString The string representation of a release version.
+         * @param lenient if false, will throw exceptions if not proper version
+         *                string.
+         * @return The builder class so we can update components of the version
+         *         before building.
+         * @throws IllegalArgumentException if version string is invalid and !lenient (if it can't
          * parse a major version, will throw this exception even if lenient.
          */
         public Builder fromString(String versionString, boolean lenient) {
