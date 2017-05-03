@@ -316,27 +316,29 @@ public class VarExporter implements VariableHost {
     }
 
     /**
-     * Load the current value of a given variable
-     * @param variableName name of variable
-     * @return value
+     * Load the current value of a given variable.
+     * @param variableName The name of the variable we are looking up.
+     * @param <T> The data type of the exported variable.
+     * @return Null if the variable was not found. The value otherwise.
      */
     @SuppressWarnings("unchecked")
-    public <T> T getValue(String variableName) {
-        Variable variable = getVariable(variableName);
-        return variable == null ? null : (T) variable.getValue();
+    public <T> T getValue(final String variableName) {
+        final Variable variable = getVariable(variableName);
+        return (variable == null) ? null : (T) variable.getValue();
     }
 
     /**
-     * Load the dynamic variable object
+     * Load the dynamic variable object.
      * @param variableName name of variable
-     * @return variable
+     * @param <T> The data type of the exported variable.
+     * @return Null if the variable was not found. The value otherwise.
      */
     @Override
     @SuppressWarnings("unchecked")
-    public <T> Variable<T> getVariable(String variableName) {
-        String[] subTokens = getSubVariableTokens(variableName);
+    public <T> Variable<T> getVariable(final String variableName) {
+        final String[] subTokens = getSubVariableTokens(variableName);
         if (subTokens != null) {
-            Variable<T> sub = getSubVariable(subTokens[0], subTokens[1]);
+            final Variable<T> sub = getSubVariable(subTokens[0], subTokens[1]);
             if (sub != null) {
                 return sub;
             }

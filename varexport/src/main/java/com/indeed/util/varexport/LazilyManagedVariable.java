@@ -14,7 +14,7 @@ import java.util.Set;
  * <p>
  * Example usage:
  * <pre>
- *   ManagedVariable<Integer> var = ManagedVariable.<Integer>builder().setName("myvar").setValue(524).build();
+ *   ManagedVariable&lt;Integer&gt; var = ManagedVariable.&lt;Integer&gt;builder().setName("myvar").setValue(524).build();
  *   // ...
  *   var.set(52473);
  * </pre>

@@ -9,12 +9,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * To be used instead of {@link com.indeed.util.varexport.Export} or the introspection methods
- * of {@link com.indeed.util.varexport.VarExporter} to export a manually updated variable.
+ * To be used instead of {@link Export} or the introspection methods
+ * of {@link VarExporter} to export a manually updated variable.
  * <p>
  * Example usage:
  * <pre>
- *   ManagedVariable<Integer> var = ManagedVariable.<Integer>builder().setName("myvar").setValue(524).build();
+ *   ManagedVariable&lt;Integer&gt; var = ManagedVariable.&lt;Integer&gt;builder().setName("myvar").setValue(524).build();
  *   // ...
  *   var.set(52473);
  * </pre>
@@ -99,7 +99,6 @@ public class ManagedVariable<T> extends Variable<T> {
         lastUpdated = clock.get();
     }
 
-    /** Managed variables are always considered "live" */
     @Override
     protected boolean isLive() {
         return true;
