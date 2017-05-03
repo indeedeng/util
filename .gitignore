@@ -3,7 +3,7 @@
 .project
 *.iml
 .*.sw?
-*/target/
+target/
 urlparsing/src/test/resources/logentries.txt.gz
 /bin
 .idea
