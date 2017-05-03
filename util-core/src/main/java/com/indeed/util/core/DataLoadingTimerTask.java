@@ -8,6 +8,7 @@ import java.util.TimerTask;
 
 /**
  * TimerTask implementation that exports data loading variables ({@link HasDataLoadingVariables})
+ *
  * @author jack@indeed.com (Jack Humphrey)
  */
 public abstract class DataLoadingTimerTask extends TimerTask implements HasDataLoadingVariables {
@@ -36,7 +37,11 @@ public abstract class DataLoadingTimerTask extends TimerTask implements HasDataL
         dataLoadTimer.loadComplete();
     }
 
-    /** Implement load instead of run */
+    /**
+     * Instead of implementing {@link #run()}
+     *
+     * @return True if the load was successful. False otherwise.
+     */
     public abstract boolean load();
 
     public Integer getSecondsSinceLastLoad() {

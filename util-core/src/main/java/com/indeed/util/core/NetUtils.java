@@ -5,6 +5,7 @@ import com.google.common.base.Strings;
 import org.apache.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -52,8 +53,9 @@ public class NetUtils {
 
     /**
      * Same as determineHostName, but will use default value instead of throwing UnknownHostException
-     * @param defaultValue
-     * @return
+     *
+     * @param defaultValue    The default hostname to use in the event one is not preset.
+     * @return The detected hostname if present, or the default value.
      */
     @Nonnull
     public static String determineHostName(@Nonnull final String defaultValue) {
@@ -69,8 +71,14 @@ public class NetUtils {
     }
 
     /**
-     * Make a best effort to determine the IP address of this machine
+     * Make a best effort to determine the IP address of this machine.
+     *
+     * @return The ip address of the machine if we could determine it. Null
+     *         otherwise.
+     * @throws SocketException In the event that we fail to extract an ip from
+     *                         a network interface.
      */
+    @Nullable
     public static String determineIpAddress() throws SocketException {
         SocketException caughtException = null;
         for (final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
@@ -81,7 +89,7 @@ public class NetUtils {
                         final InetAddress inetAddress = addresses.nextElement();
                         final byte[] address = inetAddress.getAddress();
                         if ((address.length == 4) //  we don't need no steenking IPv6
-                                && (address[0] != 127 || address[1] != 0)) {    //  don't want localhost IP
+                                && ((address[0] != 127) || (address[1] != 0))) {    //  don't want localhost IP
                             return inetAddress.getHostAddress();
                         }
                     }
@@ -100,19 +108,22 @@ public class NetUtils {
         return null;
     }
 
-    private final static Pattern IPV4_ADDRESS = Pattern.compile("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
+    private static final Pattern IPV4_ADDRESS = Pattern.compile("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
 
     /**
      * Converts an IPv4 address to raw bytes, returning a byte[4], or null if the input is malformed.
+     *
+     * @param ipv4Address The string representation of an ipv4 address.
+     * @return A {@code byte[]} containing the parts of the v4 ip address.
      */
-    public static byte[] getRawAddress(String ipv4Address) {
-        Matcher m = IPV4_ADDRESS.matcher(ipv4Address);
+    public static byte[] getRawAddress(final String ipv4Address) {
+        final Matcher m = IPV4_ADDRESS.matcher(ipv4Address);
         if (!m.find()) {
             return null;
         }
-        byte[] addr = new byte[4];
+        final byte[] addr = new byte[4];
         for (int i = 0; i < 4; i++) {
-            int intVal = Integer.parseInt(m.group(i+1)) & 0x00ff;
+            final int intVal = Integer.parseInt(m.group(i+1)) & 0x00ff;
             addr[i] = (byte) intVal;
         }
         return addr;

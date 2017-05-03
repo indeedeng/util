@@ -5,14 +5,16 @@ import com.indeed.util.varexport.VarExporter;
 import org.apache.log4j.Logger;
 
 /**
- * Runnable implementation that exports data loading variables ({@link HasDataLoadingVariables})
+ * Runnable implementation of the {@link HasDataLoadingVariables} class that
+ * exports data loading variables.
+ *
  * @author jack@indeed.com (Jack Humphrey)
  */
-public abstract class DataLoadingRunnable extends com.indeed.util.core.DataLoadTimer implements HasDataLoadingVariables, Runnable {
-    private final static Logger log = Logger.getLogger(DataLoadingRunnable.class);
+public abstract class DataLoadingRunnable extends DataLoadTimer implements HasDataLoadingVariables, Runnable {
+    private static final Logger log = Logger.getLogger(DataLoadingRunnable.class);
 
     // use this for your implementation of load()
-    public static enum ReloadState {
+    public enum ReloadState {
         RELOADED,
         NO_CHANGE,
         FAILED
@@ -37,7 +39,11 @@ public abstract class DataLoadingRunnable extends com.indeed.util.core.DataLoadT
         return reloadState;
     }
 
-    /** Implement load instead of run */
+    /**
+     * Instead of implementing {@link #run()}
+     *
+     * @return True if the load was successful. False otherwise.
+     */
     public abstract boolean load();
 
     // optional feature, to be used in conjunction with ReloadState

@@ -2,11 +2,17 @@ package com.indeed.util.core.hash;
 
 /**
  * Murmur hash 2.0.
- * <p/>
- * The murmur hash is a relative fast hash function from http://murmurhash.googlepages.com/ for platforms with efficient multiplication.
- * <p/>
+ *
+ * <p>
+ * The murmur hash is a relative fast hash function from
+ * http://murmurhash.googlepages.com/ for platforms with efficient
+ * multiplication.
+ * </p>
+ *
+ * <p>
  * This is a re-implementation of the original C code plus some additional features.
- * <p/>
+ * </p>
+ *
  * Public domain.
  *
  * @author Viliam Holub
@@ -22,6 +28,8 @@ public final class MurmurHash {
      * Generates 32 bit hash from byte array of the given length and seed.
      *
      * @param data byte array to hash
+     * @param start The start position in the data array.
+     * @param length The length of the data array.
      * @param seed initial seed value
      * @return 32 bit hash of the given array
      */

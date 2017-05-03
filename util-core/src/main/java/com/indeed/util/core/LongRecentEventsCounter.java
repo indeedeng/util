@@ -7,6 +7,7 @@ import java.util.Collections;
 
 /**
  * Requires external synchronization
+ *
  * @author ketan
  */
 public class LongRecentEventsCounter {
@@ -92,7 +93,10 @@ public class LongRecentEventsCounter {
     }
 
     /**
-     * From newest (at 0) to oldest (at end)
+     * Create a snapshot of the data from newest (at position 0) to the oldest
+     * (at end) data stored in this recent events counter.
+     *
+     * @return An array of longs containing a copy of data in the window.
      */
     public long[] snapshot() {
         this.increment(0);  //  refresh just in case it's been idle a long time
