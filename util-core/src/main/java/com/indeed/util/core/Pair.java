@@ -75,33 +75,40 @@ public class Pair<A, B> implements Serializable {
 
     /**
      * Makes grabbing the first value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(String, ?) objects: 
-     * <br/>
+     * given an iterable over Pair.of(String, ?) objects:
+     *
+     * <br>
      * <code>... = Iterables.transform(iterable, Pair.fst(String.class))</code>
      *
+     * @param clazz The class type for a.
+     * @param <T1> Expected data type for {@link Pair#a}
+     * @param <T2> Expected data type for {@link Pair#b}
      * @return a Function that returns null or the first value of the Pair, which also may be null
      * @deprecated use {@link #fst()}.
      */
     @Nonnull
-    @SuppressWarnings("UnusedParameters")
     @Deprecated
     public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T1> fst(@Nonnull final Class<T1> clazz) {
-        return new First<T1, T2>();
+        return new First<>();
     }
     private static final class First<T1, T2> implements Function<Pair<? extends T1, ? extends T2>, T1> {
         @Nullable
         @Override
         public T1 apply(@Nullable Pair<? extends T1, ? extends T2> input) {
-            return input == null ? null : input.getFirst();
+            return (input == null) ? null : input.getFirst();
         }
     }
 
     /**
      * Makes grabbing the first value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(String, ?) objects: 
-     * <br/>
-     * <code>... = Iterables.transform(iterable, Pair.<String>fst())</code>
+     * given an iterable over Pair.of(String, ?) objects:
      *
+     * <br>
+     * <code>
+     *     ... = Iterables.transform(iterable, Pair.&lt;String&gt;fst())
+     * </code>
+     *
+     * @param <T> The expected data type of {@link Pair#a}
      * @return a Function that returns null or the first value of the Pair, which also may be null
      */
     @Nonnull
@@ -110,24 +117,29 @@ public class Pair<A, B> implements Serializable {
             @Nullable
             @Override
             public T apply(@Nullable Pair<? extends T, ?> input) {
-                return input == null ? null : input.getFirst();
+                return (input == null) ? null : input.getFirst();
             }
         };
     }
 
     /**
      * Makes grabbing the second value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(?, String) objects: 
-     * <br/>
-     * <code>... = Iterables.transform(iterable, Pair.snd(String.class))</code>
+     * given an iterable over Pair.of(?, String) objects:
      *
-     * @return a Function that returns null or the second value of the Pair, which also may be null
+     * <br>
+     * <code>
+     *     ... = Iterables.transform(iterable, Pair.snd(String.class))
+     * </code>
+     *
+     * @param clazz The class type for b.
+     * @param <T1> Expected data type for {@link Pair#a}
+     * @param <T2> Expected data type for {@link Pair#b}
+     * @return A function that returns null or the second value of the Pair, which also may be null
      */
     @Nonnull
-    @SuppressWarnings("UnusedParameters")
     @Deprecated
     public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T2> snd(@Nonnull final Class<T2> clazz) {
-        return new Second<T1, T2>();
+        return new Second<>();
     }
     private static final class Second<T1, T2> implements Function<Pair<? extends T1, ? extends T2>, T2> {
         @Nullable
@@ -139,10 +151,14 @@ public class Pair<A, B> implements Serializable {
 
     /**
      * Makes grabbing the second value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(?, String) objects: 
-     * <br/>
-     * <code>... = Iterables.transform(iterable, Pair.<String>snd())</code>
+     * given an iterable over Pair.of(?, String) objects:
      *
+     * <br>
+     * <code>
+     *     ... = Iterables.transform(iterable, Pair.&lt;String&gt;snd())
+     * </code>
+     *
+     * @param <T> The expected data type for {@link Pair#b}.
      * @return a Function that returns null or the second value of the Pair, which also may be null
      */
     @Nonnull
@@ -150,8 +166,8 @@ public class Pair<A, B> implements Serializable {
         return new Function<Pair<?, ? extends T>, T>() {
             @Nullable
             @Override
-            public T apply(@Nullable Pair<?, ? extends T> input) {
-                return input == null ? null : input.getSecond();
+            public T apply(@Nullable final Pair<?, ? extends T> input) {
+                return (input == null) ? null : input.getSecond();
             }
         };
     }
