@@ -29,8 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Utilities for atomic (and fsync-friendly) operations on files.
- * <p/>
+ *
+ * <p>
  * When possible methods on this class should be used over the ones in {@link com.indeed.util.io.Files}
+ * </p>
  *
  * @author rboyer
  */
@@ -39,13 +41,13 @@ public final class SafeFiles {
     private static final Logger LOG = Logger.getLogger(SafeFiles.class);
 
     /**
-     * Perform an atomic rename of oldName -> newName and fsync the containing directory.
+     * Perform an atomic rename of oldName -&gt; newName and fsync the containing directory.
      * This is only truly fsync-safe if both files are in the same directory, but it will at least
      * try to do the right thing if the files are in different directories.
      *
      * @param oldName original file
      * @param newName new file
-     * @throws IOException
+     * @throws IOException In the event that we could not rename the path.
      */
     public static void rename(final Path oldName, final Path newName) throws IOException {
         checkNotNull(oldName);
@@ -68,8 +70,8 @@ public final class SafeFiles {
      * Create a directory if it does not already exist.  Fails if the path exists and is NOT a directory.
      * Will fsync the parent directory inode.
      *
-     * @param path path to ens
-     * @throws IOException
+     * @param path path to ensure is a directory.
+     * @throws IOException In the event that the path is not a directory.
      */
     public static void ensureDirectoryExists(final Path path) throws IOException {
         if (Files.exists(path)) {
@@ -89,7 +91,7 @@ public final class SafeFiles {
      *
      * @param root directory to start the traversal.
      * @return number of NormalFiles fsynced (not including directories).
-     * @throws IOException
+     * @throws IOException in the event that we could not fsync the provided directory.
      */
     @Nonnegative
     public static int fsyncRecursive(final Path root) throws IOException {
@@ -131,7 +133,7 @@ public final class SafeFiles {
      * Fsync a single path. Please only call this on things that are Directories or NormalFiles.
      *
      * @param path path to fsync
-     * @throws IOException
+     * @throws IOException in the event that we could not fsync the provided path.
      */
     public static void fsync(final Path path) throws IOException {
         if (! Files.isDirectory(path) && ! Files.isRegularFile(path)) {
@@ -145,6 +147,8 @@ public final class SafeFiles {
 
     /**
      * Fsync a path and all parents all the way up to the fs root.
+     *
+     * @param path The path that we want to fsync.
      */
     private static void fsyncLineage(final Path path) throws IOException {
         Path cursor = path.toRealPath();
@@ -160,7 +164,7 @@ public final class SafeFiles {
      *
      * @param value string value to write to file as UTF8 bytes
      * @param path path to write out to
-     * @throws IOException
+     * @throws IOException in the event that the data could not be written to the path.
      */
     public static void writeUTF8(final String value, final Path path) throws IOException {
         write(value.getBytes(Charsets.UTF_8), path);
@@ -172,7 +176,7 @@ public final class SafeFiles {
      *
      * @param data binary value to write to file
      * @param path path to write out to
-     * @throws IOException
+     * @throws IOException in the event that the data could not be written to the path.
      */
     public static void write(final byte[] data, final Path path) throws IOException {
         try (final SafeOutputStream out = createAtomicFile(path)) {
@@ -184,28 +188,40 @@ public final class SafeFiles {
     /**
      * This is just like a lazy variation of {@link SafeFiles#write}.  It opens a temp file
      * and proxies writes through to the underlying file.
-     * <p/>
+     *
+     * <p>
      * Upon calling {@link SafeOutputStream#commit()} the rest of the safety behaviors kick in:
-     * <p/>
-     *   - flush
-     *   - fsync temp file
-     *   - close temp file
-     *   - atomic rename temp file to desired filename
-     *   - fsync parent directory
-     * <p/>
+     * </p>
+     *
+     * <ul>
+     *   <li>flush</li>
+     *   <li>fsync temp file</li>
+     *   <li>close temp file</li>
+     *   <li>atomic rename temp file to desired filename</li>
+     *   <li>fsync parent directory</li>
+     * </ul>
+     *
+     * <p>
      * On error it will make a best-effort to erase the temporary file.
-     * <p/>
+     * </p>
+     *
+     * <p>
      * If you call {@link SafeOutputStream#close()} without calling {@link SafeOutputStream#commit()}
      * the atomic write is aborted and cleaned up.
-     * <p/>
+     * </p>
+     *
+     * <p>
      * It is safe to call {@link SafeOutputStream#close()}} after {@link SafeOutputStream#commit()}
      * so that try-with-resources works.
-     * <p/>
+     * </p>
+     *
+     * <p>
      * The returned {@link SafeOutputStream} is NOT safe for calls from multiple threads.
+     * </p>
      *
      * @param path final desired output path
      * @return handle to opened temp file
-     * @throws IOException
+     * @throws IOException in the event that the file could not be created.
      */
     @Nonnull
     public static SafeOutputStream createAtomicFile(final Path path) throws IOException {
@@ -252,7 +268,7 @@ public final class SafeFiles {
     }
 
     /**
-     * @see {@link SafeFiles#createAtomicFile}
+     * @see SafeFiles#createAtomicFile(Path)
      */
     @ParametersAreNonnullByDefault
     @NotThreadSafe
