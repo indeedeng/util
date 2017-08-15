@@ -13,12 +13,25 @@ public class TestWallClocks {
     public void testWallClock() {
         final WallClock wallClock = new DefaultWallClock();
 
-        final long now = System.currentTimeMillis();
-        final long wrappedNow = wallClock.currentTimeMillis();
+        {
+            final long now = System.currentTimeMillis();
+            final long wrappedNow = wallClock.currentTimeMillis();
 
-        Assert.assertTrue(
-                "Expected sequential calls to currentTimeMillis to be equal, and these were more than 5ms distant.",
-                Math.abs(wrappedNow - now) < 5);
+            Assert.assertTrue(
+                    "Expected sequential calls to currentTimeMillis() to be equal, and these were more than 5ms distant.",
+                    Math.abs(wrappedNow - now) < 5
+            );
+        }
+
+        {
+            final long now = System.nanoTime();
+            final long wrappedNow = wallClock.nanoTime();
+
+            Assert.assertTrue(
+                    "Expected sequential calls to nanoTime() to be equal, and these were more than 5ms distant.",
+                    Math.abs(wrappedNow - now) < TimeUnit.MILLISECONDS.toNanos(5)
+            );
+        }
     }
 
     @Test
@@ -31,16 +44,22 @@ public class TestWallClocks {
         wallClock.set(now);
         Assert.assertEquals(
                 "Expected the wall clock time to be insensitive to system time changes",
-                now, wallClock.currentTimeMillis());
+                now, wallClock.currentTimeMillis()
+        );
 
         wallClock.plus(10, TimeUnit.SECONDS);
         Assert.assertEquals(
                 "Expected a predictable change in the reported milliseconds",
-                now + 10 * 1000, wallClock.currentTimeMillis());
+                now + (10 * 1000), wallClock.currentTimeMillis()
+        );
 
         wallClock.plus(-5, TimeUnit.SECONDS);
         Assert.assertEquals(
                 "Expected negative changes to be accepted",
-                now + 5 * 1000, wallClock.currentTimeMillis());
+                now + (5 * 1000), wallClock.currentTimeMillis()
+        );
+
+        final StoppedClock initializedClock = new StoppedClock(now);
+        Assert.assertEquals(now, initializedClock.currentTimeMillis());
     }
 }

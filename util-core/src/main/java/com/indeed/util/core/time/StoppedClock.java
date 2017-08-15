@@ -72,7 +72,7 @@ public final class StoppedClock implements WallClock {
 
     @Override
     public long currentTimeMillis () {
-        return TimeUnit.NANOSECONDS.toMillis(nanos.get());
+        return TimeUnit.NANOSECONDS.toMillis(nanoTime());
     }
 
     @Override
