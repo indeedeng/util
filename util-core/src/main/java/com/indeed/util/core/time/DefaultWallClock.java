@@ -11,4 +11,9 @@ public class DefaultWallClock implements WallClock {
     public long currentTimeMillis() {
         return System.currentTimeMillis();
     }
+
+    @Override
+    public long nanoTime() {
+        return System.nanoTime();
+    }
 }

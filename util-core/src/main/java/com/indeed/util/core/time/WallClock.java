@@ -7,4 +7,6 @@ package com.indeed.util.core.time;
  */
 public interface WallClock {
     long currentTimeMillis();
+
+    long nanoTime();
 }
