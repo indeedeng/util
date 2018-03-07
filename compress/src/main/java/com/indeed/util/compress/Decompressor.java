@@ -118,6 +118,9 @@ public interface Decompressor {
 
   /**
    * Closes the decompressor and discards any unprocessed input.
+   *
+   * IMPORTANT: Some compressors allocate off-heap memory that will not be freed
+   * unless and until this method is called.
    */
   public void end(); 
 }

@@ -274,6 +274,11 @@ public class ZlibDecompressor implements Decompressor {
     userBufOff = userBufLen = 0;
   }
 
+  /**
+   * IMPORTANT: This decompressor allocates off-heap memory that will not be freed
+   * unless and until this method is called. Java's garbage collection system will
+   * not do anything to help with this.
+   */
   public synchronized void end() {
     if (stream != 0) {
       end(stream);
