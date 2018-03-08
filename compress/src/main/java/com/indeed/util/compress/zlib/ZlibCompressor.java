@@ -388,6 +388,11 @@ public class ZlibCompressor implements Compressor {
       stream = 0;
     }
   }
+
+  @Override
+  protected void finalize() {
+    end();
+  }
   
   private void checkStream() {
     if (stream == 0)

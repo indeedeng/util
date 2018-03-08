@@ -286,6 +286,7 @@ public class ZlibDecompressor implements Decompressor {
     }
   }
 
+  @Override
   protected void finalize() {
     end();
   }
