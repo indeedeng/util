@@ -188,14 +188,9 @@ public class DecompressorStream extends CompressionInputStream {
     return (eof) ? 0 : 1;
   }
 
-  private void end() throws IOException {
-    decompressor.end();
-  }
-
   public void close() throws IOException {
     if (!closed) {
       in.close();
-      end();
       closed = true;
     }
   }

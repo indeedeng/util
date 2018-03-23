@@ -76,10 +76,6 @@ public class CompressorStream extends CompressionOutputStream {
     }
   }
 
-  private void end() throws IOException {
-    compressor.end();
-  }
-
   public void finish() throws IOException {
     if (!compressor.finished()) {
       compressor.finish();
@@ -96,7 +92,6 @@ public class CompressorStream extends CompressionOutputStream {
   public void close() throws IOException {
     if (!closed) {
       finish();
-      end();
       out.close();
       closed = true;
     }
