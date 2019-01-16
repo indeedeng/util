@@ -34,6 +34,3 @@ Utility for serializing and deserializing data to and from binary and string for
 
 # Contributing
 
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/indeedeng/util/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
