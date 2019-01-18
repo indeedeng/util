@@ -28,7 +28,7 @@ public abstract class IteratorMultiHeap<T> {
     protected IteratorMultiHeap(int capacity, Class<T> tClass) {
         this.elements = (T[])Array.newInstance(tClass, capacity);
         size = 0;
-        candidates = new int[(capacity+1)/2];
+        candidates = new int[capacity/2 + (capacity % 2)];
         nextCandidates = new int[candidates.length];
         minIndexes = new int[capacity];
         min = (T[])Array.newInstance(tClass, capacity);
