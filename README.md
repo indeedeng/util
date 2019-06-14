@@ -1,5 +1,7 @@
 # indeedeng/util
 
+![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/indeedeng/util.svg)
+
 ## [util-core](https://github.com/indeedeng/util/tree/master/util-core)
 
 General Java utilities and helper classes
@@ -28,9 +30,11 @@ Utility for performing mmap operations and direct memory access.
 
 Utility for serializing and deserializing data to and from binary and string formats.
 
+## Code of Conduct
+This project is governed by the [Contributor Covenant v 1.4.1](CODE_OF_CONDUCT.md)
+
 # License
 
 [Apache License Version 2.0](https://github.com/indeedeng/util/blob/master/LICENSE)
 
 # Contributing
-
