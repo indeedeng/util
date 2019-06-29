@@ -1,6 +1,6 @@
 # indeedeng/util
 
-![NetflixOSS Lifecycle](https://img.shields.io/osslifecycle/indeedeng/util.svg)
+![OSS Lifecycle](https://img.shields.io/osslifecycle/indeedeng/util.svg)
 
 ## [util-core](https://github.com/indeedeng/util/tree/master/util-core)
 
