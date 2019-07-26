@@ -67,7 +67,7 @@ public class NumberParsingBenchmark {
 
     public static void doNumberParsingBenchMark(final CharSource intData, final CharSource floatData, final Stopwatch stopwatchA, final Stopwatch stopwatchB, final NumberParser numberParser) throws IOException {
 
-        final Integer numInts = CharStreams.readLines(intData, new LineProcessor<Integer>() {
+        final Integer numInts = intData.readLines(new LineProcessor<Integer>() {
             private int count;
 
             @Override
@@ -86,7 +86,7 @@ public class NumberParsingBenchmark {
             }
         });
 
-        final Integer numFloats = CharStreams.readLines(floatData, new LineProcessor<Integer>() {
+        final Integer numFloats = floatData.readLines(new LineProcessor<Integer>() {
             private int count;
 
             @Override

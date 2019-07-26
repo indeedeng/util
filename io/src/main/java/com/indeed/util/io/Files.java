@@ -323,8 +323,7 @@ public class Files {
     }
 
     public static long computeFileChecksum(@Nonnull final File file, @Nonnull final Checksum checksum) throws IOException {
-        return ByteStreams.hash(com.google.common.io.Files.newInputStreamSupplier(file), Hashing.crc32())
-            .padToLong();
+        return com.google.common.io.Files.asByteSource(file).hash(Hashing.crc32()).padToLong();
     }
 
     /**
