@@ -31,7 +31,7 @@ import java.io.OutputStream;
 public class SnappyCodec implements CompressionCodec {
 
   /**
-   * Are the native snappy libraries loaded & initialized?
+   * Are the native snappy libraries loaded &amp; initialized?
    */
   public static void checkNativeCodeLoaded() {
       if (!SnappyCompressor.isNativeCodeLoaded()) {

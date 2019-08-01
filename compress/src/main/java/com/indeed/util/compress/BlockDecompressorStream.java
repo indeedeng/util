@@ -23,10 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A {@link org.apache.hadoop.io.compress.DecompressorStream} which works
+ * A {@link DecompressorStream} which works
  * with 'block-based' based compression algorithms, as opposed to 
  * 'stream-based' compression algorithms.
- *  
  */
 public class BlockDecompressorStream extends DecompressorStream {
   private int originalBlockSize = 0;
