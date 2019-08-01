@@ -22,13 +22,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * A {@link org.apache.hadoop.io.compress.CompressorStream} which works
+ * A {@link CompressorStream} which works
  * with 'block-based' based compression algorithms, as opposed to 
  * 'stream-based' compression algorithms.
  *
  * It should be noted that this wrapper does not guarantee that blocks will
  * be sized for the compressor. If the
- * {@link org.apache.hadoop.io.compress.Compressor} requires buffering to
+ * {@link Compressor} requires buffering to
  * effect meaningful compression, it is responsible for it.
  */
 public class BlockCompressorStream extends CompressorStream {

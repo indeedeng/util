@@ -9,7 +9,7 @@ package com.indeed.util.urlparsing;
 
 public class QueryStringParser {
     /**
-     * @param queryString The raw urlParams string (e.g. "key1=value1&key2=value2&key3=value3&key4=value4")
+     * @param queryString The raw urlParams string (e.g. {@code "key1=value1&key2=value2&key3=value3&key4=value4"})
      * @param callback Callback which is called for each key/value pair
      * @param storage Storage object, passed to each callback call
      */
@@ -18,12 +18,12 @@ public class QueryStringParser {
     }
 
     /**
-     * @param queryString The raw urlParams string (e.g. "key1=value1&key2=value2&key3=value3&key4=value4")
+     * @param queryString The raw urlParams string (e.g. {@code "key1=value1&key2=value2&key3=value3&key4=value4"})
      * @param callback Callback which is called for each key/value pair
      * @param storage Storage object, passed to each callback call
      * @param qsStart index into queryString param where queryString actually starts
      * @param qsEnd index into queryString param where queryString actually ends
-     * @param pairDelim String delimeter that occurs between keyvalue pairs, e.g. "&"
+     * @param pairDelim String delimeter that occurs between keyvalue pairs, e.g. {@code "&"}
      * @param kvDelim String delimeted that occurs between a key and its value, e.g. "="
      */
     public static <T> void parseQueryString(String queryString, QueryStringParserCallback<T> callback, T storage, int qsStart, int qsEnd, String pairDelim, String kvDelim) {

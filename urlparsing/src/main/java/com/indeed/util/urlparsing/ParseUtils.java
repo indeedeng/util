@@ -26,7 +26,7 @@ public final class ParseUtils {
      * Parses out an int value from the provided string, equivalent to Integer.parseInt(s.substring(start, end)),
      * but has significantly less overhead, no object creation and later garbage collection required.
      *
-     * @throws {@link NumberFormatException} if it encounters any character that is not [-0-9].
+     * @throws NumberFormatException if it encounters any character that is not [-0-9].
      */
     public static int parseSignedInt(CharSequence s, final int start, final int end) throws NumberFormatException {
         if (s.charAt(start) == '-') {
@@ -60,7 +60,7 @@ public final class ParseUtils {
      * Parses out a long value from the provided string, equivalent to Long.parseLong(s.substring(start, end)),
      * but has significantly less overhead, no object creation and later garbage collection required
      *
-     * @throws {@link NumberFormatException} if it encounters any character that is not [-0-9].
+     * @throws NumberFormatException if it encounters any character that is not [-0-9].
      */
     public static long parseSignedLong(CharSequence s, final int start, final int end) throws NumberFormatException {
         if (s.charAt(start) == '-') {
@@ -75,7 +75,7 @@ public final class ParseUtils {
      * Parses out a long value from the provided string, equivalent to Long.parseLong(s.substring(start, end)),
      * but has significantly less overhead, no object creation and later garbage collection required
      *
-     * @throws {@link NumberFormatException} if it encounters any character that is not [0-9].
+     * @throws NumberFormatException if it encounters any character that is not [0-9].
      */
     public static long parseUnsignedLong(CharSequence s, final int start, final int end) throws NumberFormatException {
         long ret = 0;
@@ -97,7 +97,7 @@ public final class ParseUtils {
      * Parses out a float value from the provided string, more specialized than Float.parseFloat(s.substring(start, end))
      * but has significantly less overhead, no object creation and later garbage collection required
      * Does not support parsing the strings "NaN", "Infinity","-Infinity" and HexFloatingPointLiterals
-     * @throws {@link NumberFormatException} if the input doesn't correspond to a float.
+     * @throws NumberFormatException if the input doesn't correspond to a float.
      */
     public static float parseFloat(String s, final int start, final int end) throws NumberFormatException {
         int i = start;

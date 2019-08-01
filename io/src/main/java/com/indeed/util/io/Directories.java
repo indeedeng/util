@@ -38,9 +38,9 @@ public final class Directories {
 
     /**
      * Convenience method to return all paths in a SMALL directory.
-     * <p/>
+     * <p>
      * DO NOT USE THIS TO TRAVERSE LARGE (multi-thousand inode) DIRECTORIES!
-     * <p/>
+     * <p>
      * For starters you shouldn't be making directories that big at all, but if you did please use
      * {@link Files#newDirectoryStream(Path)} directly in your code.
      *
