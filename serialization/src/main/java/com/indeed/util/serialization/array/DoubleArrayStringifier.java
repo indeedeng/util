@@ -24,7 +24,7 @@ public final class DoubleArrayStringifier implements Stringifier<double[]> {
     @Override
     public double[] fromString(String str) {
         List<Double> doubles = Lists.newArrayList();
-        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.WHITESPACE.or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
+        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
         Iterator<String> split = splitter.split(str.substring(1, str.length()-1));
         while (split.hasNext()) {
             doubles.add(Double.parseDouble(split.next()));

@@ -1,0 +1,12 @@
+plugins {
+    id 'java'
+}
+
+ext['indeed.publish.name'] = 'util-compress'
+
+dependencies {
+    compile project(':util-core')
+    compile 'log4j:log4j'
+
+    testCompile 'junit:junit'
+}

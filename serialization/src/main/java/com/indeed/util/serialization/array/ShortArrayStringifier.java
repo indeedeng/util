@@ -24,7 +24,7 @@ public final class ShortArrayStringifier implements Stringifier<short[]> {
     @Override
     public short[] fromString(String str) {
         List<Short> shorts = Lists.newArrayList();
-        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.WHITESPACE.or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
+        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
         Iterator<String> split = splitter.split(str.substring(1, str.length()-1));
         while (split.hasNext()) {
             shorts.add(Short.parseShort(split.next()));

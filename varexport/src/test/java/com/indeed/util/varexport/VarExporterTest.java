@@ -121,10 +121,10 @@ public class VarExporterTest {
         @Export(name="map", expand=true, cacheTimeoutMs=1L)
         public Map<String, Map<String, String>> map = Maps.newHashMap();
         {
-            map.put("m1", Maps.<String, String>newLinkedHashMap());
+            map.put("m1", Maps.newLinkedHashMap());
             map.get("m1").put("1", "one");
             map.get("m1").put("2", "two");
-            map.put("m2", Maps.<String, String>newLinkedHashMap());
+            map.put("m2", Maps.newLinkedHashMap());
             map.get("m2").put("one", "1");
             map.get("m2").put("two", "2");
         }
@@ -162,7 +162,7 @@ public class VarExporterTest {
         @Export(name="nodoc", cacheTimeoutMs=10000L)
         public String nodoc = "hi";
 
-        private AtomicReference<Integer> valRef= new AtomicReference<Integer>(num);
+        private AtomicReference<Integer> valRef = new AtomicReference(num);
         @Export(name="val", doc="cached value", cacheTimeoutMs=10000L)
         public Integer getVal() {
             return valRef.get();
@@ -174,11 +174,7 @@ public class VarExporterTest {
     VarExporter exporter;
 
     private long curTime = 0L;
-    private Supplier<Long> testClock = new Supplier<Long>() {
-        public Long get() {
-            return curTime;
-        }
-    };
+    private Supplier<Long> testClock = () -> curTime;
 
     @Before
     public void setUp() throws Exception {
@@ -202,11 +198,7 @@ public class VarExporterTest {
 
     private static Collection<String> getExportedNames(VarExporter exporter) {
         final List<String> names = Lists.newLinkedList();
-        exporter.visitVariables(new VariableVisitor() {
-            public void visit(Variable var) {
-                names.add(var.getName());
-            }
-        });
+        exporter.visitVariables(var -> names.add(var.getName()));
         return names;
     }
 
@@ -229,11 +221,11 @@ public class VarExporterTest {
         ExampleClass instance = new ExampleClass();
         exporter.export(instance, "");
         assertExportedNames(exporter, "ex1field", "ex1method", "static1field", "static1method", "myNameIsEarl");
-        assertEquals(1, exporter.getValue("ex1field"));
-        assertEquals(1, exporter.getValue("ex1method"));
+        assertEquals(1, (int) exporter.getValue("ex1field"));
+        assertEquals(1, (int) exporter.getValue("ex1method"));
         instance.ex1++;
-        assertEquals(2, exporter.getValue("ex1field"));
-        assertEquals(2, exporter.getValue("ex1method"));
+        assertEquals(2, (int) exporter.getValue("ex1field"));
+        assertEquals(2, (int) exporter.getValue("ex1method"));
     }
 
     private void assertHasTags(Set<String> tags, String... expectedTagNames) {
@@ -244,11 +236,7 @@ public class VarExporterTest {
     private void assertVariableNamesForTag(String tag, String... expectedNames) {
         final List<String> variableNames = Lists.newLinkedList();
         VarExporter.withTag(tag).visitVariables(
-                new VariableVisitor() {
-                    public void visit(Variable var) {
-                        variableNames.add(var.getName());
-                    }
-                }
+                var -> variableNames.add(var.getName())
         );
         assertThat(variableNames, Matchers.containsInAnyOrder(expectedNames));
     }
@@ -269,8 +257,8 @@ public class VarExporterTest {
     public void testNamespaceIsNull() throws Exception {
         // the namespace is stored in the map at key NULL
         // but null/global/"" are all considered the same namespace
-        assertSame(VarExporter.forNamespace(""), VarExporter.forNamespace((String) null));
-        assertSame(VarExporter.global(), VarExporter.forNamespace((String) null));
+        assertSame(VarExporter.forNamespace(""), VarExporter.forNamespace(null));
+        assertSame(VarExporter.global(), VarExporter.forNamespace(null));
         assertSame(VarExporter.global(), VarExporter.forNamespace(""));
 
         assertTrue(Lists.newArrayList(VarExporter.getNamespaces()).contains(null));
@@ -299,16 +287,13 @@ public class VarExporterTest {
         final AtomicInteger locals = new AtomicInteger(0);
         final AtomicInteger others = new AtomicInteger(0);
         // assert that all of the IAmAwesome tag variables are in the local or other namespace
-        VarExporter.withTag("IAmAwesome").visitVariables(new VariableVisitor() {
-            @Override
-            public void visit(final Variable var) {
-                if ("local".equals(var.getNamespace())) {
-                    locals.incrementAndGet();
-                } else if ("other".equals(var.getNamespace())) {
-                    others.incrementAndGet();
-                } else {
-                    fail("Saw namespace " + var.getNamespace() + " when not expecting it");
-                }
+        VarExporter.withTag("IAmAwesome").visitVariables(var -> {
+            if ("local".equals(var.getNamespace())) {
+                locals.incrementAndGet();
+            } else if ("other".equals(var.getNamespace())) {
+                others.incrementAndGet();
+            } else {
+                fail("Saw namespace " + var.getNamespace() + " when not expecting it");
             }
         });
         assertEquals(2, locals.get());
@@ -337,8 +322,8 @@ public class VarExporterTest {
         exporter.export(ExampleClass.class, "");
         assertExportedNames(exporter, "static1field", "static1method", "myNameIsEarl");
         ExampleClass.static1 = 52473L;
-        assertEquals(52473L, exporter.getValue("static1field"));
-        assertEquals(52474L, exporter.getValue("static1method"));
+        assertEquals(52473L, (long) exporter.getValue("static1field"));
+        assertEquals(52474L, (long) exporter.getValue("static1method"));
     }
 
     @Test
@@ -348,20 +333,20 @@ public class VarExporterTest {
         // export field with a custom name
         exporter.export(instance, ExampleClass.class.getField("notExported"), "", "not-exported");
         assertExportedNames(exporter, "not-exported");
-        assertEquals(0, exporter.getValue("not-exported"));
+        assertEquals(0, (int) exporter.getValue("not-exported"));
         instance.notExported = 1;
-        assertEquals(1, exporter.getValue("not-exported"));
+        assertEquals(1, (int) exporter.getValue("not-exported"));
 
         // export field with default name
         exporter.export(instance, ExampleClass.class.getField("notExported"), "", null);
         assertExportedNames(exporter, "not-exported", "notExported");
-        assertEquals(1, exporter.getValue("notExported"));
+        assertEquals(1, (int) exporter.getValue("notExported"));
 
         // export field with @Export
         exporter.export(instance, ExampleClass.class.getField("ex1"), "", "WONTUSE");
         assertExportedNames(exporter, "not-exported", "notExported", "ex1field");
         instance.ex1 = 999;
-        assertEquals(999, exporter.getValue("ex1field"));
+        assertEquals(999, (int) exporter.getValue("ex1field"));
     }
 
     @Test
@@ -371,20 +356,20 @@ public class VarExporterTest {
         // export field with a custom name
         exporter.export(instance, ExampleClass.class.getMethod("getNotExported"), "", "not-exported");
         assertExportedNames(exporter, "not-exported");
-        assertEquals(0, exporter.getValue("not-exported"));
+        assertEquals(0, (int) exporter.getValue("not-exported"));
         instance.notExported = 1;
-        assertEquals(1, exporter.getValue("not-exported"));
+        assertEquals(1, (int) exporter.getValue("not-exported"));
 
         // export field with default name
         exporter.export(instance, ExampleClass.class.getMethod("getNotExported"), "", null);
         assertExportedNames(exporter, "not-exported", "getNotExported");
-        assertEquals(1, exporter.getValue("getNotExported"));
+        assertEquals(1, (int) exporter.getValue("getNotExported"));
 
         // export field with @Export
         exporter.export(instance, ExampleClass.class.getMethod("getEx1"), "", "WONTUSE");
         assertExportedNames(exporter, "not-exported", "getNotExported", "ex1method");
         instance.ex1 = 999;
-        assertEquals(999, exporter.getValue("ex1method"));
+        assertEquals(999, (int) exporter.getValue("ex1method"));
     }
 
     @Test
@@ -393,20 +378,20 @@ public class VarExporterTest {
         exporter.export(ExampleClass.class, ExampleClass.class.getField("staticNotExported"), "", "not-exported");
         assertExportedNames(exporter, "not-exported");
         ExampleClass.staticNotExported = 0;
-        assertEquals(0, exporter.getValue("not-exported"));
+        assertEquals(0, (int) exporter.getValue("not-exported"));
         ExampleClass.staticNotExported = 1;
-        assertEquals(1, exporter.getValue("not-exported"));
+        assertEquals(1, (int) exporter.getValue("not-exported"));
 
         // export field with default name
         exporter.export(ExampleClass.class, ExampleClass.class.getField("staticNotExported"), "", null);
         assertExportedNames(exporter, "not-exported", "staticNotExported");
-        assertEquals(1, exporter.getValue("staticNotExported"));
+        assertEquals(1, (int) exporter.getValue("staticNotExported"));
 
         // export field with @Export
         exporter.export(ExampleClass.class, ExampleClass.class.getField("static1"), "", "WONTUSE");
         assertExportedNames(exporter, "not-exported", "staticNotExported", "static1field");
         ExampleClass.static1 = 999L;
-        assertEquals(999L, exporter.getValue("static1field"));
+        assertEquals(999L, (long) exporter.getValue("static1field"));
     }
 
     @Test
@@ -415,20 +400,20 @@ public class VarExporterTest {
         exporter.export(ExampleClass.class, ExampleClass.class.getMethod("getStaticNotExported"), "", "not-exported");
         assertExportedNames(exporter, "not-exported");
         ExampleClass.staticNotExported = 0;
-        assertEquals(0, exporter.getValue("not-exported"));
+        assertEquals(0, (int) exporter.getValue("not-exported"));
         ExampleClass.staticNotExported = 1;
-        assertEquals(1, exporter.getValue("not-exported"));
+        assertEquals(1, (int) exporter.getValue("not-exported"));
 
         // export field with default name
         exporter.export(ExampleClass.class, ExampleClass.class.getMethod("getStaticNotExported"), "", null);
         assertExportedNames(exporter, "not-exported", "getStaticNotExported");
-        assertEquals(1, exporter.getValue("getStaticNotExported"));
+        assertEquals(1, (int) exporter.getValue("getStaticNotExported"));
 
         // export field with @Export
         exporter.export(ExampleClass.class, ExampleClass.class.getMethod("getStatic1"), "", "WONTUSE");
         assertExportedNames(exporter, "not-exported", "getStaticNotExported", "static1method");
         ExampleClass.static1 = 999L;
-        assertEquals(1000L, exporter.getValue("static1method"));
+        assertEquals(1000L, (long) exporter.getValue("static1method"));
     }
 
     @Test
@@ -455,8 +440,8 @@ public class VarExporterTest {
         exporter.export(ExampleClass.class, "prefix-");
         assertExportedNames(exporter, "prefix-static1field", "prefix-static1method", "prefix-myNameIsEarl");
         ExampleClass.static1 = 52473L;
-        assertEquals(52473L, exporter.getValue("prefix-static1field"));
-        assertEquals(52474L, exporter.getValue("prefix-static1method"));
+        assertEquals(52473L, (long) exporter.getValue("prefix-static1field"));
+        assertEquals(52474L, (long) exporter.getValue("prefix-static1method"));
     }
 
     @Test
@@ -516,11 +501,7 @@ public class VarExporterTest {
         alt.export(instance, "");
         alt.export(instance, ExampleClass.class.getField("notExported"), "", null);
         final AtomicInteger count = new AtomicInteger(0);
-        VarExporter.visitNamespaceVariables("alt", new VariableVisitor() {
-            public void visit(Variable var) {
-                count.incrementAndGet();
-            }
-        });
+        VarExporter.visitNamespaceVariables("alt", var -> count.incrementAndGet());
         assertEquals(6, count.get());
     }
 
@@ -594,7 +575,7 @@ public class VarExporterTest {
             public int local = 50;
         }, "");
         assertEquals("test", exporter.getValue("ifcmethod1"));
-        assertEquals(50, exporter.getValue("local"));
+        assertEquals(50, (int) exporter.getValue("local"));
     }
 
     @Test
@@ -702,19 +683,19 @@ public class VarExporterTest {
         variable.setClock(testClock);
 
         curTime = 1000L;
-        assertEquals(0, exporter.getValue("num"));
+        assertEquals(0, (int) exporter.getValue("num"));
         example.num = 1;
         curTime = 2000L;
-        assertEquals(0, exporter.getValue("num"));
+        assertEquals(0, (int) exporter.getValue("num"));
         curTime = 11000L;
-        assertEquals(0, exporter.getValue("num"));
+        assertEquals(0, (int) exporter.getValue("num"));
         curTime = 11001L;
-        assertEquals(1, exporter.getValue("num"));
+        assertEquals(1, (int) exporter.getValue("num"));
         example.num = 2;
         curTime = 15000L;
-        assertEquals(1, exporter.getValue("num"));
+        assertEquals(1, (int) exporter.getValue("num"));
         curTime = 25000L;
-        assertEquals(2, exporter.getValue("num"));
+        assertEquals(2, (int) exporter.getValue("num"));
 
         StringWriter out = new StringWriter();
         exporter.dump(new PrintWriter(out, true), true);
@@ -741,26 +722,22 @@ public class VarExporterTest {
         variable.setClock(testClock);
 
         curTime = 1000L;
-        assertEquals(0, alt.getValue("val"));
+        assertEquals(0, (int) alt.getValue("val"));
         example.valRef.set(1);
         curTime = 11001L;
-        assertEquals(1, alt.getValue("val"));
+        assertEquals(1, (int) alt.getValue("val"));
         example.valRef.set(2);
         curTime = 15000L;
-        assertEquals(1, exporter.getValue("foo-val"));
-        assertEquals(1, alt.getValue("val"));
+        assertEquals(1, (int) exporter.getValue("foo-val"));
+        assertEquals(1, (int) alt.getValue("val"));
         curTime = 25000L;
-        assertEquals(2, exporter.getValue("foo-val"));
-        assertEquals(2, alt.getValue("val"));
+        assertEquals(2, (int) exporter.getValue("foo-val"));
+        assertEquals(2, (int) alt.getValue("val"));
     }
 
     private void assertVariableCount(VarExporter exporter, int expected) {
         final AtomicInteger count = new AtomicInteger(0);
-        exporter.visitVariables(new VariableVisitor() {
-            public void visit(Variable var) {
-                count.incrementAndGet();
-            }
-        });
+        exporter.visitVariables(var -> count.incrementAndGet());
         assertEquals(expected, count.get());
     }
 

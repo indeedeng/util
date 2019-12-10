@@ -4,5 +4,4 @@ jdk:
   - openjdk8
 
 script:
-  - mvn test
-
+  - ./gradlew check

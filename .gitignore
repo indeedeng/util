@@ -1,9 +1,11 @@
-**/.classpath/
-**/.settings/
-.project
+.classpath/
+.settings/
+.project/
 *.iml
 .*.sw?
 target/
 urlparsing/src/test/resources/logentries.txt.gz
-/bin
-.idea
+/bin/
+.idea/
+.gradle/
+build/
