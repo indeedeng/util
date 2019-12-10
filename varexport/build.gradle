@@ -10,11 +10,14 @@ dependencies {
 
     compileOnly 'com.google.code.findbugs:jsr305'
     compileOnly 'org.apache.tomcat:tomcat-servlet-api'
-    compileOnly 'org.freemarker:freemarker'
 
     testCompile 'junit:junit'
-    testCompile 'org.freemarker:freemarker'
     testCompile 'org.easymock:easymock'
     testCompile 'org.hamcrest:hamcrest-core'
     testCompile 'org.apache.tomcat:tomcat-servlet-api'
+
+    // Freemarker is an "optional" dependency, meaning that clients will need to include
+    // it themselves if the want to use our freemarker features.
+    compileOnly 'org.freemarker:freemarker'
+    testCompile 'org.freemarker:freemarker'
 }

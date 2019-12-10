@@ -12,7 +12,7 @@ allprojects {
                 compile 'org.apache.tomcat:tomcat-servlet-api:7.0.8'
                 compile 'org.freemarker:freemarker:2.3.16'
                 compile 'org.easymock:easymock:4.1'
-                compile 'commons-lang:commons-lang:2.4'
+                compile 'commons-lang:commons-lang:2.6'
                 compile 'org.hamcrest:hamcrest-core:2.2'
             }
         }

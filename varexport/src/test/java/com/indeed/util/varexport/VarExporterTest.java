@@ -162,7 +162,7 @@ public class VarExporterTest {
         @Export(name="nodoc", cacheTimeoutMs=10000L)
         public String nodoc = "hi";
 
-        private AtomicReference<Integer> valRef = new AtomicReference(num);
+        private AtomicReference<Integer> valRef = new AtomicReference<>(num);
         @Export(name="val", doc="cached value", cacheTimeoutMs=10000L)
         public Integer getVal() {
             return valRef.get();
