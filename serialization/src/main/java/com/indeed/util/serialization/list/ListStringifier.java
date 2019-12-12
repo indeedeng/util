@@ -17,7 +17,7 @@ import java.util.List;
 public final class ListStringifier<E> implements Stringifier<List<E>> {
     private static final Logger log = Logger.getLogger(ListStringifier.class);
 
-    private static final EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.WHITESPACE.or(CharMatcher.is(',')), EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
+    private static final EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.is(',')), EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
     
     public static <T> ListStringifier<T> arrayListStringifier(Stringifier<T> stringifier) {
         return new ListStringifier<T>(new CollectionSuppliers.ArrayListSupplier<T>(), stringifier);

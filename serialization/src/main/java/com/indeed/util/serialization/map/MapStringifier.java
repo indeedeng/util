@@ -17,7 +17,7 @@ import java.util.Map;
 public final class MapStringifier<K,V> implements Stringifier<Map<K, V>> {
     private static final Logger log = Logger.getLogger(MapStringifier.class);
 
-    private static final EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.WHITESPACE.or(CharMatcher.anyOf(",=")), EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
+    private static final EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.anyOf(",=")), EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
 
     public static <K,V> MapStringifier<K,V> hashMapStringifier(Stringifier<K> keyStringifier, Stringifier<V> valueStringifier) {
         return new MapStringifier<K, V>(new CollectionSuppliers.HashMapSupplier<K, V>(), keyStringifier, valueStringifier);

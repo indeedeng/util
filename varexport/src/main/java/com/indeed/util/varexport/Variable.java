@@ -158,7 +158,7 @@ public abstract class Variable<T> {
         StringBuilder result = null;
         for (int i = 0; i < str.length(); i++) {
             char c = str.charAt(i);
-            final boolean isAscii = CharMatcher.ASCII.matches(c);
+            final boolean isAscii = CharMatcher.ascii().matches(c);
             final boolean requiresEscape = !isAscii || (toEscape != null && toEscape.contains(c));
             if (requiresEscape && result == null) {
                 result = new StringBuilder(str.length() * 2);
@@ -185,7 +185,7 @@ public abstract class Variable<T> {
             StringBuilder b = new StringBuilder();
             for (int i = 0; i < input.length(); i++) {
                 char c = input.charAt(i);
-                if (!CharMatcher.ASCII.matches(c)) {
+                if (!CharMatcher.ascii().matches(c)) {
                     b.append(escapeChar(c));
                 } else {
                     b.append(c);

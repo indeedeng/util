@@ -99,28 +99,6 @@ QueryStringParser.parseQueryString(s, builder.buildCallback() , foo );
 
 ```
 
-Benchmarks
-------------
-Benchmarks comparing the runtime speed and gc stats are in src/test. `KeyValueParsingBenchmark` runs the parsing code over a million query strings and prints time and gc stats. Use `runKeyValueParsingBenchmark.sh` to run it. When it is run with the argument "Indeed" it uses `IndeedKeyValueParser` to parse those query strings. When no argument is given it uses `StringSplitKeyValueParser` which implements parsing with Java's `String.split` and `UrlDecoder.decode`. Our benchmark shows that `IndeedKeyValueParser` is about 4X faster than `StringSplitKeyValueParser`
-
-```
-./runKeyValueParsingBenchmark.sh Indeed
-```
-and
-```
-./runKeyValueParsingBenchMark.sh
-```
-We have also included `runNumParsingBenchmark.sh` for benchmarking the numeric parsing utilities in ParseUtils. It compares the `parseInt` and `parseFloat` methods in `ParseUtils` to Java's `Integer.parseInt` and `Float.parseFloat`. Usage is similar to the key value parsing benchmark.
-
-```
-./runNumParsingBenchmark.sh Indeed
-```
-and
-```
-./runNumParsingBenchmark.sh
-```
-JVM options are set inside these scripts at the top, like `export MAVEN_OPTS='-Xmx64M -XX:+PrintGCDetails -verbose:gc'`
-
 ## Custom delimiters
 `QueryStringParser` also has a parse method that accepts custom delimiters, instead of the default "&" and "=". For example if you had data like:
 

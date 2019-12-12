@@ -24,7 +24,7 @@ public final class CharArrayStringifier implements Stringifier<char[]> {
     @Override
     public char[] fromString(String str) {
         List<Character> chars = Lists.newArrayList();
-        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.WHITESPACE.or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
+        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
         Iterator<String> split = splitter.split(str.substring(1, str.length()-1));
         while (split.hasNext()) {
             chars.add(split.next().charAt(0));

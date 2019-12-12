@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+ext['indeed.publish.name'] = 'util-zookeeper'
+
+dependencies {
+    compile project(':io')
+    compile 'org.apache.zookeeper:zookeeper:3.4.5'
+    compile 'log4j:log4j'
+
+    testCompile 'junit:junit'
+}

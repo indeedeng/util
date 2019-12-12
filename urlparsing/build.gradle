@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+ext['indeed.publish.name'] = 'util-urlparsing'
+
+dependencies {
+    compile 'log4j:log4j'
+    compile 'it.unimi.dsi:fastutil:6.2.2'
+    compile 'com.google.guava:guava'
+
+    testCompile 'junit:junit'
+}
