@@ -16,5 +16,8 @@ allprojects {
                 compile 'org.hamcrest:hamcrest-core:2.2'
             }
         }
+        tasks.withType(JavaCompile) {
+            options.encoding = "UTF-8"
+        }
     }
 }
