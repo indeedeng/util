@@ -1,4 +1,0 @@
-    <properties>
-        <fastutil.version>6.5.15</fastutil.version>
-        <additionalparam>-Xdoclint:none</additionalparam>
-    </properties>
