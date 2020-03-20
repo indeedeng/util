@@ -5,19 +5,19 @@ plugins {
 ext['indeed.publish.name'] = 'util-varexport'
 
 dependencies {
-    compile 'com.google.guava:guava'
-    compile 'log4j:log4j'
+    compile library('com.google.guava:guava')
+    compile library('log4j:log4j')
 
-    compileOnly 'com.google.code.findbugs:jsr305'
-    compileOnly 'org.apache.tomcat:tomcat-servlet-api'
+    compileOnly library('com.google.code.findbugs:jsr305')
+    compileOnly library('org.apache.tomcat:tomcat-servlet-api')
 
-    testCompile 'junit:junit'
-    testCompile 'org.easymock:easymock'
-    testCompile 'org.hamcrest:hamcrest-core'
-    testCompile 'org.apache.tomcat:tomcat-servlet-api'
+    testCompile library('junit:junit')
+    testCompile library('org.easymock:easymock')
+    testCompile library('org.hamcrest:hamcrest-core')
+    testCompile library('org.apache.tomcat:tomcat-servlet-api')
 
     // Freemarker is an "optional" dependency, meaning that clients will need to include
     // it themselves if the want to use our freemarker features.
-    compileOnly 'org.freemarker:freemarker'
-    testCompile 'org.freemarker:freemarker'
+    compileOnly library('org.freemarker:freemarker')
+    testCompile library('org.freemarker:freemarker')
 }

@@ -5,9 +5,9 @@ plugins {
 ext['indeed.publish.name'] = 'util-serialization'
 
 dependencies {
-    compile 'log4j:log4j'
-    compile 'commons-lang:commons-lang'
-    compile 'com.google.guava:guava'
+    compile library('log4j:log4j')
+    compile library('commons-lang:commons-lang')
+    compile library('com.google.guava:guava')
 
-    testCompile 'junit:junit'
+    testCompile library('junit:junit')
 }

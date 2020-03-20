@@ -3,19 +3,22 @@ allprojects {
         repositories {
             mavenCentral()
         }
-        dependencies {
-            constraints {
-                compile 'log4j:log4j:1.2.17'
-                compile 'junit:junit:4.8.2'
-                compile 'com.google.guava:guava:19.0'
-                compile 'com.google.code.findbugs:jsr305:1.3.9'
-                compile 'org.apache.tomcat:tomcat-servlet-api:7.0.8'
-                compile 'org.freemarker:freemarker:2.3.16'
-                compile 'org.easymock:easymock:4.1'
-                compile 'commons-lang:commons-lang:2.6'
-                compile 'org.hamcrest:hamcrest-core:2.2'
-            }
+
+        def versions = [
+                'log4j:log4j': '1.2.17',
+                'junit:junit': '4.8.2',
+                'com.google.guava:guava': '19.0',
+                'com.google.code.findbugs:jsr305': '1.3.9',
+                'org.apache.tomcat:tomcat-servlet-api': '7.0.8',
+                'org.freemarker:freemarker': '2.3.16',
+                'org.easymock:easymock': '4.1',
+                'commons-lang:commons-lang': '2.6',
+                'org.hamcrest:hamcrest-core': '2.2'
+        ];
+        ext['library'] = {
+            return it + ':' + versions[it]
         }
+
         tasks.withType(JavaCompile) {
             options.encoding = "UTF-8"
         }
