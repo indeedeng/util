@@ -1,13 +1,14 @@
 package com.indeed.util.compress;
 
 import com.indeed.util.core.NativeLibraryUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author jplaisance
  */
 public final class NativeCodeLoader {
-    private static final Logger log = Logger.getLogger(NativeCodeLoader.class);
+    private static final Logger log = LogManager.getLogger(NativeCodeLoader.class);
 
     static boolean nativeCodeLoaded = false;
 

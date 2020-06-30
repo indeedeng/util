@@ -13,7 +13,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -33,7 +34,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class VarExporter implements VariableHost {
 
-    private static Logger log = Logger.getLogger(VarExporter.class);
+    private static Logger log = LogManager.getLogger(VarExporter.class);
 
     @VisibleForTesting
     protected static ManagedVariable<String> startTime = createStartTimeVariable(new Date());

@@ -1,12 +1,13 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author jplaisance
  */
 public final class ByteArray {
-    private static final Logger log = Logger.getLogger(ByteArray.class);
+    private static final Logger log = LogManager.getLogger(ByteArray.class);
     
     private final Memory buffer;
     private final long length;

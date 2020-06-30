@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -10,7 +11,7 @@ import java.lang.reflect.Field;
  * @author jplaisance
  */
 final class NativeEndianHeapDataAccess implements HeapDataAccess {
-    private static final Logger log = Logger.getLogger(NativeEndianHeapDataAccess.class);
+    private static final Logger log = LogManager.getLogger(NativeEndianHeapDataAccess.class);
 
     private static final Unsafe UNSAFE;
     private static final long BYTE_ARRAY_BASE_OFFSET;

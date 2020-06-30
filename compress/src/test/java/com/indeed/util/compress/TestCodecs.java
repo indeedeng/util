@@ -3,7 +3,8 @@ package com.indeed.util.compress;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Files;
 import junit.framework.TestCase;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,7 +18,7 @@ import java.util.Arrays;
  * @author jplaisance
  */
 public final class TestCodecs extends TestCase {
-    private static final Logger log = Logger.getLogger(TestCodecs.class);
+    private static final Logger log = LogManager.getLogger(TestCodecs.class);
 
     public static void testGzip() throws IOException {
 /*        GzipCodec codec = new GzipCodec();

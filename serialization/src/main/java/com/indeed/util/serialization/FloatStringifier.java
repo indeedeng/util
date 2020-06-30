@@ -1,12 +1,13 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author jplaisance
  */
 public final class FloatStringifier implements Stringifier<Float> {
-    private static final Logger log = Logger.getLogger(FloatStringifier.class);
+    private static final Logger log = LogManager.getLogger(FloatStringifier.class);
 
     @Override
     public String toString(Float aFloat) {

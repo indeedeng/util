@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,7 +10,7 @@ import java.io.InputStream;
  * @author jplaisance
  */
 public final class MemoryInputStream extends InputStream {
-    private static final Logger log = Logger.getLogger(MemoryInputStream.class);
+    private static final Logger log = LogManager.getLogger(MemoryInputStream.class);
 
     private final Memory memory;
 

@@ -1,7 +1,8 @@
 package com.indeed.util.mmap;
 
 import com.google.common.io.ByteStreams;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,7 +14,7 @@ import java.io.OutputStream;
  * @author jplaisance
  */
 public final class LoadIndeedMMap {
-    private static final Logger log = Logger.getLogger(LoadIndeedMMap.class);
+    private static final Logger log = LogManager.getLogger(LoadIndeedMMap.class);
 
     private static boolean loaded = false;
 

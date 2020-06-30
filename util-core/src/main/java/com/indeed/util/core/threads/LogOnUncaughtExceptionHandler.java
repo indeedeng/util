@@ -2,7 +2,8 @@ package com.indeed.util.core.threads;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class LogOnUncaughtExceptionHandler implements UncaughtExceptionHandler {
     private final Logger logger;

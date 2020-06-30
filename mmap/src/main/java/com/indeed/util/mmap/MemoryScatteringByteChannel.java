@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,7 +12,7 @@ import java.nio.channels.ScatteringByteChannel;
 */
 public final class MemoryScatteringByteChannel implements ScatteringByteChannel {
 
-    private static final Logger log = Logger.getLogger(MemoryScatteringByteChannel.class);
+    private static final Logger log = LogManager.getLogger(MemoryScatteringByteChannel.class);
 
     private boolean closed = false;
 

@@ -20,7 +20,8 @@ package com.indeed.util.compress.zlib;
 
 import com.indeed.util.compress.Compressor;
 import com.indeed.util.compress.NativeCodeLoader;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 import java.nio.Buffer;
@@ -34,7 +35,7 @@ import java.nio.ByteBuffer;
  */
 public class ZlibCompressor implements Compressor {
 
-  private static final Logger LOG = Logger.getLogger(ZlibCompressor.class);
+  private static final Logger LOG = LogManager.getLogger(ZlibCompressor.class);
 
   private static final int DEFAULT_DIRECT_BUFFER_SIZE = 64*1024;
 

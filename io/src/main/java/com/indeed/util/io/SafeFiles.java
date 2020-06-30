@@ -4,7 +4,8 @@ package com.indeed.util.io;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.indeed.util.core.io.Closeables2;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -38,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @ParametersAreNonnullByDefault
 public final class SafeFiles {
-    private static final Logger LOG = Logger.getLogger(SafeFiles.class);
+    private static final Logger LOG = LogManager.getLogger(SafeFiles.class);
 
     /**
      * Perform an atomic rename of oldName -&gt; newName and fsync the containing directory.

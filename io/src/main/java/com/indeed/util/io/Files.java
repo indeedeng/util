@@ -7,7 +7,8 @@ import com.google.common.base.Supplier;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nonnull;
 
@@ -28,7 +29,7 @@ import java.util.zip.Checksum;
 public class Files {
     // you may wish to use this particular logger sparingly, as many times it can be more helpful
     // if you log stuff to a more specific (context-specific) logger than something in common-util
-    private static final Logger LOGGER = Logger.getLogger(Files.class);
+    private static final Logger LOGGER = LogManager.getLogger(Files.class);
 
     private Files() {
     }

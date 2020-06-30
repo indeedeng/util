@@ -1,12 +1,13 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author jplaisance
  */
 public final class BooleanStringifier implements Stringifier<Boolean> {
-    private static final Logger log = Logger.getLogger(BooleanStringifier.class);
+    private static final Logger log = LogManager.getLogger(BooleanStringifier.class);
 
     @Override
     public String toString(Boolean aBoolean) {

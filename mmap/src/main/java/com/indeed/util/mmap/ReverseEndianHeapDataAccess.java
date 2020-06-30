@@ -1,12 +1,13 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author jplaisance
  */
 final class ReverseEndianHeapDataAccess implements HeapDataAccess {
-    private static final Logger log = Logger.getLogger(ReverseEndianHeapDataAccess.class);
+    private static final Logger log = LogManager.getLogger(ReverseEndianHeapDataAccess.class);
     private static final ReverseEndianHeapDataAccess instance = new ReverseEndianHeapDataAccess();
 
     private static final NativeEndianHeapDataAccess delegate = NativeEndianHeapDataAccess.getInstance();

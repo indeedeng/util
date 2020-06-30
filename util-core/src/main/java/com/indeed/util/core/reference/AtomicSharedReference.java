@@ -2,7 +2,8 @@ package com.indeed.util.core.reference;
 
 import com.google.common.base.Function;
 import com.indeed.util.core.io.Closeables2;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.io.Closeable;
@@ -19,7 +20,7 @@ import java.io.IOException;
  * @author jplaisance
  */
 public final class AtomicSharedReference<T> {
-    private static final Logger log = Logger.getLogger(AtomicSharedReference.class);
+    private static final Logger log = LogManager.getLogger(AtomicSharedReference.class);
 
     public static <T> AtomicSharedReference<T> create() {
         return new AtomicSharedReference<T>();

@@ -1,6 +1,7 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -10,7 +11,7 @@ import java.io.IOException;
  * @author jplaisance
  */
 public final class VarULongSerializer implements Serializer<Long> {
-    private static final Logger log = Logger.getLogger(VarULongSerializer.class);
+    private static final Logger log = LogManager.getLogger(VarULongSerializer.class);
 
     private static final long MAX_31 = 0x7FFFFFFF;
     public static final int HIGH_BIT = 1 << 31;

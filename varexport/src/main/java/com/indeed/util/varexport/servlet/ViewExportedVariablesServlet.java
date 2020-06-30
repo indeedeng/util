@@ -12,7 +12,8 @@ import com.indeed.util.varexport.VariableVisitor;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -35,7 +36,7 @@ import java.util.*;
  */
 public class ViewExportedVariablesServlet extends HttpServlet {
 
-    private static final Logger log = Logger.getLogger(ViewExportedVariablesServlet.class);
+    private static final Logger log = LogManager.getLogger(ViewExportedVariablesServlet.class);
 
     private static final Joiner COMMA_JOINER = Joiner.on(',');
 

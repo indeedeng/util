@@ -1,6 +1,7 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -11,7 +12,7 @@ import java.io.IOException;
  */
 public final class ByteSerializer implements Serializer<Byte> {
 
-    private static final Logger log = Logger.getLogger(ByteSerializer.class);
+    private static final Logger log = LogManager.getLogger(ByteSerializer.class);
 
     @Override
     public void write(final Byte val, final DataOutput out) throws IOException {

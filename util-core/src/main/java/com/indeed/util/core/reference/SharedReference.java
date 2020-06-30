@@ -1,6 +1,7 @@
 package com.indeed.util.core.reference;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import javax.annotation.Nullable;
 import java.io.Closeable;
@@ -22,7 +23,7 @@ import java.io.IOException;
  */
 public final class SharedReference<T> implements Closeable {
 
-    private static final Logger log = Logger.getLogger(SharedReference.class);
+    private static final Logger log = LogManager.getLogger(SharedReference.class);
 
     private static final boolean debug = Boolean.getBoolean("com.indeed.common.util.reference.SharedReference.debug");
 

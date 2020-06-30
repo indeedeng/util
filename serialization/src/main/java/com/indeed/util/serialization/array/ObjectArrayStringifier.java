@@ -2,7 +2,8 @@ package com.indeed.util.serialization.array;
 
 import com.indeed.util.serialization.Stringifier;
 import com.indeed.util.serialization.list.ListStringifier;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import java.util.List;
 * @author jplaisance
 */
 public final class ObjectArrayStringifier<E> implements Stringifier<E[]> {
-    private static final Logger log = Logger.getLogger(ObjectArrayStringifier.class);
+    private static final Logger log = LogManager.getLogger(ObjectArrayStringifier.class);
 
     private final ListStringifier<E> listStringifier;
     private final Class<E> type;

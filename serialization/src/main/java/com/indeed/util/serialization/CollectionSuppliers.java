@@ -4,7 +4,8 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.TreeMap;
  * @author jplaisance
  */
 public final class CollectionSuppliers {
-    private static final Logger log = Logger.getLogger(CollectionSuppliers.class);
+    private static final Logger log = LogManager.getLogger(CollectionSuppliers.class);
 
     public static class HashMapSupplier<K, V> implements Supplier<Map<K, V>> {
         @Override

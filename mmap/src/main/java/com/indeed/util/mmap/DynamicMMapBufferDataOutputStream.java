@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.DataOutput;
 import java.io.File;
@@ -16,7 +17,7 @@ import java.util.List;
  */
 public final class DynamicMMapBufferDataOutputStream extends OutputStream implements DataOutput {
 
-    private static final Logger log = Logger.getLogger(DynamicMMapBufferDataOutputStream.class);
+    private static final Logger log = LogManager.getLogger(DynamicMMapBufferDataOutputStream.class);
 
     private MMapBuffer buffer;
 

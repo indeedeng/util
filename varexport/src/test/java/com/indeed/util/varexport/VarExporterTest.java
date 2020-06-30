@@ -7,9 +7,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.indeed.util.varexport.external.PublicClass;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Level;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -33,6 +38,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.apache.logging.log4j.core.appender.ConsoleAppender.Target;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -186,9 +192,19 @@ public class VarExporterTest {
 
     @BeforeClass
     public static void initClass() {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.ERROR);
-        Logger.getLogger("com.indeed").setLevel(Level.ERROR);
+        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+        final Configuration config = builder.setStatusLevel(Level.ERROR)
+                                      .setConfigurationName("Indeed Logging")
+                                      .add(builder.newAppender("stderr", "Console")
+                                                  .addAttribute("target", Target.SYSTEM_ERR))
+                                      .add(builder.newAsyncLogger("com.indeed", Level.DEBUG)
+                                                  .add(builder.newAppenderRef("stderr"))
+                                                  .addAttribute("addivity", false))
+                                      .add(builder.newAsyncRootLogger(Level.ERROR)
+                                                  .add(builder.newAppenderRef("stderr"))
+                                                  .addAttribute("additivity", false))
+                                      .build();
+        Configurator.initialize(builder.build());
     }
 
     @After
@@ -587,7 +603,9 @@ public class VarExporterTest {
 
     @Test
     public void testConcreteClassImplementingInterfaceAgain() {
-        Logger.getRootLogger().setLevel(Level.WARN);
+        LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
+        ctx.getConfiguration().getLoggerConfig(LogManager.ROOT_LOGGER_NAME).setLevel(Level.WARN);
+        ctx.updateLoggers(); 
         exporter.export(new ConcreteClassImplementingInterfaceAgain(), "");
         assertEquals("", exporter.getValue("ifcmethod1"));
         assertEquals("yes", exporter.getValue("something#else"));

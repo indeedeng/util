@@ -1,13 +1,14 @@
 package com.indeed.util.core.reference;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * @author jplaisance
  */
 public final class WeakSharedReference<T> {
 
-    private static final Logger log = Logger.getLogger(WeakSharedReference.class);
+    private static final Logger log = LogManager.getLogger(WeakSharedReference.class);
 
     public static <T> WeakSharedReference<T> create(SharedReference<T> ref) {
         return new WeakSharedReference<T>(ref);
