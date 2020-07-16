@@ -25,6 +25,8 @@ import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
+import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 /**
@@ -110,6 +112,22 @@ public class ViewExportedVariablesServletTest {
         assertLines(getOutput(servlet, "", "VEVST2"), "ex2field=2", "ex4field=four");
         assertLines(getOutput(servlet, "", "VEVST3"), "ex3field=3", "ex1method=1");
         assertLines(getOutput(servlet, "", "nothing"), "null");
+    }
+
+    @Test
+    public void notFoundIsServedOnMissingNamespace() throws IOException {
+        final String nonExistentNamespace = "a-nonexistent-namespace";
+
+        assertFalse(VarExporter.getNamespaces().contains(nonExistentNamespace));
+
+        final HttpServletResponse response = createMock(HttpServletResponse.class);
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified namespace not found");
+        replay(response);
+
+        setupServlet().showVariables("/private/v", response, nonExistentNamespace, "", true, ViewExportedVariablesServlet.DisplayType.HTML);
+        verify(response);
+
+        assertFalse(VarExporter.getNamespaces().contains(nonExistentNamespace));
     }
 
     @Before

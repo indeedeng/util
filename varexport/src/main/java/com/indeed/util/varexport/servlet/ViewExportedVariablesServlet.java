@@ -214,13 +214,18 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         if (!Strings.isNullOrEmpty(tag)) {
             exporter = VarExporter.withTag(tag);
         } else if (!Strings.isNullOrEmpty(namespace)) {
-            exporter = VarExporter.forNamespace(namespace);
+            final Optional<VarExporter> maybeExporter = VarExporter.forNamespaceIfExists(namespace);
+            if (!maybeExporter.isPresent()) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified namespace not found");
+                return;
+            }
+            exporter = maybeExporter.get();
         } else {
             exporter = VarExporter.global();
         }
+
         final PrintWriter out = response.getWriter();
         response.setContentType(displayType.mimeType);
-
         switch(displayType) {
             case HTML:
                 showUsingTemplate(exporter, uri, namespace, includeDoc, varHtmlTemplate, true, out, vars);

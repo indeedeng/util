@@ -80,6 +80,16 @@ public class VarExporter implements VariableHost {
     }
 
     /**
+     * Look up an exporter for the specified namespace.
+     *
+     * @param namespace the namespace to look up an exporter for
+     * @return the exporter for the specified namespace, or {@link Optional#empty()}, if the namespace does not exist
+     */
+    public static synchronized Optional<VarExporter> forNamespaceIfExists(@Nonnull final String namespace) {
+        return Optional.ofNullable(namespaces.get(namespace));
+    }
+
+    /**
      * Load an exporter with a specified class.
      * @param clazz Class type from which variables will be exported.
      * @param declaredFieldsOnly if true, will not export any variable belonging to superclasses of {@code clazz}.

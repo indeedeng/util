@@ -28,6 +28,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -828,5 +829,19 @@ public class VarExporterTest {
     public void testExportIncompatibleType2() {
         final VarExporter exporter = VarExporter.forNamespace(ExampleClass.class, true);
         exporter.export(ExampleNeedingEscaping.class, "");
+    }
+
+    @Test
+    public void forNamespaceIfExistsReturnsEmptyOnNonExistentNamespace() {
+        assertEquals(Optional.empty(), VarExporter.forNamespaceIfExists("a-nonexistent-namespace"));
+    }
+
+    @Test
+    public void forNamespaceIfExistsReturnsNamespace() {
+        final String ns = "a-test-namespace";
+        final VarExporter varExporter = VarExporter.forNamespace(ns);
+        final Optional<VarExporter> maybeVarExporter = VarExporter.forNamespaceIfExists(ns);
+        assertTrue(maybeVarExporter.isPresent());
+        assertSame(varExporter, maybeVarExporter.get());
     }
 }
