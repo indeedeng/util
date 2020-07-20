@@ -130,6 +130,40 @@ public class ViewExportedVariablesServletTest {
         assertFalse(VarExporter.getNamespaces().contains(nonExistentNamespace));
     }
 
+    @Test
+    public void escapesHtmlInVariableNamesAndValues() throws IOException {
+        final StringWriter bodyWriter = new StringWriter();
+
+        final HttpServletResponse response = createMock(HttpServletResponse.class);
+        response.setContentType("text/html");
+        expectLastCall().once();
+        expect(response.getWriter()).andReturn(new PrintWriter(bodyWriter)).once();
+        replay(response);
+
+        final String unescaped = "<img src='https://goo.gl/1nzcxx'/>";
+        VarExporter.global().export(
+                ManagedVariable
+                        .builder()
+                        .setName(unescaped)
+                        .setValue(unescaped)
+                        .build()
+        );
+
+        setupServlet()
+                .showVariables(
+                        "/private/v",
+                        response,
+                        "",
+                        "",
+                        false,
+                        ViewExportedVariablesServlet.DisplayType.HTML
+                        );
+
+        verify(response);
+
+        assertFalse(bodyWriter.toString().contains(unescaped));
+    }
+
     @Before
     public void setUp() throws Exception {
         VarExporter.resetGlobal();

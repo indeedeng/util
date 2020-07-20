@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>${name} variables at ${date}</title>
+<title>${name?html} variables at ${date?html}</title>
 <style type="text/css">
     input {
         width: 300px;
@@ -67,18 +67,18 @@
 <body>
 <input id="input" placeholder="You can query with multiple words" disabled>
 <table>
-    <caption>${name} variables at ${date}</caption>
+    <caption>${name?html} variables at ${date?html}</caption>
     <thead>
         <tr><th>Name</th><th>Value</th><#if includeDoc><th>Doc</th><th>Last Updated</th></#if></tr>
     </thead>
     <tbody id="tbody">
     <#list vars as var>
         <tr>
-            <td data-key="${var.name}">${var.name}</td>
-            <td>${var.valueString}</td>
+            <td data-key="${var.name?html}">${var.name?html}</td>
+            <td>${var.valueString?html}</td>
             <#if includeDoc>
-            <td>${var.doc}</td>
-            <td><#if var.lastUpdated??>${var.lastUpdated?c}</#if></td>
+            <td>${var.doc?html}</td>
+            <td><#if var.lastUpdated??>${var.lastUpdated?html}</#if></td>
             </#if>
         </tr>
     </#list>
