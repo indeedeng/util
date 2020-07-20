@@ -232,7 +232,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         } else if (!Strings.isNullOrEmpty(namespace)) {
             final Optional<VarExporter> maybeExporter = VarExporter.forNamespaceIfExists(namespace);
             if (!maybeExporter.isPresent()) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified namespace not found");
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified namespace was not found");
                 return;
             }
             exporter = maybeExporter.get();

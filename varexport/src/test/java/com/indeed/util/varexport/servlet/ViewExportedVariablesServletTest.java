@@ -126,7 +126,7 @@ public class ViewExportedVariablesServletTest {
         assertFalse(VarExporter.getNamespaces().contains(nonExistentNamespace));
 
         final HttpServletResponse response = createMock(HttpServletResponse.class);
-        response.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified namespace not found");
+        response.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified namespace was not found");
         replay(response);
 
         setupServlet().showVariables("/private/v", response, nonExistentNamespace, "", true, ViewExportedVariablesServlet.DisplayType.HTML);
