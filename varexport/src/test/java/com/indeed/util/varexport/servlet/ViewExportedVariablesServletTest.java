@@ -2,6 +2,8 @@ package com.indeed.util.varexport.servlet;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.TreeMultimap;
 import com.indeed.util.varexport.Export;
 import com.indeed.util.varexport.ManagedVariable;
 import com.indeed.util.varexport.VarExporter;
@@ -19,13 +21,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
@@ -162,6 +167,63 @@ public class ViewExportedVariablesServletTest {
         verify(response);
 
         assertFalse(bodyWriter.toString().contains(unescaped));
+    }
+
+    @Test
+    public void buildAlphaNumericNGramIndex() {
+        final TreeMultimap<String, Integer> expectedTriGramIndex = TreeMultimap.create();
+        expectedTriGramIndex.put("abc", 0);
+        expectedTriGramIndex.put("bcd", 0);
+        expectedTriGramIndex.put("bcd", 1);
+        expectedTriGramIndex.put("zzz", 2);
+
+        final SetMultimap<String, Integer> actualTriGramIndex = ViewExportedVariablesServlet.buildAlphanumericNGramIndex(
+                Arrays.asList(
+                        ManagedVariable.builder().setName("abcd").build(),
+                        ManagedVariable.builder().setName("bcd").build(),
+                        ManagedVariable.builder().setName("zzz").build()
+                ),
+                3
+        );
+
+        assertEquals(expectedTriGramIndex, actualTriGramIndex);
+    }
+
+    @Test
+    public void alphanumericNGrams() {
+        assertEquals(0, ViewExportedVariablesServlet.alphanumericNGrams(null, 1).count());
+        assertEquals(0, ViewExportedVariablesServlet.alphanumericNGrams("zzz", 42).count());
+
+        assertEquals(
+                Arrays.asList("m", "1", "3", "b", "i", "t", "r", "i"),
+                ViewExportedVariablesServlet
+                        .alphanumericNGrams("m1-3-/bi<</tri", 1)
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                Arrays.asList("m1", "bi", "tr", "ri"),
+                ViewExportedVariablesServlet
+                        .alphanumericNGrams("m1-3-/bi<</tri", 2)
+                        .collect(Collectors.toList())
+        );
+
+        assertEquals(
+                Arrays.asList(
+                        "m1x",
+                        "1x3",
+                        "x3d",
+                        "3dc",
+                        "dca",
+                        "cas",
+                        "ase",
+                        "tri",
+                        "tri"
+                ),
+                ViewExportedVariablesServlet
+                        .alphanumericNGrams("m1x3dCaSe-1-/bi<</tri?tri", 3)
+                        .collect(Collectors.toList())
+        );
     }
 
     @Before

@@ -51,6 +51,11 @@ public abstract class Variable<T> {
         return name;
     }
 
+    /**
+     * @deprecated do not use this.
+     * Please implement your own tokenization of variable names, if needed.
+     */
+    @Deprecated
     public String[] getIndexableNames() {
         return indexableNames;
     }

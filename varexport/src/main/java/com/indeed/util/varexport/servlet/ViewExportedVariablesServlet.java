@@ -4,7 +4,11 @@ package com.indeed.util.varexport.servlet;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.SetMultimap;
+import com.google.common.collect.TreeMultimap;
 import com.indeed.util.varexport.VarExporter;
 import com.indeed.util.varexport.Variable;
 import com.indeed.util.varexport.VariableHost;
@@ -14,6 +18,7 @@ import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import org.apache.log4j.Logger;
 
+import javax.annotation.Nullable;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -25,7 +30,18 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 /**
  * Servlet for displaying variables exported by {@link VarExporter}.
@@ -287,8 +303,7 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         }
         root.put("vars", varList);
         if (withIndex) {
-            final String varsIndex = buildIndex(varList);
-            root.put("varsIndex", varsIndex);
+            root.put("varsIndex", alphanumericNGramIndexesJSON(varList));
         }
 
         try {
@@ -298,19 +313,24 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         }
     }
 
-    private String buildIndex(final List<Variable> varList) {
-        final SetMultimap<String, Integer> uniGram = buildNGramIndex(varList, 1);
-        final SetMultimap<String, Integer> biGram = buildNGramIndex(varList, 2);
-        final SetMultimap<String, Integer> triGram = buildNGramIndex(varList, 3);
+    private String alphanumericNGramIndexesJSON(final List<Variable> varList) {
+        // The JSON we build here is valid as we only use alphanumeric n-grams
+
         final StringBuilder json = new StringBuilder();
+
         json.append('{').append('\n');
-        json.append("\"uniGram\":").append('\n');
-        appendTo(json, uniGram).append(',').append('\n');
+
+        json.append("\n\"uniGram\":").append('\n');
+        appendTo(json, buildAlphanumericNGramIndex(varList, 1)).append(',').append('\n');
+
         json.append("\"biGram\":").append('\n');
-        appendTo(json, biGram).append(',').append('\n');;
+        appendTo(json, buildAlphanumericNGramIndex(varList, 2)).append(',').append('\n');;
+
         json.append("\"triGram\":").append('\n');
-        appendTo(json, triGram);
+        appendTo(json, buildAlphanumericNGramIndex(varList, 3));
+
         json.append('}');
+
         return json.toString();
     }
 
@@ -333,19 +353,32 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         return json;
     }
 
-    private SetMultimap<String, Integer> buildNGramIndex(final List<Variable> varList, final int n) {
-        final TreeMultimap<String, Integer> uniGram = TreeMultimap.create();
-        for (int index = 0; index < varList.size(); index++) {
-            final Variable var = varList.get(index);
-            final String[] indexableNames = var.getIndexableNames();
-            for (final String indexableName : indexableNames) {
-                for (int i = 0; i < indexableName.length() - n + 1; i++) {
-                    final String key = indexableName.substring(i, i + n);
-                    uniGram.put(key, index);
-                }
-            }
+    @VisibleForTesting
+    static SetMultimap<String, Integer> buildAlphanumericNGramIndex(final List<Variable> varList, final int n) {
+        final TreeMultimap<String, Integer> nGramIndex = TreeMultimap.create();
+        IntStream
+                .range(0, varList.size())
+                .forEach(i ->
+                        alphanumericNGrams(varList.get(i).getName(), n)
+                                .forEach(ngram -> nGramIndex.put(ngram, i))
+                );
+        return nGramIndex;
+    }
+
+    private static final Pattern NON_ALPHANUMERIC = Pattern.compile("[^a-z0-9]+");
+
+    @VisibleForTesting
+    static Stream<String> alphanumericNGrams(@Nullable final String in, final int n) {
+        if (in == null) {
+            return Stream.empty();
         }
-        return uniGram;
+        return NON_ALPHANUMERIC
+                .splitAsStream(in.toLowerCase(Locale.US))
+                .flatMap(alnumSubString ->
+                        IntStream
+                                .rangeClosed(0, alnumSubString.length() - n)
+                                .mapToObj(i -> alnumSubString.substring(i, i + n))
+                );
     }
 
     private void addVariable(final Variable v, final List<Variable> out) {
