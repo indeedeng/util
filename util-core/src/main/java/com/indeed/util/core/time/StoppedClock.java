@@ -7,8 +7,11 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Simple wall clock frozen to a moment in time.
  *
+ * @deprecated with {@link WallClock}. Use a mocking framework with a mocked {@link java.time.Clock} instead.
+ *
  * @author matts
  */
+@Deprecated
 public final class StoppedClock implements WallClock {
     @Nonnull private final AtomicLong millis;
 
