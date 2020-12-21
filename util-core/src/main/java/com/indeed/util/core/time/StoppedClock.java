@@ -1,5 +1,7 @@
 package com.indeed.util.core.time;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -7,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Simple wall clock frozen to a moment in time.
  *
- * @deprecated with {@link WallClock}. Use a mocking framework with a mocked {@link java.time.Clock} instead.
+ * @deprecated with {@link WallClock}. Use {@link java.time.Clock#fixed(Instant, ZoneId)} instead.
  *
  * @author matts
  */
