@@ -2,7 +2,8 @@
 package com.indeed.util.core;
 
 import com.indeed.util.varexport.VarExporter;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * Runnable implementation of the {@link HasDataLoadingVariables} class that
@@ -11,7 +12,7 @@ import org.apache.log4j.Logger;
  * @author jack@indeed.com (Jack Humphrey)
  */
 public abstract class DataLoadingRunnable extends DataLoadTimer implements HasDataLoadingVariables, Runnable {
-    private static final Logger log = Logger.getLogger(DataLoadingRunnable.class);
+    private static final Logger log = LogManager.getLogger(DataLoadingRunnable.class);
 
     // use this for your implementation of load()
     public enum ReloadState {

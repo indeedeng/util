@@ -7,9 +7,13 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.Configuration;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilder;
+import org.apache.logging.log4j.core.config.builder.api.ConfigurationBuilderFactory;
+import org.apache.logging.log4j.core.config.builder.impl.BuiltConfiguration;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
@@ -21,6 +25,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.apache.logging.log4j.core.appender.ConsoleAppender.Target;
 
 /**
  * @author jack@indeed.com (Jack Humphrey)
@@ -43,9 +49,19 @@ public class ManagedVariableTest {
 
     @BeforeClass
     public static void initClass() {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.ERROR);
-        Logger.getLogger("com.indeed").setLevel(Level.ERROR);
+        ConfigurationBuilder<BuiltConfiguration> builder = ConfigurationBuilderFactory.newConfigurationBuilder();
+        final Configuration config = builder.setStatusLevel(Level.ERROR)
+                                      .setConfigurationName("Indeed Logging")
+                                      .add(builder.newAppender("stderr", "Console")
+                                                  .addAttribute("target", Target.SYSTEM_ERR))
+                                      .add(builder.newAsyncLogger("com.indeed", Level.DEBUG)
+                                                  .add(builder.newAppenderRef("stderr"))
+                                                  .addAttribute("addivity", false))
+                                      .add(builder.newAsyncRootLogger(Level.ERROR)
+                                                  .add(builder.newAppenderRef("stderr"))
+                                                  .addAttribute("additivity", false))
+                                      .build();
+        Configurator.initialize(builder.build());
     }
 
     @After

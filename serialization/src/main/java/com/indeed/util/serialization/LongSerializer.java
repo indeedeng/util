@@ -1,6 +1,7 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -11,7 +12,7 @@ import java.io.IOException;
  */
 public final class LongSerializer implements Serializer<Long> {
 
-    private static final Logger log = Logger.getLogger(LongSerializer.class);
+    private static final Logger log = LogManager.getLogger(LongSerializer.class);
 
     @Override
     public void write(final Long l, final DataOutput out) throws IOException {

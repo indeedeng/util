@@ -1,6 +1,7 @@
 package com.indeed.util.urlparsing.benchmark;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public class StringSplitKeyValueParser implements KeyValueParser {
 
-    private static final Logger LOGGER = Logger.getLogger(StringSplitKeyValueParser.class);
+    private static final Logger LOGGER = LogManager.getLogger(StringSplitKeyValueParser.class);
 
     @Override
     public void parse(String log) {

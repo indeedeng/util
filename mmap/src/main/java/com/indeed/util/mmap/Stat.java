@@ -2,7 +2,8 @@ package com.indeed.util.mmap;
 
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -16,7 +17,7 @@ import java.nio.ByteOrder;
  */
 public final class Stat {
 
-    private static final Logger log = Logger.getLogger(Stat.class);
+    private static final Logger log = LogManager.getLogger(Stat.class);
 
     private static final Field fdField;
 

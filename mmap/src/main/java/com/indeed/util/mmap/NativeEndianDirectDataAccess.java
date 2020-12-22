@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
@@ -9,7 +10,7 @@ import java.lang.reflect.Field;
  * @author jplaisance
  */
 final class NativeEndianDirectDataAccess implements DirectDataAccess {
-    private static final Logger log = Logger.getLogger(NativeEndianDirectDataAccess.class);
+    private static final Logger log = LogManager.getLogger(NativeEndianDirectDataAccess.class);
 
     private static final Unsafe UNSAFE;
     private static final NativeEndianDirectDataAccess instance = new NativeEndianDirectDataAccess();

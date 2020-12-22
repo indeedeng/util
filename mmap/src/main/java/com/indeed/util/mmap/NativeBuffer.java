@@ -1,7 +1,8 @@
 package com.indeed.util.mmap;
 
 import com.google.common.base.Throwables;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import sun.misc.Unsafe;
 
 import java.io.Closeable;
@@ -17,7 +18,7 @@ import java.nio.ByteOrder;
  * @author jplaisance
  */
 public final class NativeBuffer implements BufferResource {
-    private static final Logger log = Logger.getLogger(NativeBuffer.class);
+    private static final Logger log = LogManager.getLogger(NativeBuffer.class);
 
     private static final Unsafe UNSAFE;
     private static final Field FD_FIELD;

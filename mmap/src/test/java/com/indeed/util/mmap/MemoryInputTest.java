@@ -1,7 +1,8 @@
 package com.indeed.util.mmap;
 
 import junit.framework.TestCase;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -12,7 +13,7 @@ import java.nio.channels.FileChannel;
  * @author goodwin
  */
 public class MemoryInputTest extends TestCase {
-    private static final Logger log = Logger.getLogger(MemoryInputTest.class);
+    private static final Logger log = LogManager.getLogger(MemoryInputTest.class);
 
     int length = 120000;
 

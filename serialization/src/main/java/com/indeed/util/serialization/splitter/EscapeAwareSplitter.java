@@ -4,7 +4,8 @@ import com.google.common.base.CharMatcher;
 import com.google.common.base.Supplier;
 import com.google.common.collect.AbstractIterator;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Iterator;
 
@@ -12,7 +13,7 @@ import java.util.Iterator;
  * @author jplaisance
  */
 public final class EscapeAwareSplitter {
-    private static final Logger log = Logger.getLogger(EscapeAwareSplitter.class);
+    private static final Logger log = LogManager.getLogger(EscapeAwareSplitter.class);
     
     public static final Supplier<Lexer> NO_ESCAPE_LEXER_SUPPLIER = new Supplier<Lexer>() {
         @Override

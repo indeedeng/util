@@ -3,7 +3,8 @@ package com.indeed.util.mmap;
 import com.google.common.io.Files;
 import com.google.common.io.LittleEndianDataOutputStream;
 import junit.framework.TestCase;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -19,7 +20,7 @@ import java.nio.channels.FileChannel;
  */
 public final class TestWeirdStuff extends TestCase {
 
-    private static final Logger log = Logger.getLogger(TestWeirdStuff.class);
+    private static final Logger log = LogManager.getLogger(TestWeirdStuff.class);
 
     File tmpDir;
 

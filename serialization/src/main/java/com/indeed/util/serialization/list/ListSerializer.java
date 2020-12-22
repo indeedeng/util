@@ -4,7 +4,8 @@ import com.google.common.base.Supplier;
 import com.indeed.util.serialization.CollectionSuppliers;
 import com.indeed.util.serialization.LengthVIntSerializer;
 import com.indeed.util.serialization.Serializer;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -15,7 +16,7 @@ import java.util.List;
  * @author jplaisance
  */
 public final class ListSerializer<T> implements Serializer<List<T>> {
-    private static final Logger log = Logger.getLogger(ListSerializer.class);
+    private static final Logger log = LogManager.getLogger(ListSerializer.class);
 
     private static final LengthVIntSerializer lengthSerializer = new LengthVIntSerializer();
 

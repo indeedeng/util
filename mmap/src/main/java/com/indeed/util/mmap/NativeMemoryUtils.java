@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.nio.ByteBuffer;
 
@@ -8,7 +9,7 @@ import java.nio.ByteBuffer;
  * @author jplaisance
  */
 final class NativeMemoryUtils {
-    private static final Logger log = Logger.getLogger(NativeMemoryUtils.class);
+    private static final Logger log = LogManager.getLogger(NativeMemoryUtils.class);
 
     static {
         LoadIndeedMMap.loadLibrary();

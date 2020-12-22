@@ -6,7 +6,8 @@ import com.indeed.util.serialization.CollectionSuppliers;
 import com.indeed.util.serialization.Stringifier;
 import com.indeed.util.serialization.splitter.EscapeAwareSplitter;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -15,7 +16,7 @@ import java.util.Map;
  * @author jplaisance
  */
 public final class MapStringifier<K,V> implements Stringifier<Map<K, V>> {
-    private static final Logger log = Logger.getLogger(MapStringifier.class);
+    private static final Logger log = LogManager.getLogger(MapStringifier.class);
 
     private static final EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.anyOf(",=")), EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
 

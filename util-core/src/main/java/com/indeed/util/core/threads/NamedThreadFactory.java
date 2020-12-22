@@ -4,7 +4,8 @@ import com.indeed.util.core.threads.LogOnUncaughtExceptionHandler;
 
 import java.util.concurrent.ThreadFactory;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * ThreadFactory implementation that creates threads with descriptive names.
@@ -26,7 +27,7 @@ public class NamedThreadFactory implements ThreadFactory {
     }
 
     public NamedThreadFactory(final String threadName, String loggerName){
-        this(threadName, false, Logger.getLogger(loggerName));
+        this(threadName, false, LogManager.getLogger(loggerName));
     }
 
     public NamedThreadFactory(final String threadName, final Logger logger) {
@@ -60,8 +61,8 @@ public class NamedThreadFactory implements ThreadFactory {
         }
         final Class<? extends Runnable> runnableClass = r.getClass();
         if (runnableClass.getPackage().getName().startsWith("com.indeed.")) {
-            return Logger.getLogger(runnableClass);
+            return LogManager.getLogger(runnableClass);
         }
-        return Logger.getLogger(NamedThreadFactory.class);
+        return LogManager.getLogger(NamedThreadFactory.class);
     }
 }

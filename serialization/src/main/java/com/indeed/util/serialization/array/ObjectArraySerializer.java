@@ -2,7 +2,8 @@ package com.indeed.util.serialization.array;
 
 import com.indeed.util.serialization.LengthVIntSerializer;
 import com.indeed.util.serialization.Serializer;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -13,7 +14,7 @@ import java.lang.reflect.Array;
  * @author jplaisance
  */
 public final class ObjectArraySerializer<E> implements Serializer<E[]> {
-    private static final Logger log = Logger.getLogger(ObjectArraySerializer.class);
+    private static final Logger log = LogManager.getLogger(ObjectArraySerializer.class);
 
     private static final LengthVIntSerializer lengthSerializer = new LengthVIntSerializer();
 

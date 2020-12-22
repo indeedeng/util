@@ -1,6 +1,7 @@
 package com.indeed.util.zookeeper;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.apache.zookeeper.AsyncCallback;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
@@ -21,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class ZooKeeperConnection {
 
-    private static final Logger log = Logger.getLogger(ZooKeeperConnection.class);
+    private static final Logger log = LogManager.getLogger(ZooKeeperConnection.class);
 
     private ZooKeeper zooKeeper;
 

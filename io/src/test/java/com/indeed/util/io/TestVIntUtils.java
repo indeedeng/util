@@ -1,7 +1,8 @@
 package com.indeed.util.io;
 
 import junit.framework.TestCase;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -11,7 +12,7 @@ import java.io.ByteArrayOutputStream;
  */
 public final class TestVIntUtils extends TestCase {
 
-    private static final Logger log = Logger.getLogger(TestVIntUtils.class);
+    private static final Logger log = LogManager.getLogger(TestVIntUtils.class);
 
     int[] ints = new int[]{1, -1, 0, Integer.MAX_VALUE, Integer.MIN_VALUE, 63, -64, 64, -65};
 

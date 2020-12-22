@@ -3,7 +3,8 @@ package com.indeed.util.serialization;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import junit.framework.TestCase;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.IOException;
 
@@ -11,7 +12,7 @@ import java.io.IOException;
  * @author jplaisance
  */
 public final class TestVarULongSerializer extends TestCase {
-    private static final Logger log = Logger.getLogger(TestVarULongSerializer.class);
+    private static final Logger log = LogManager.getLogger(TestVarULongSerializer.class);
 
     public void testStuff() throws IOException {
         testLong(0);

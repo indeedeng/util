@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -11,7 +12,7 @@ import java.io.IOException;
  */
 public final class NativeFileUtils {
 
-    private static final Logger log = Logger.getLogger(NativeFileUtils.class);
+    private static final Logger log = LogManager.getLogger(NativeFileUtils.class);
 
     public static long du(String path) throws IOException {
 

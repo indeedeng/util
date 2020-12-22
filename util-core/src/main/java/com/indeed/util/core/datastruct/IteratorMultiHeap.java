@@ -1,6 +1,7 @@
 package com.indeed.util.core.datastruct;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 import java.lang.reflect.Array;
 
@@ -9,7 +10,7 @@ import java.lang.reflect.Array;
  */
 public abstract class IteratorMultiHeap<T> {
 
-    private static final Logger log = Logger.getLogger(IteratorMultiHeap.class);
+    private static final Logger log = LogManager.getLogger(IteratorMultiHeap.class);
 
     private final T[] elements;
 
