@@ -1,12 +1,9 @@
-plugins {
-    id 'java'
-}
-
-ext['indeed.publish.name'] = 'util-mmap'
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-mmap'
 
 dependencies {
-    compile library('com.google.guava:guava')
-    compile library('log4j:log4j')
+    implementation libs.guava
+    implementation libs.log4j
 
-    testCompile library('junit:junit')
+    testImplementation libs.junit
 }

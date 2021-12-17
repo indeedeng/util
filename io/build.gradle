@@ -1,16 +1,13 @@
-plugins {
-    id 'java'
-}
-
-ext['indeed.publish.name'] = 'util-io'
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-io'
 
 dependencies {
-    compile project(':serialization')
-    compile project(':util-core')
-    compile library('com.google.guava:guava')
-    compile library('log4j:log4j')
+    implementation project(':serialization')
+    implementation project(':util-core')
+    implementation libs.guava
+    implementation libs.log4j
 
-    compileOnly library('com.google.code.findbugs:jsr305')
+    compileOnly libs.jsr305
 
-    testCompile library('junit:junit')
+    testImplementation libs.junit
 }
