@@ -1,6 +1,7 @@
 package com.indeed.util.io;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -9,7 +10,7 @@ import java.util.Arrays;
  * @author jplaisance
  */
 public final class UnsafeByteArrayOutputStream extends OutputStream {
-    private static final Logger log = Logger.getLogger(UnsafeByteArrayOutputStream.class);
+    private static final Logger log = LoggerFactory.getLogger(UnsafeByteArrayOutputStream.class);
     
     private byte[] buf;
     private int count = 0;

@@ -6,15 +6,10 @@ import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.indeed.util.varexport.external.PublicClass;
-
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.io.PrintWriter;
@@ -183,13 +178,6 @@ public class VarExporterTest {
         exporter = VarExporter.global();
 
         VarExporter.startTime = null;
-    }
-
-    @BeforeClass
-    public static void initClass() {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.ERROR);
-        Logger.getLogger("com.indeed").setLevel(Level.ERROR);
     }
 
     @After
@@ -588,7 +576,6 @@ public class VarExporterTest {
 
     @Test
     public void testConcreteClassImplementingInterfaceAgain() {
-        Logger.getRootLogger().setLevel(Level.WARN);
         exporter.export(new ConcreteClassImplementingInterfaceAgain(), "");
         assertEquals("", exporter.getValue("ifcmethod1"));
         assertEquals("yes", exporter.getValue("something#else"));

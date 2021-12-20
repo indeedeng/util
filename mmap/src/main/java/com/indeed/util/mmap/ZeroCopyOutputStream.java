@@ -1,7 +1,8 @@
 package com.indeed.util.mmap;
 
 import com.google.common.io.ByteStreams;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -16,7 +17,7 @@ import java.nio.ByteOrder;
  * @author jplaisance
  */
 public final class ZeroCopyOutputStream extends OutputStream implements DataOutput {
-    private static final Logger log = Logger.getLogger(ZeroCopyOutputStream.class);
+    private static final Logger log = LoggerFactory.getLogger(ZeroCopyOutputStream.class);
 
     private NativeBuffer buffer;
     private DirectMemory memory;

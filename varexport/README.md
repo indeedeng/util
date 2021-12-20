@@ -155,14 +155,3 @@ Drop in to your `web.xml`. Example (URL path /debug/v):
         <url-pattern>/debug/v</url-pattern>
     </servlet-mapping>
 ```
-
-
-## Dependencies
-
-- guava (16.0.1 ok)
-- log4j
-- servlet API (optional)
-- freemarker (optional for servlet)
-- junit-dep (4.X
-- removes bundled hamcrest-core)
-- hamcrest-library (1.3)

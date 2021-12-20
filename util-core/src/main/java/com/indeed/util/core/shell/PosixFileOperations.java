@@ -3,7 +3,8 @@ package com.indeed.util.core.shell;
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.CharStreams;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,7 +24,7 @@ import java.util.ArrayDeque;
  */
 public final class PosixFileOperations {
 
-    private static final Logger log = Logger.getLogger(PosixFileOperations.class);
+    private static final Logger log = LoggerFactory.getLogger(PosixFileOperations.class);
 
     private static final String separator = System.getProperty("file.separator");
 

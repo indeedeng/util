@@ -4,7 +4,8 @@ import com.google.common.base.CharMatcher;
 import com.google.common.collect.Lists;
 import com.indeed.util.serialization.Stringifier;
 import com.indeed.util.serialization.splitter.EscapeAwareSplitter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Iterator;
@@ -14,7 +15,7 @@ import java.util.List;
  * @author jplaisance
  */
 public final class CharArrayStringifier implements Stringifier<char[]> {
-    private static final Logger log = Logger.getLogger(CharArrayStringifier.class);
+    private static final Logger log = LoggerFactory.getLogger(CharArrayStringifier.class);
 
     @Override
     public String toString(char[] chars) {

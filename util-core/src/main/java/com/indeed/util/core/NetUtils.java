@@ -2,7 +2,8 @@ package com.indeed.util.core;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,7 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  *
  */
 public class NetUtils {
-    private static final Logger log = Logger.getLogger(NetUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(NetUtils.class);
     private static volatile Optional<String> OPT_HOSTNAME = Optional.absent();
 
     /**

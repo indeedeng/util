@@ -1,12 +1,8 @@
 // Copyright 2015 Indeed
 package com.indeed.util.io;
 
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -77,13 +73,5 @@ public class DirectoriesTest {
     @Before
     public void init() {
         root = tempDir.getRoot().toPath();
-    }
-
-    @BeforeClass
-    public static void initClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.WARN);
-        Logger.getLogger("com.indeed").setLevel(Level.DEBUG);
     }
 }

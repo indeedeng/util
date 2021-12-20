@@ -3,12 +3,8 @@ package com.indeed.util.io;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -16,8 +12,8 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.file.*;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Set;
@@ -262,11 +258,4 @@ public class SafeFilesTest {
         root = tempDir.getRoot().toPath();
     }
 
-    @BeforeClass
-    public static void initClass() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.WARN);
-        Logger.getLogger("com.indeed").setLevel(Level.DEBUG);
-    }
 }

@@ -1,18 +1,27 @@
 package com.indeed.util.core.threads;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import org.apache.log4j.Logger;
-
 public class LogOnUncaughtExceptionHandler implements UncaughtExceptionHandler {
-    private final Logger logger;
 
-    public LogOnUncaughtExceptionHandler(final Logger logger) {
-        this.logger = logger;
+    public static final Logger log = LoggerFactory.getLogger(LogOnUncaughtExceptionHandler.class);
+
+    public LogOnUncaughtExceptionHandler() {
+    }
+
+    /**
+     * @deprecated Use {@link #LogOnUncaughtExceptionHandler()}
+     */
+    @Deprecated
+    public LogOnUncaughtExceptionHandler(final org.apache.log4j.Logger logger) {
+        this();
     }
 
     @Override
     public void uncaughtException(final Thread t, final Throwable e) {
-        logger.error("Uncaught throwable in thread " + t.getName() + "/" + t.getId(), e);
+        log.error("Uncaught throwable in thread " + t.getName() + "/" + t.getId(), e);
     }
 }

@@ -6,7 +6,8 @@ import com.indeed.util.serialization.CollectionSuppliers;
 import com.indeed.util.serialization.Stringifier;
 import com.indeed.util.serialization.splitter.EscapeAwareSplitter;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.List;
  * @author jplaisance
  */
 public final class ListStringifier<E> implements Stringifier<List<E>> {
-    private static final Logger log = Logger.getLogger(ListStringifier.class);
+    private static final Logger log = LoggerFactory.getLogger(ListStringifier.class);
 
     private static final EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.is(',')), EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
     
