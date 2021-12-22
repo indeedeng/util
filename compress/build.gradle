@@ -6,4 +6,5 @@ dependencies {
     implementation libs.log4j
 
     testImplementation libs.junit
+    testImplementation libs.guava
 }
