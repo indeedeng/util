@@ -40,7 +40,7 @@ public final class ReloadableSharedReference<T, E extends Throwable> {
         private static final Closer<Closeable> closeableCloser = new Closer<Closeable>() {
             @Override
             public void close(final Closeable closeable) {
-                Closeables2.closeQuietly(closeable);
+                Closeables2.close(closeable);
             }
         };
 

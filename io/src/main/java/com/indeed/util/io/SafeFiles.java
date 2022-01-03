@@ -247,7 +247,7 @@ public final class SafeFiles {
 
             //noinspection ConstantConditions
             if (fc != null) {
-                Closeables2.closeQuietly(fc);
+                Closeables2.close(fc);
             }
 
             Throwables.propagateIfInstanceOf(e, IOException.class);
@@ -335,7 +335,7 @@ public final class SafeFiles {
         @Override
         public void close() throws IOException {
             if (!closed) {
-                Closeables2.closeQuietly(fileChannel);
+                Closeables2.close(fileChannel);
                 deleteIfExistsQuietly(tempFile);
 
                 closed = true;

@@ -101,7 +101,7 @@ public final class AtomicSharedReference<T> {
      * Unsets the reference, closing with Closeables2.closeQuietly().
      */
     public synchronized void unsetQuietly() {
-        if (ref != null) Closeables2.closeQuietly(ref);
+        if (ref != null) Closeables2.close(ref);
         ref = null;
     }
 
@@ -177,7 +177,7 @@ public final class AtomicSharedReference<T> {
                 return function.apply(localRef.get());
             }
         } finally {
-            if (localRef != null) Closeables2.closeQuietly(localRef);
+            if (localRef != null) Closeables2.close(localRef);
         }
     }
 }
