@@ -1,6 +1,7 @@
 package com.indeed.util.io;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -13,7 +14,7 @@ import java.io.OutputStream;
  */
 public final class VIntUtils {
 
-    private static final Logger log = Logger.getLogger(VIntUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(VIntUtils.class);
 
     public static int writeVInt(OutputStream out, int i) throws IOException {
         if (i < 0) {

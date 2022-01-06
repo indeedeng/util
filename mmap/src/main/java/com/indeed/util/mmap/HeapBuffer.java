@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteOrder;
@@ -9,7 +10,7 @@ import java.nio.ByteOrder;
  * @author jplaisance
  */
 public final class HeapBuffer implements BufferResource {
-    private static final Logger log = Logger.getLogger(HeapBuffer.class);
+    private static final Logger log = LoggerFactory.getLogger(HeapBuffer.class);
 
     private final HeapMemory memory;
 

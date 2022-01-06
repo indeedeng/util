@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -9,7 +10,7 @@ import java.nio.ByteOrder;
  * @author jplaisance
  */
 public final class DirectMemory extends AbstractMemory {
-    private static final Logger log = Logger.getLogger(DirectMemory.class);
+    private static final Logger log = LoggerFactory.getLogger(DirectMemory.class);
     private static final boolean debug = true;
 
     private final ByteOrder order;

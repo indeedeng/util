@@ -1,6 +1,7 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.DataInput;
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.io.IOException;
  */
 public final class MemoryDataInput implements DataInput {
 
-    private static final Logger log = Logger.getLogger(MemoryDataInput.class);
+    private static final Logger log = LoggerFactory.getLogger(MemoryDataInput.class);
     
     private final Memory memory;
 

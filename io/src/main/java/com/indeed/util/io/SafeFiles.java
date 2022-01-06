@@ -4,7 +4,8 @@ package com.indeed.util.io;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.indeed.util.core.io.Closeables2;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -38,7 +39,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  */
 @ParametersAreNonnullByDefault
 public final class SafeFiles {
-    private static final Logger LOG = Logger.getLogger(SafeFiles.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SafeFiles.class);
 
     /**
      * Perform an atomic rename of oldName -&gt; newName and fsync the containing directory.
@@ -246,7 +247,7 @@ public final class SafeFiles {
 
             //noinspection ConstantConditions
             if (fc != null) {
-                Closeables2.closeQuietly(fc, LOG);
+                Closeables2.close(fc);
             }
 
             Throwables.propagateIfInstanceOf(e, IOException.class);
@@ -333,8 +334,8 @@ public final class SafeFiles {
          */
         @Override
         public void close() throws IOException {
-            if (! closed) {
-                Closeables2.closeQuietly(fileChannel, LOG);
+            if (!closed) {
+                Closeables2.close(fileChannel);
                 deleteIfExistsQuietly(tempFile);
 
                 closed = true;

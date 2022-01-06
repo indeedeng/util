@@ -1,12 +1,13 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jplaisance
  */
 public final class StringStringifier implements Stringifier<String> {
-    private static final Logger log = Logger.getLogger(StringStringifier.class);
+    private static final Logger log = LoggerFactory.getLogger(StringStringifier.class);
 
     @Override
     public String toString(String s) {

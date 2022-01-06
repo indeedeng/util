@@ -2,7 +2,7 @@ indeedOss.activateFeature 'library'
 indeedLibrary.name = 'util-serialization'
 
 dependencies {
-    implementation libs.log4j
+    implementation libs.slf4jApi
     implementation libs.commonsLang
     implementation libs.guava
 

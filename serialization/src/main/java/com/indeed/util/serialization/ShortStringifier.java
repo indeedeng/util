@@ -1,12 +1,13 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jplaisance
  */
 public final class ShortStringifier implements Stringifier<Short> {
-    private static final Logger log = Logger.getLogger(ShortStringifier.class);
+    private static final Logger log = LoggerFactory.getLogger(ShortStringifier.class);
 
     @Override
     public String toString(Short aShort) {

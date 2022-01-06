@@ -2,7 +2,7 @@ indeedOss.activateFeature 'library'
 indeedLibrary.name = 'util-urlparsing'
 
 dependencies {
-    implementation libs.log4j
+    implementation libs.slf4jApi
     implementation 'it.unimi.dsi:fastutil:6.2.2'
     implementation libs.guava
 

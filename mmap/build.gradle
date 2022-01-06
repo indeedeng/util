@@ -3,7 +3,7 @@ indeedLibrary.name = 'util-mmap'
 
 dependencies {
     implementation libs.guava
-    implementation libs.log4j
+    implementation libs.slf4jApi
 
     testImplementation libs.junit
 }

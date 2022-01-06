@@ -5,13 +5,32 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.hash.Hashing;
-import com.google.common.io.ByteStreams;
-
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.FilterOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
@@ -22,13 +41,10 @@ import java.util.regex.Pattern;
 import java.util.zip.CRC32;
 import java.util.zip.Checksum;
 
-/**
- * @author ahudson
- */
 public class Files {
     // you may wish to use this particular logger sparingly, as many times it can be more helpful
     // if you log stuff to a more specific (context-specific) logger than something in common-util
-    private static final Logger LOGGER = Logger.getLogger(Files.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(Files.class);
 
     private Files() {
     }
@@ -45,24 +61,12 @@ public class Files {
 
     /**
      * Serializes an object to a file, throws an exception if it fails
-     *
-     * @param obj object to write to a file
-     * @param file path to save the object to
-     * @throws java.io.IOException if the existing file could not be erased, or the file could not be written, flushed, synced, or closed
-     */
-    public static void writeObjectToFileOrDie(@Nonnull final Object obj, @Nonnull final String file) throws IOException {
-        writeObjectToFileOrDie(obj, file, LOGGER);
-    }
-
-    /**
-     * Serializes an object to a file, throws an exception if it fails
      * 
      * @param obj object to write to a file
      * @param file path to save the object to
-     * @param log logger to use
      * @throws java.io.IOException if the existing file could not be erased, or the file could not be written, flushed, synced, or closed
      */
-    public static void writeObjectToFileOrDie(@Nonnull final Object obj, @Nonnull final String file, @Nonnull final Logger log) throws IOException {
+    public static void writeObjectToFileOrDie2(@Nonnull final Object obj, @Nonnull final String file) throws IOException {
         Preconditions.checkNotNull(file, "file argument is required!");
         Preconditions.checkArgument(!file.isEmpty(), "file argument is required!");
 
@@ -73,7 +77,7 @@ public class Files {
 
         // write object to temporary file that is flushed, fsynced, and closed by the time it returns
         final ObjectOutputStreamCallback callback = new ObjectOutputStreamCallback(obj);
-        final File tmpFile = writeDataToTempFileOrDie(callback, targetFile, log);
+        final File tmpFile = writeDataToTempFileOrDie2(callback, targetFile);
         final long checksumForWrittenData = callback.getChecksumValue();
 
         // verify that what we WROTE to the disk is then immediately READABLE before allowing the rename to happen
@@ -88,6 +92,15 @@ public class Files {
             throw new IOException("Could not rename '" + tmpFile + "' to '" + targetFile + "'.");
         }
     }
+
+    /**
+     * @deprecated Use {@link #writeObjectToFileOrDie2(java.lang.Object, java.lang.String)}
+     */
+    @Deprecated
+    public static void writeObjectToFileOrDie(@Nonnull final Object obj, @Nonnull final String file, @Nonnull final org.apache.log4j.Logger log) throws IOException {
+        writeObjectToFileOrDie2(obj, file);
+    }
+
     private static class ObjectOutputStreamCallback implements OutputStreamCallback {
         private long checksumForWrittenData = 0L;
         @Nonnull
@@ -157,11 +170,9 @@ public class Files {
 
     // return a reference to a temp file that contains the written + flushed + fsynced + closed data
     @Nonnull
-    private static File writeDataToTempFileOrDie(@Nonnull final OutputStreamCallback callback,
-                                                 @Nonnull final File targetFile,
-                                                 @Nonnull final Logger log) throws IOException {
+    private static File writeDataToTempFileOrDie2(@Nonnull final OutputStreamCallback callback,
+                                                  @Nonnull final File targetFile) throws IOException {
         Preconditions.checkNotNull(callback, "callback argument is required!");
-        Preconditions.checkNotNull(log, "log argument is required!");
         Preconditions.checkNotNull(targetFile, "targetFile argument is required!");
 
         FileOutputStream fileOut = null;
@@ -198,14 +209,23 @@ public class Files {
         }
     }
 
+    /**
+     * @deprecated Use {@link Files#writeDataToTempFileOrDie2(com.indeed.util.io.Files.OutputStreamCallback, java.io.File)}
+     */
+    @Deprecated
     @Nonnull
-    private static File writeTextToTempFileOrDie(
+    private static File writeDataToTempFileOrDie(@Nonnull final OutputStreamCallback callback,
+                                                 @Nonnull final File targetFile,
+                                                 @Nonnull final org.apache.log4j.Logger log) throws IOException {
+        return writeDataToTempFileOrDie2(callback, targetFile);
+    }
+
+    @Nonnull
+    private static File writeTextToTempFileOrDie2(
             @Nonnull final String[] text,
-            @Nonnull final File targetFile,
-            @Nonnull final Logger log
+            @Nonnull final File targetFile
     ) throws IOException {
         Preconditions.checkNotNull(text, "callback argument is required!");
-        Preconditions.checkNotNull(log, "log argument is required!");
         Preconditions.checkNotNull(targetFile, "targetFile argument is required!");
 
         final String targetFinalName = targetFile.getName();
@@ -238,19 +258,16 @@ public class Files {
     }
 
     /**
-     * Writes an object to a file only if it is different from the current
-     * contents of the file, or if the file does not exist.  Note that you must
-     * have enough heap to contain the entire contents of the object graph.
-     *
-     * @param obj object to write to a file
-     * @param file path to save the object to
-     * @return true if the file was actually written, false if the file was unchanged
-     * @throws java.io.IOException if the existing file could not be read for comparison,
-     *                             if the existing file could not be erased,
-     *                             or if the new file could not be written, flushed, synced, or closed
+     * @deprecated Use {@link #writeTextToTempFileOrDie2(java.lang.String[], java.io.File)}
      */
-    public static boolean writeObjectIfChangedOrDie(@Nonnull final Object obj, @Nonnull final String file) throws IOException {
-        return writeObjectIfChangedOrDie(obj, file, LOGGER);
+    @Deprecated
+    @Nonnull
+    private static File writeTextToTempFileOrDie(
+            @Nonnull final String[] text,
+            @Nonnull final File targetFile,
+            @Nonnull final org.apache.log4j.Logger log
+    ) throws IOException {
+        return writeTextToTempFileOrDie2(text, targetFile);
     }
 
     /**
@@ -260,15 +277,12 @@ public class Files {
      *
      * @param obj object to write to a file
      * @param file path to save the object to
-     * @param log logger to use
      * @return true if the file was actually written, false if the file was unchanged
      * @throws java.io.IOException if the existing file could not be read for comparison,
      *                             if the existing file could not be erased, 
      *                             or if the new file could not be written, flushed, synced, or closed
      */
-    public static boolean writeObjectIfChangedOrDie(@Nonnull final Object obj, @Nonnull final String file, @Nonnull final Logger log) throws IOException {
-        Preconditions.checkNotNull(log, "log argument is required!");
-
+    public static boolean writeObjectIfChangedOrDie2(@Nonnull final Object obj, @Nonnull final String file) throws IOException {
         Preconditions.checkNotNull(file, "file argument is required!");
         Preconditions.checkArgument(!file.isEmpty(), "file argument is required!");
 
@@ -293,15 +307,12 @@ public class Files {
             final File targetFile = new File(file);
 
             // write object to temporary file that is flushed, fsynced, and closed by the time it returns
-            final File tmpFile = writeDataToTempFileOrDie(new OutputStreamCallback(){
-                @Override
-                public void writeAndFlushData(@Nonnull OutputStream outputStream) throws IOException {
-                    // write the data
-                    baos.writeTo(outputStream);
-                    // flush it, so that the fsync() has everything it needs
-                    outputStream.flush();
-                }
-            }, targetFile, log);
+            final File tmpFile = writeDataToTempFileOrDie2(outputStream -> {
+                // write the data
+                baos.writeTo(outputStream);
+                // flush it, so that the fsync() has everything it needs
+                outputStream.flush();
+            }, targetFile);
 
             // verify that what we WROTE to the disk is then immediately READABLE before allowing the rename to happen
             checksum.reset();
@@ -322,6 +333,14 @@ public class Files {
         }
     }
 
+    /**
+     * @deprecated Use {@link #writeObjectIfChangedOrDie2(java.lang.Object, java.lang.String)}
+     */
+    @Deprecated
+    public static boolean writeObjectIfChangedOrDie(@Nonnull final Object obj, @Nonnull final String file, @Nonnull final org.apache.log4j.Logger log) throws IOException {
+        return writeObjectIfChangedOrDie2(obj, file);
+    }
+
     public static long computeFileChecksum(@Nonnull final File file, @Nonnull final Checksum checksum) throws IOException {
         return com.google.common.io.Files.asByteSource(file).hash(Hashing.crc32()).padToLong();
     }
@@ -329,12 +348,12 @@ public class Files {
     /**
      * Writes an object to a file.
      * @return true if the file was successfully written, false otherwise
-     * @deprecated use {@link #writeObjectToFileOrDie(Object, String, org.apache.log4j.Logger)} instead
+     * @deprecated use {@link #writeObjectToFileOrDie2(Object, String)} instead
      */
     @Deprecated
     public static boolean writeObjectToFile(Object obj, String file) {
         try {
-            writeObjectToFileOrDie(obj, file, LOGGER);
+            writeObjectToFileOrDie2(obj, file);
             return true;
         } catch (Exception e) {
             LOGGER.error(e.getClass() + ": writeObjectToFile(" + file + ") encountered exception: " + e.getMessage(), e);
@@ -348,24 +367,16 @@ public class Files {
      * have enough heap to contain the entire contents of the object graph.
      *
      * @return true if the file was actually written, false otherwise
-     * @deprecated use {@link #writeObjectIfChangedOrDie(Object, String, org.apache.log4j.Logger)} instead
+     * @deprecated use {@link #writeObjectIfChangedOrDie2(Object, String)} instead
      */
     @Deprecated
     public static boolean writeObjectIfChanged(Object obj, String filepath) {
         try {
-            return writeObjectIfChangedOrDie(obj, filepath, LOGGER);
+            return writeObjectIfChangedOrDie2(obj, filepath);
         } catch (Exception e) {
             LOGGER.error(e.getClass() + ": writeObjectIfChanged(" + filepath + ") encountered exception: " + e.getMessage(), e);
             return false;
         }
-    }
-
-    /**
-     * Returns true iff the bytes in an array are different from the bytes
-     * contained in the given file, or if the file does not exist.
-     */
-    private static boolean isChanged(byte[] bytes, String filepath) throws IOException {
-        return isChanged(bytes, bytes.length,  filepath);
     }
 
     /**
@@ -642,7 +653,7 @@ public class Files {
     ) throws IOException {
         // Write out a temp file (or die)
         final File f = new File(file);
-        final File temp = writeTextToTempFileOrDie(lines, f, LOGGER);
+        final File temp = writeTextToTempFileOrDie2(lines, f);
         // Rename the temp file if writing succeeded
         if (!temp.renameTo(f)) {
             throw new IOException(String.format(

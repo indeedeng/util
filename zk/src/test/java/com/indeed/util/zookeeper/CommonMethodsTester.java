@@ -1,6 +1,7 @@
 package com.indeed.util.zookeeper;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.beans.BeanInfo;
 import java.beans.Introspector;
@@ -11,7 +12,7 @@ import java.lang.reflect.Method;
  * @author jplaisance
  */
 public final class CommonMethodsTester {
-    private static final Logger log = Logger.getLogger(CommonMethodsTester.class);
+    private static final Logger log = LoggerFactory.getLogger(CommonMethodsTester.class);
 
     public static void testObjectMethods(Class c) {
         try {

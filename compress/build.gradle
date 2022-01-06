@@ -3,7 +3,7 @@ indeedLibrary.name = 'util-compress'
 
 dependencies {
     implementation project(':util-core')
-    implementation libs.log4j
+    implementation libs.slf4jApi
 
     testImplementation libs.junit
     testImplementation libs.guava

@@ -2,7 +2,8 @@ package com.indeed.util.core.reference;
 
 import com.google.common.base.Supplier;
 import com.indeed.util.core.io.Closeables2;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.Closeable;
@@ -13,7 +14,7 @@ import java.io.IOException;
  */
 public final class ReloadableSharedReference<T, E extends Throwable> {
 
-    private static final Logger log = Logger.getLogger(ReloadableSharedReference.class);
+    private static final Logger log = LoggerFactory.getLogger(ReloadableSharedReference.class);
 
     public static <T extends Closeable, E extends Throwable> ReloadableSharedReference<T, E> create(Loader<T, E> loader) {
         return new ReloadableSharedReference<T, E>(loader, Closer.<T>closeableCloser());
@@ -39,7 +40,7 @@ public final class ReloadableSharedReference<T, E extends Throwable> {
         private static final Closer<Closeable> closeableCloser = new Closer<Closeable>() {
             @Override
             public void close(final Closeable closeable) {
-                Closeables2.closeQuietly(closeable, log);
+                Closeables2.close(closeable);
             }
         };
 

@@ -4,7 +4,7 @@ indeedLibrary.name = 'util-zookeeper'
 dependencies {
     implementation project(':io')
     implementation 'org.apache.zookeeper:zookeeper:3.4.5'
-    implementation libs.log4j
+    implementation libs.slf4jApi
 
     testImplementation libs.junit
 }

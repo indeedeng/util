@@ -2,7 +2,8 @@ package com.indeed.util.core.reference;
 
 import com.google.common.base.Function;
 import com.indeed.util.core.io.Closeables2;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.io.Closeable;
@@ -19,7 +20,7 @@ import java.io.IOException;
  * @author jplaisance
  */
 public final class AtomicSharedReference<T> {
-    private static final Logger log = Logger.getLogger(AtomicSharedReference.class);
+    private static final Logger log = LoggerFactory.getLogger(AtomicSharedReference.class);
 
     public static <T> AtomicSharedReference<T> create() {
         return new AtomicSharedReference<T>();
@@ -100,7 +101,7 @@ public final class AtomicSharedReference<T> {
      * Unsets the reference, closing with Closeables2.closeQuietly().
      */
     public synchronized void unsetQuietly() {
-        if (ref != null) Closeables2.closeQuietly(ref, log);
+        if (ref != null) Closeables2.close(ref);
         ref = null;
     }
 
@@ -176,7 +177,7 @@ public final class AtomicSharedReference<T> {
                 return function.apply(localRef.get());
             }
         } finally {
-            if (localRef != null) Closeables2.closeQuietly(localRef, log);
+            if (localRef != null) Closeables2.close(localRef);
         }
     }
 }
