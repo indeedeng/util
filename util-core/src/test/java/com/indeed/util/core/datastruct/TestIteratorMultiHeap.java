@@ -3,7 +3,8 @@ package com.indeed.util.core.datastruct;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.Ints;
 import junit.framework.TestCase;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.List;
@@ -15,7 +16,7 @@ import java.util.Random;
  */
 public final class TestIteratorMultiHeap extends TestCase {
 
-    private static final Logger log = Logger.getLogger(TestIteratorMultiHeap.class);
+    private static final Logger log = LoggerFactory.getLogger(TestIteratorMultiHeap.class);
 
     public static final class RandomIntIterator {
 

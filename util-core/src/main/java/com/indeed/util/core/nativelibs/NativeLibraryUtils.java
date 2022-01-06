@@ -2,7 +2,8 @@ package com.indeed.util.core.nativelibs;
 
 import com.google.common.base.Strings;
 import com.google.common.io.ByteStreams;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +16,7 @@ import java.io.OutputStream;
  */
 public final class NativeLibraryUtils {
 
-    private static final Logger log = Logger.getLogger(NativeLibraryUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(NativeLibraryUtils.class);
 
     public static void loadLibrary(String name) {
         loadLibrary(name, "");

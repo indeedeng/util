@@ -1,12 +1,13 @@
 package com.indeed.util.mmap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jplaisance
  */
 public final class LongArray {
-    private static final Logger log = Logger.getLogger(LongArray.class);
+    private static final Logger log = LoggerFactory.getLogger(LongArray.class);
 
     private static final long TYPE_SIZE = 8;
 

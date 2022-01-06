@@ -8,7 +8,12 @@ dependencies {
     compile project(':serialization')
     compile project(':util-core')
     compile library('com.google.guava:guava')
-    compile library('log4j:log4j')
+    compile library('org.slf4j:slf4j-api')
+
+    // This is a fake copy of the log4j1 Logger, which allows us to continue
+    // accepting it in our deprecated method signatures without accidentially using
+    // any of its functionality.
+    compileOnly project(':log4j1dummyshim')
 
     compileOnly library('com.google.code.findbugs:jsr305')
 

@@ -9,12 +9,8 @@ import com.indeed.util.varexport.ManagedVariable;
 import com.indeed.util.varexport.VarExporter;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.hamcrest.Matchers;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import javax.servlet.http.HttpServletResponse;
@@ -229,12 +225,5 @@ public class ViewExportedVariablesServletTest {
     @Before
     public void setUp() throws Exception {
         VarExporter.resetGlobal();
-    }
-
-    @BeforeClass
-    public static void initClass() {
-        BasicConfigurator.configure();
-        Logger.getRootLogger().setLevel(Level.ERROR);
-        Logger.getLogger("com.indeed").setLevel(Level.ERROR);
     }
 }

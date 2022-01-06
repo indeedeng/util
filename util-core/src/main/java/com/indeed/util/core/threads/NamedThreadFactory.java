@@ -1,43 +1,64 @@
 package com.indeed.util.core.threads;
 
-import com.indeed.util.core.threads.LogOnUncaughtExceptionHandler;
-
 import java.util.concurrent.ThreadFactory;
-
-import org.apache.log4j.Logger;
 
 /**
  * ThreadFactory implementation that creates threads with descriptive names.
  * Helpful when creating thread pools using the Executor class.
+ * @deprecated Use {@link com.google.common.util.concurrent.ThreadFactoryBuilder#setNameFormat}
  */
+@Deprecated
 public class NamedThreadFactory implements ThreadFactory {
     private final String threadNamePrefix;
     private final String threadName;
     private final boolean isDaemon;
     private int threadCount = 0;
-    private final Logger logger;
 
+    /**
+     * @deprecated Use {@link com.google.common.util.concurrent.ThreadFactoryBuilder#setNameFormat}
+     */
+    @Deprecated
     public NamedThreadFactory(final String threadName) {
         this(threadName, false);
     }
 
+    /**
+     * @deprecated Use {@link com.google.common.util.concurrent.ThreadFactoryBuilder#setNameFormat}
+     * NOTE: Using this constructor will result in a javac compilation error if log4j is not on the classpath
+     * because of the other legacy override. Switch to the linked alternative if this happens in your project.
+     */
+    @Deprecated
     public NamedThreadFactory(final String threadName, boolean isDaemon) {
-        this(threadName, isDaemon, null);
-    }
-
-    public NamedThreadFactory(final String threadName, String loggerName){
-        this(threadName, false, Logger.getLogger(loggerName));
-    }
-
-    public NamedThreadFactory(final String threadName, final Logger logger) {
-        this(threadName, false, logger);
-    }
-
-    public NamedThreadFactory(final String threadName, boolean isDaemon, final Logger logger) {
         this.threadName = threadName;
         this.threadNamePrefix = threadName + "-Thread-";
         this.isDaemon = isDaemon;
-        this.logger = logger;
+    }
+
+    /**
+     * @deprecated Use {@link com.google.common.util.concurrent.ThreadFactoryBuilder#setNameFormat}
+     * NOTE: Using this constructor will result in a javac compilation error if log4j is not on the classpath
+     * because of the other legacy override. Switch to the linked alternative if this happens in your project.
+     */
+    @Deprecated
+    public NamedThreadFactory(final String threadName, String loggerName) {
+        this(threadName);
+    }
+
+    /**
+     * @deprecated Use {@link com.google.common.util.concurrent.ThreadFactoryBuilder#setNameFormat}
+     */
+    @Deprecated
+    public NamedThreadFactory(final String threadName, final org.apache.log4j.Logger logger) {
+        this(threadName);
+        new LogOnUncaughtExceptionHandler(logger);
+    }
+
+    /**
+     * @deprecated Use {@link com.google.common.util.concurrent.ThreadFactoryBuilder#setNameFormat}
+     */
+    @Deprecated
+    public NamedThreadFactory(final String threadName, boolean isDaemon, final org.apache.log4j.Logger logger) {
+        this(threadName, isDaemon);
     }
 
     public String getThreadName() {
@@ -50,18 +71,7 @@ public class NamedThreadFactory implements ThreadFactory {
         if (isDaemon) {
             t.setDaemon(true);
         }
-        t.setUncaughtExceptionHandler(new LogOnUncaughtExceptionHandler(getLogger(r)));
+        t.setUncaughtExceptionHandler(new LogOnUncaughtExceptionHandler());
         return t;
-    }
-
-    private Logger getLogger(final Runnable r) {
-        if (logger != null) {
-            return logger;
-        }
-        final Class<? extends Runnable> runnableClass = r.getClass();
-        if (runnableClass.getPackage().getName().startsWith("com.indeed.")) {
-            return Logger.getLogger(runnableClass);
-        }
-        return Logger.getLogger(NamedThreadFactory.class);
     }
 }

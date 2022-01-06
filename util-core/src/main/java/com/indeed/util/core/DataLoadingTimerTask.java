@@ -2,7 +2,8 @@
 package com.indeed.util.core;
 
 import com.indeed.util.varexport.VarExporter;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.TimerTask;
 
@@ -12,7 +13,7 @@ import java.util.TimerTask;
  * @author jack@indeed.com (Jack Humphrey)
  */
 public abstract class DataLoadingTimerTask extends TimerTask implements HasDataLoadingVariables {
-    private static final Logger log = Logger.getLogger(DataLoadingTimerTask.class);
+    private static final Logger log = LoggerFactory.getLogger(DataLoadingTimerTask.class);
 
     protected DataLoadTimer dataLoadTimer = new DataLoadTimer();
     private String dataVersion;

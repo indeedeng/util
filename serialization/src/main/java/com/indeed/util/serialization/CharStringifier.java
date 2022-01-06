@@ -1,12 +1,13 @@
 package com.indeed.util.serialization;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jplaisance
  */
 public final class CharStringifier implements Stringifier<Character>{
-    private static final Logger log = Logger.getLogger(CharStringifier.class);
+    private static final Logger log = LoggerFactory.getLogger(CharStringifier.class);
 
     @Override
     public String toString(Character character) {

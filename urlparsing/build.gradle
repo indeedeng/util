@@ -5,7 +5,7 @@ plugins {
 ext['indeed.publish.name'] = 'util-urlparsing'
 
 dependencies {
-    compile library('log4j:log4j')
+    compile library('org.slf4j:slf4j-api')
     compile 'it.unimi.dsi:fastutil:6.2.2'
     compile library('com.google.guava:guava')
 
