@@ -1,12 +1,10 @@
-plugins {
-    id 'java'
-}
-
-ext['indeed.publish.name'] = 'util-compress'
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-compress'
 
 dependencies {
-    compile project(':util-core')
-    compile library('org.slf4j:slf4j-api')
+    implementation project(':util-core')
+    implementation libs.slf4jApi
 
-    testCompile library('junit:junit')
+    testImplementation libs.junit
+    testImplementation libs.guava
 }

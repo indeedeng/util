@@ -1,3 +1,4 @@
+enableFeaturePreview 'VERSION_CATALOGS'
 include 'compress'
 include 'io'
 include 'mmap'

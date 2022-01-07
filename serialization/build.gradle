@@ -1,13 +1,10 @@
-plugins {
-    id 'java'
-}
-
-ext['indeed.publish.name'] = 'util-serialization'
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-serialization'
 
 dependencies {
-    compile library('org.slf4j:slf4j-api')
-    compile library('commons-lang:commons-lang')
-    compile library('com.google.guava:guava')
+    implementation libs.slf4jApi
+    implementation libs.commonsLang
+    implementation libs.guava
 
-    testCompile library('junit:junit')
+    testImplementation libs.junit
 }

@@ -1,13 +1,10 @@
-plugins {
-    id 'java'
-}
-
-ext['indeed.publish.name'] = 'util-zookeeper'
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-zookeeper'
 
 dependencies {
-    compile project(':io')
-    compile 'org.apache.zookeeper:zookeeper:3.4.5'
-    compile library('org.slf4j:slf4j-api')
+    implementation project(':io')
+    implementation 'org.apache.zookeeper:zookeeper:3.4.5'
+    implementation libs.slf4jApi
 
-    testCompile library('junit:junit')
+    testImplementation libs.junit
 }

@@ -1,13 +1,10 @@
-plugins {
-    id 'java'
-}
-
-ext['indeed.publish.name'] = 'util-urlparsing'
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-urlparsing'
 
 dependencies {
-    compile library('org.slf4j:slf4j-api')
-    compile 'it.unimi.dsi:fastutil:6.2.2'
-    compile library('com.google.guava:guava')
+    implementation libs.slf4jApi
+    implementation 'it.unimi.dsi:fastutil:6.2.2'
+    implementation libs.guava
 
-    testCompile library('junit:junit')
+    testImplementation libs.junit
 }

@@ -1,23 +1,20 @@
-plugins {
-    id 'java'
-}
-
-ext['indeed.publish.name'] = 'util-varexport'
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-varexport'
 
 dependencies {
-    compile library('com.google.guava:guava')
-    compile library('org.slf4j:slf4j-api')
+    implementation libs.guava
+    implementation libs.slf4jApi
 
-    compileOnly library('com.google.code.findbugs:jsr305')
-    compileOnly library('org.apache.tomcat:tomcat-servlet-api')
+    compileOnly libs.jsr305
+    compileOnly libs.servletApi
 
-    testCompile library('junit:junit')
-    testCompile library('org.easymock:easymock')
-    testCompile library('org.hamcrest:hamcrest-core')
-    testCompile library('org.apache.tomcat:tomcat-servlet-api')
+    testImplementation libs.junit
+    testImplementation libs.easymock
+    testImplementation libs.hamcrest
+    testImplementation libs.servletApi
 
     // Freemarker is an "optional" dependency, meaning that clients will need to include
     // it themselves if the want to use our freemarker features.
-    compileOnly library('org.freemarker:freemarker')
-    testCompile library('org.freemarker:freemarker')
+    compileOnly libs.freemarker
+    testImplementation libs.freemarker
 }
