@@ -1,32 +1,29 @@
 package com.indeed.util.core.threads;
 
+import com.indeed.util.core.TreeTimer;
 import junit.framework.TestCase;
 
 import java.util.BitSet;
 import java.util.Random;
 
-import com.indeed.util.core.TreeTimer;
-
-/**
- * @author ahudson
- */
+/** @author ahudson */
 public class TestThreadSafeBitSet extends TestCase {
     private final Random rand = new Random();
 
     public void testFunctionality() {
         for (int size = 5000; size < 6000; size++) {
             ThreadSafeBitSet bitSet = new ThreadSafeBitSet(size);
-            for (int i = 0; i < size; i+=3) {
+            for (int i = 0; i < size; i += 3) {
                 bitSet.set(i, true);
             }
             for (int i = 0; i < size; i++) {
-                assertTrue(bitSet.get(i) == (i%3 == 0));
+                assertTrue(bitSet.get(i) == (i % 3 == 0));
             }
             for (int i = 3; i < size; i += 6) {
                 bitSet.set(i, false);
             }
             for (int i = 0; i < size; i++) {
-                assertTrue(bitSet.get(i) == (i%6 == 0));
+                assertTrue(bitSet.get(i) == (i % 6 == 0));
             }
         }
     }
@@ -34,7 +31,7 @@ public class TestThreadSafeBitSet extends TestCase {
     public void testExpand() {
         ThreadSafeBitSet bs = new ThreadSafeBitSet(100);
         for (int i = 0; i < bs.size(); i++) {
-            if (i%7 == 0) bs.set(i);
+            if (i % 7 == 0) bs.set(i);
         }
         ThreadSafeBitSet bs2 = ThreadSafeBitSet.expand(bs, 200);
         for (int i = 0; i < bs2.size(); i++) {
@@ -42,15 +39,14 @@ public class TestThreadSafeBitSet extends TestCase {
         }
     }
 
-
     public void testCopyFrom() {
         ThreadSafeBitSet bs = new ThreadSafeBitSet(100);
         for (int i = 0; i < bs.size(); i++) {
-            if (i%3 == 0) bs.set(i);
+            if (i % 3 == 0) bs.set(i);
         }
         ThreadSafeBitSet bs2 = new ThreadSafeBitSet(200);
         for (int i = 0; i < bs2.size(); i++) {
-            if (i%2 == 0) bs2.set(i);
+            if (i % 2 == 0) bs2.set(i);
         }
         bs2.copyFrom(bs);
         for (int i = 0; i < 100; i++) {
@@ -64,7 +60,7 @@ public class TestThreadSafeBitSet extends TestCase {
     public void testClearAll() {
         ThreadSafeBitSet bs = new ThreadSafeBitSet(100);
         for (int i = 0; i < bs.size(); i++) {
-            if (i%7 == 0) bs.set(i);
+            if (i % 7 == 0) bs.set(i);
         }
         bs.clearAll();
         for (int i = 0; i < bs.size(); i++) {
@@ -75,7 +71,7 @@ public class TestThreadSafeBitSet extends TestCase {
     public void testSetAll() {
         ThreadSafeBitSet bs = new ThreadSafeBitSet(100);
         for (int i = 0; i < bs.size(); i++) {
-            if (i%7 == 0) bs.set(i);
+            if (i % 7 == 0) bs.set(i);
         }
         bs.setAll();
         for (int i = 0; i < bs.size(); i++) {
@@ -89,13 +85,14 @@ public class TestThreadSafeBitSet extends TestCase {
         ThreadSafeBitSet b = new ThreadSafeBitSet(200);
         for (int i = 50; i < 150; i++) b.set(i);
         b.and(a);
-        for (int i = 0; i < 200; i++) assertEquals(""+i, b.get(i), (i >= 50 && i < 100));
+        for (int i = 0; i < 200; i++) assertEquals("" + i, b.get(i), (i >= 50 && i < 100));
 
-        for (int i = 0; i < 100; i+=2) a.clear(i);
+        for (int i = 0; i < 100; i += 2) a.clear(i);
         b.clearAll();
-        for (int i = 0; i < 100; i+=3) b.set(i);
+        for (int i = 0; i < 100; i += 3) b.set(i);
         b.and(a);
-        for (int i = 0; i < 200; i++) assertEquals(""+i, b.get(i), ((i < 100) && (i%2 != 0) && (i%3 == 0)));
+        for (int i = 0; i < 200; i++)
+            assertEquals("" + i, b.get(i), ((i < 100) && (i % 2 != 0) && (i % 3 == 0)));
     }
 
     public void testOr() {
@@ -103,16 +100,18 @@ public class TestThreadSafeBitSet extends TestCase {
         for (int i = 0; i < 100; i++) a.set(i);
         ThreadSafeBitSet b = new ThreadSafeBitSet(200);
         b.or(a);
-        for (int i = 0; i < 200; i++) assertEquals(""+i, b.get(i), i < 100);
+        for (int i = 0; i < 200; i++) assertEquals("" + i, b.get(i), i < 100);
 
-        for (int i = 1; i < 100; i+=2) {a.clear(i);b.set(i);}
+        for (int i = 1; i < 100; i += 2) {
+            a.clear(i);
+            b.set(i);
+        }
         b.or(a);
-        for (int i = 0; i < 200; i++) assertEquals(""+i, b.get(i), i < 100);
+        for (int i = 0; i < 200; i++) assertEquals("" + i, b.get(i), i < 100);
     }
 
-
     public void testCardinality() {
-        for (int i=0; i<32; i++) {
+        for (int i = 0; i < 32; i++) {
             final ThreadSafeBitSet smallBitSet = new ThreadSafeBitSet(i);
             smallBitSet.setAll();
             final int cardinality = smallBitSet.cardinality();
@@ -124,7 +123,7 @@ public class TestThreadSafeBitSet extends TestCase {
         final Random rand = new Random(42);
         final int size = 32 * 10 + 5;
         final ThreadSafeBitSet randomSet = new ThreadSafeBitSet(size);
-        for (int i=0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             if (rand.nextDouble() < 0.2) {
                 randomSet.set(i);
             }
@@ -141,22 +140,20 @@ public class TestThreadSafeBitSet extends TestCase {
         assertEquals(invRandomSet.cardinality(), size);
     }
 
-
-
     public void testXor() {
         ThreadSafeBitSet a = new ThreadSafeBitSet(200);
         for (int i = 0; i < 100; i++) a.set(i);
         ThreadSafeBitSet b = new ThreadSafeBitSet(200);
         for (int i = 50; i < 150; i++) b.set(i);
         b.and(a);
-        for (int i = 0; i < 200; i++) assertEquals(""+i, b.get(i), (i >= 50 && i < 100));
+        for (int i = 0; i < 200; i++) assertEquals("" + i, b.get(i), (i >= 50 && i < 100));
 
-        for (int i = 0; i < 100; i+=2) a.clear(i);
+        for (int i = 0; i < 100; i += 2) a.clear(i);
         b.clearAll();
-        for (int i = 0; i < 100; i+=3) b.set(i);
+        for (int i = 0; i < 100; i += 3) b.set(i);
         b.xor(a);
-        for (int i = 0; i < 100; i++) assertEquals(""+i, b.get(i), ((i%2 != 0) ^ (i%3 == 0)));
-        for (int i = 100; i < 200; i++) assertEquals(""+i, b.get(i), (i < 100));
+        for (int i = 0; i < 100; i++) assertEquals("" + i, b.get(i), ((i % 2 != 0) ^ (i % 3 == 0)));
+        for (int i = 100; i < 200; i++) assertEquals("" + i, b.get(i), (i < 100));
     }
 
     public void testEquals() {
@@ -183,7 +180,7 @@ public class TestThreadSafeBitSet extends TestCase {
 
     public void perfTestSpeed() {
         int size = 100000000;
-        
+
         for (int c = 0; c < 10; c++) {
             TreeTimer timer = new TreeTimer();
             timer.push("new implementation");
@@ -191,7 +188,7 @@ public class TestThreadSafeBitSet extends TestCase {
             ThreadSafeBitSet tsBitSet = new ThreadSafeBitSet(size);
             timer.pop();
             timer.push("initialization");
-            for (int i = 0; i < size; i+=3) {
+            for (int i = 0; i < size; i += 3) {
                 tsBitSet.set(i, true);
             }
             timer.pop();
@@ -203,15 +200,15 @@ public class TestThreadSafeBitSet extends TestCase {
             timer.pop();
             timer.pop();
             tsBitSet = null;
-            
-            assertTrue(count == (size+2)/3);
-            
+
+            assertTrue(count == (size + 2) / 3);
+
             timer.push("old implementation");
             timer.push("allocation");
             BitSet oBitSet = new BitSet(size);
             timer.pop();
             timer.push("initialization");
-            for (int i = 0; i < size; i+=3) {
+            for (int i = 0; i < size; i += 3) {
                 oBitSet.set(i, true);
             }
             timer.pop();
@@ -222,26 +219,26 @@ public class TestThreadSafeBitSet extends TestCase {
             }
             timer.pop();
             timer.pop();
-    
-            assertTrue(count == (size+2)/3);
-            
+
+            assertTrue(count == (size + 2) / 3);
+
             System.out.println(timer);
         }
     }
 
     public void testMaxSize() {
         ThreadSafeBitSet bitSet = new ThreadSafeBitSet(Integer.MAX_VALUE);
-        bitSet.set(Integer.MAX_VALUE-1, true);
-        assertTrue(bitSet.get(Integer.MAX_VALUE-1));
+        bitSet.set(Integer.MAX_VALUE - 1, true);
+        assertTrue(bitSet.get(Integer.MAX_VALUE - 1));
     }
 
     // ok this isn't a guaranteed good test but it is A test at least
     public void slowTestThreadSafety() {
         int num = 20;
         ThreadSafeBitSet bitSet = new ThreadSafeBitSet(2000);
-        ReaderThread threads [] = new ReaderThread[num];
+        ReaderThread threads[] = new ReaderThread[num];
         for (int i = 0; i < num; i++) {
-            threads[i] = new ReaderThread(bitSet, i*100);
+            threads[i] = new ReaderThread(bitSet, i * 100);
             (new Thread(threads[i])).start();
         }
         try {
@@ -249,7 +246,7 @@ public class TestThreadSafeBitSet extends TestCase {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        for (int i = 0; i < bitSet.size(); i+= 3) {
+        for (int i = 0; i < bitSet.size(); i += 3) {
             bitSet.set(i, true);
             try {
                 Thread.sleep(10);
@@ -272,7 +269,7 @@ public class TestThreadSafeBitSet extends TestCase {
         }
         int count = 0;
         for (int i = 0; i < num; i++) {
-            count += threads[i].foundIt?1:0; 
+            count += threads[i].foundIt ? 1 : 0;
         }
         assertTrue(count == 7);
     }
@@ -285,10 +282,13 @@ public class TestThreadSafeBitSet extends TestCase {
         assertEquals(200, result.size());
         for (int i = 0; i < 200; i++) assertEquals(result.get(i), i < 100);
 
-        for (int i = 1; i < 100; i+=2) {a.clear(i);b.set(i);}
+        for (int i = 1; i < 100; i += 2) {
+            a.clear(i);
+            b.set(i);
+        }
         result = ThreadSafeBitSet.or(a, b);
         assertEquals(200, result.size());
-        for (int i = 0; i < 200; i++) assertEquals(""+i, result.get(i), i < 100);
+        for (int i = 0; i < 200; i++) assertEquals("" + i, result.get(i), i < 100);
     }
 
     public void testCopyFromRange() {
@@ -373,10 +373,16 @@ public class TestThreadSafeBitSet extends TestCase {
 
             for (int index = 0; index < dest.size(); ++index) {
                 assertEquals(
-                        "mismatch at index " + index + " with start=" + start + ", otherStart=" + otherStart + ", length=" + length,
+                        "mismatch at index "
+                                + index
+                                + " with start="
+                                + start
+                                + ", otherStart="
+                                + otherStart
+                                + ", length="
+                                + length,
                         expected.get(index),
-                        dest.get(index)
-                );
+                        dest.get(index));
             }
         }
     }
@@ -386,16 +392,16 @@ public class TestThreadSafeBitSet extends TestCase {
         final int target;
         boolean foundIt;
         boolean stop;
-        
-        ReaderThread(ThreadSafeBitSet bitSet, int target) { 
+
+        ReaderThread(ThreadSafeBitSet bitSet, int target) {
             this.bitSet = bitSet;
             this.target = target;
         }
-        
+
         public void stop() {
             this.stop = true;
         }
-        
+
         public void run() {
             while (!foundIt && !stop) {
                 foundIt = bitSet.get(target);

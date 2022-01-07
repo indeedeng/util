@@ -9,10 +9,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * To be used instead of {@link Export} or the introspection methods
- * of {@link VarExporter} to export a manually updated variable.
- * <p>
- * Example usage:
+ * To be used instead of {@link Export} or the introspection methods of {@link VarExporter} to
+ * export a manually updated variable.
+ *
+ * <p>Example usage:
+ *
  * <pre>
  *   ManagedVariable&lt;Integer&gt; var = ManagedVariable.&lt;Integer&gt;builder().setName("myvar").setValue(524).build();
  *   // ...
@@ -30,7 +31,7 @@ public class ManagedVariable<T> extends Variable<T> {
     public static <T> Builder<T> builder(String namespace) {
         return new Builder<T>(namespace);
     }
-    
+
     public static class Builder<T> {
         private final String namespace;
         private String name = null;
@@ -80,16 +81,18 @@ public class ManagedVariable<T> extends Variable<T> {
     }
 
     @VisibleForTesting
-    protected Supplier<Long> clock = new Supplier<Long>() {
-        public Long get() {
-            return System.currentTimeMillis();
-        }
-    };
+    protected Supplier<Long> clock =
+            new Supplier<Long>() {
+                public Long get() {
+                    return System.currentTimeMillis();
+                }
+            };
 
     private T value;
     private Long lastUpdated = clock.get();
 
-    private ManagedVariable(String name, Set<String> tags, String doc, boolean expand, T value, String namespace) {
+    private ManagedVariable(
+            String name, Set<String> tags, String doc, boolean expand, T value, String namespace) {
         super(name, tags, doc, expand, namespace);
         this.value = value;
     }

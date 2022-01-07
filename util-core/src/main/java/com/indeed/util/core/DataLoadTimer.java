@@ -1,9 +1,10 @@
-package com.indeed.util.core;// Copyright 2009 Indeed
+package com.indeed.util.core; // Copyright 2009 Indeed
 
 import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Helper or base class that stores timestamps for data loading processes.
+ *
  * @author jack@indeed.com (Jack Humphrey)
  */
 public class DataLoadTimer {
@@ -11,20 +12,16 @@ public class DataLoadTimer {
     private Long lastFailLoad = null;
     private Long lastLoadCheck = null;
 
-    // right at startup, this boolean may report incorrectly, so always use isLoadedDataSuccessfullyRecently() instead
-    @VisibleForTesting
-    protected boolean lastLoadWasSuccessful = false;
+    // right at startup, this boolean may report incorrectly, so always use
+    // isLoadedDataSuccessfullyRecently() instead
+    @VisibleForTesting protected boolean lastLoadWasSuccessful = false;
 
-    /**
-     * Updates the timestamp of when the last load was attempted
-     */
-    public void updateLastLoadCheck(){
+    /** Updates the timestamp of when the last load was attempted */
+    public void updateLastLoadCheck() {
         lastLoadCheck = System.currentTimeMillis();
     }
 
-    /**
-     * Updates the last successful load time without setting lastLoadWasSuccessful to true
-     */
+    /** Updates the last successful load time without setting lastLoadWasSuccessful to true */
     protected void updateLastSuccessLoadTime() {
         lastSuccessLoad = System.currentTimeMillis();
         lastLoadWasSuccessful = true;
@@ -50,8 +47,8 @@ public class DataLoadTimer {
         return (int) (System.currentTimeMillis() - lastFailLoad) / 1000;
     }
 
-    public Integer getSecondsSinceLastLoadCheck(){
-        if(lastLoadCheck == null) return null;
+    public Integer getSecondsSinceLastLoadCheck() {
+        if (lastLoadCheck == null) return null;
         return (int) (System.currentTimeMillis() - lastLoadCheck) / 1000;
     }
 

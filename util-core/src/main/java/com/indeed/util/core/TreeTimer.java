@@ -1,15 +1,15 @@
 package com.indeed.util.core;
 
+import javax.annotation.Nonnull;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
-import java.util.LinkedHashMap;
-
-import javax.annotation.Nonnull;
 
 /**
- * Class to help keep a set of timings.  Call push() with a name when timer should start, then call pop() when the timer should stop.  If another push() is called prior to a pop
- * the timing values begin to nest.  If the same name is pushed/popped several times the times accumulate
- * To dump all the timing information call toString()
+ * Class to help keep a set of timings. Call push() with a name when timer should start, then call
+ * pop() when the timer should stop. If another push() is called prior to a pop the timing values
+ * begin to nest. If the same name is pushed/popped several times the times accumulate To dump all
+ * the timing information call toString()
  *
  * @author ahudson
  */
@@ -21,6 +21,7 @@ public class TreeTimer {
     private static class Node {
         long time = 0;
         Map<String, Node> children = null;
+
         Node getChild(String s) {
             if (children == null) children = new LinkedHashMap<String, Node>();
             Node child = children.get(s);
@@ -67,7 +68,7 @@ public class TreeTimer {
         if (n.children == null) return;
         long max = findMaxTime(n);
         int width = String.valueOf(max).length();
-        for (Map.Entry<String, Node> entry: n.children.entrySet()) {
+        for (Map.Entry<String, Node> entry : n.children.entrySet()) {
             ret.append(TreeTimer.leftpad(String.valueOf(entry.getValue().time), width + indent));
             ret.append("ms ").append(entry.getKey()).append("\n");
             printNode(indent + width + 3, entry.getValue(), ret);
@@ -75,8 +76,8 @@ public class TreeTimer {
     }
 
     /**
-     * Left-pads a String with spaces so it is length <code>n</code>.  If the String
-     * is already at least length n, no padding is done.
+     * Left-pads a String with spaces so it is length <code>n</code>. If the String is already at
+     * least length n, no padding is done.
      */
     @Nonnull
     private static String leftpad(@Nonnull String s, int n) {
@@ -84,8 +85,8 @@ public class TreeTimer {
     }
 
     /**
-     * Left-pads a String with the specific padChar so it is length <code>n</code>.  If the String
-     * is already at least length n, no padding is done.
+     * Left-pads a String with the specific padChar so it is length <code>n</code>. If the String is
+     * already at least length n, no padding is done.
      */
     @Nonnull
     private static String leftpad(@Nonnull String s, int n, char padChar) {

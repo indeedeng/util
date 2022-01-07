@@ -7,9 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteOrder;
 
-/**
- * @author goodwin
- */
+/** @author goodwin */
 public class NativeBufferTest extends TestCase {
     private static final Logger log = LoggerFactory.getLogger(NativeBufferTest.class);
 
@@ -26,10 +24,12 @@ public class NativeBufferTest extends TestCase {
     }
 
     public void testMMapThreshold() throws IOException {
-        final NativeBuffer buffer = new NativeBuffer(1024*1024*1024+1, ByteOrder.LITTLE_ENDIAN);
-        buffer.memory().putByte(1024*1024*1024, (byte)3);
-        final NativeBuffer buffer2 = new NativeBuffer(1024*1024*1024+1, ByteOrder.LITTLE_ENDIAN);
-        assertEquals(buffer2.memory().getByte(1024*1024*1024), 0);
+        final NativeBuffer buffer =
+                new NativeBuffer(1024 * 1024 * 1024 + 1, ByteOrder.LITTLE_ENDIAN);
+        buffer.memory().putByte(1024 * 1024 * 1024, (byte) 3);
+        final NativeBuffer buffer2 =
+                new NativeBuffer(1024 * 1024 * 1024 + 1, ByteOrder.LITTLE_ENDIAN);
+        assertEquals(buffer2.memory().getByte(1024 * 1024 * 1024), 0);
         buffer.close();
     }
 

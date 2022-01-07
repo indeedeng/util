@@ -3,9 +3,7 @@ package com.indeed.util.core.reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class WeakSharedReference<T> {
 
     private static final Logger log = LoggerFactory.getLogger(WeakSharedReference.class);

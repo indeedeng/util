@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class MemoryInputStream extends InputStream {
     private static final Logger log = LoggerFactory.getLogger(MemoryInputStream.class);
 
@@ -25,7 +23,7 @@ public final class MemoryInputStream extends InputStream {
         if (position >= length()) {
             return -1;
         }
-        return memory.getByte(position++)&0xFF;
+        return memory.getByte(position++) & 0xFF;
     }
 
     @Override
@@ -35,22 +33,23 @@ public final class MemoryInputStream extends InputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        //min of int and long is guaranteed to be int
-        final int read = (int)Math.min(len, length()-position);
+        // min of int and long is guaranteed to be int
+        final int read = (int) Math.min(len, length() - position);
         if (read == 0) return -1;
         memory.getBytes(position, b, off, read);
-        position+=read;
+        position += read;
         return read;
     }
 
     @Override
     public long skip(long n) throws IOException {
-        position+=n;
+        position += n;
         return n;
     }
 
     public void seek(long position) {
-        if (position < 0 || position > length()) throw new IndexOutOfBoundsException(String.valueOf(position));
+        if (position < 0 || position > length())
+            throw new IndexOutOfBoundsException(String.valueOf(position));
         this.position = position;
     }
 

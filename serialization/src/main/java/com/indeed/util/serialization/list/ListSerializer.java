@@ -12,9 +12,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.List;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class ListSerializer<T> implements Serializer<List<T>> {
     private static final Logger log = LoggerFactory.getLogger(ListSerializer.class);
 
@@ -25,10 +23,10 @@ public final class ListSerializer<T> implements Serializer<List<T>> {
     }
 
     private final Supplier<List<T>> listSupplier;
-    
+
     private final Serializer<T> tSerializer;
 
-    public ListSerializer(Supplier<List<T>> listSupplier,Serializer<T> tSerializer) {
+    public ListSerializer(Supplier<List<T>> listSupplier, Serializer<T> tSerializer) {
         this.listSupplier = listSupplier;
         this.tSerializer = tSerializer;
     }

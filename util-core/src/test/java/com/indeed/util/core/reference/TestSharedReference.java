@@ -6,12 +6,10 @@ import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 
-/**
- * @author pwp
- */
-
+/** @author pwp */
 public class TestSharedReference extends TestCase {
-    // A simple test class that starts life as open, and lets us ask whether its close() has been called.
+    // A simple test class that starts life as open, and lets us ask whether its close() has been
+    // called.
     public static class TestObj implements Closeable {
         private boolean isOpen = false;
 
@@ -104,7 +102,7 @@ public class TestSharedReference extends TestCase {
         try {
             final SharedReference<TestObj> badRef = refOne.copy();
             fail("copy of closed ref shouldn't have worked");
-        } catch (IllegalStateException e){
+        } catch (IllegalStateException e) {
             // expected
         }
 

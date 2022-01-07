@@ -1,8 +1,6 @@
 package com.indeed.util.mmap;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public interface HeapDataAccess {
 
     public char getChar(byte[] b, int off);

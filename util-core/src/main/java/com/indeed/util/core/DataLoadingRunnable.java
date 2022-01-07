@@ -6,12 +6,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Runnable implementation of the {@link HasDataLoadingVariables} class that
- * exports data loading variables.
+ * Runnable implementation of the {@link HasDataLoadingVariables} class that exports data loading
+ * variables.
  *
  * @author jack@indeed.com (Jack Humphrey)
  */
-public abstract class DataLoadingRunnable extends DataLoadTimer implements HasDataLoadingVariables, Runnable {
+public abstract class DataLoadingRunnable extends DataLoadTimer
+        implements HasDataLoadingVariables, Runnable {
     private static final Logger log = LoggerFactory.getLogger(DataLoadingRunnable.class);
 
     // use this for your implementation of load()
@@ -65,8 +66,10 @@ public abstract class DataLoadingRunnable extends DataLoadTimer implements HasDa
     //        final long timestamp = readTimestamp(path);
     //        if (timestamp == -1) return DataLoadingRunnable.ReloadState.FAILED;
     //        final LocalArtifactCore current = serviceCore;
-    //        if (current != null && current.timestamp == timestamp) return DataLoadingRunnable.ReloadState.NO_CHANGE;
-    //        int[] stuff = (int[])Files.readObjectFromFile(Files.buildPath(binDirectory, "stuff.bin"));
+    //        if (current != null && current.timestamp == timestamp) return
+    // DataLoadingRunnable.ReloadState.NO_CHANGE;
+    //        int[] stuff = (int[])Files.readObjectFromFile(Files.buildPath(binDirectory,
+    // "stuff.bin"));
     //        if (stuff == null) return DataLoadingRunnable.ReloadState.FAILED;
     //        final long newTimestamp = readTimestamp(path);
     //        if (timestamp != newTimestamp) return DataLoadingRunnable.ReloadState.FAILED;
@@ -74,7 +77,8 @@ public abstract class DataLoadingRunnable extends DataLoadTimer implements HasDa
     //        return DataLoadingRunnable.ReloadState.RELOADED;
     //    }
     //    private static long readTimestamp(String path) {
-    //        final Long timestamp = (Long)Files.readObjectFromFile(Files.buildPath(path, "timestamp.bin"));
+    //        final Long timestamp = (Long)Files.readObjectFromFile(Files.buildPath(path,
+    // "timestamp.bin"));
     //        return timestamp == null ? -1 : timestamp;
     //    }
     //

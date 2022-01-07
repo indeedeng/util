@@ -16,9 +16,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class BufferedFileDataInputStream extends InputStream implements DataInput, Seekable {
     private static final int DEFAULT_BUFFER_SIZE = 131072;
 
@@ -40,7 +38,8 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
         this(file, order, DEFAULT_BUFFER_SIZE);
     }
 
-    public BufferedFileDataInputStream(File file, ByteOrder order, int bufferSize) throws FileNotFoundException {
+    public BufferedFileDataInputStream(File file, ByteOrder order, int bufferSize)
+            throws FileNotFoundException {
         // for backwards compatiblity with file interface, we still use RandomAccessFile
         final RandomAccessFile raf = closer.register(new RandomAccessFile(file, "r"));
         channel = raf.getChannel();
@@ -63,7 +62,8 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
         this(path, order, DEFAULT_BUFFER_SIZE);
     }
 
-    public BufferedFileDataInputStream(Path path, ByteOrder order, int bufferSize) throws IOException {
+    public BufferedFileDataInputStream(Path path, ByteOrder order, int bufferSize)
+            throws IOException {
         channel = FileChannel.open(path, StandardOpenOption.READ);
         closer.register(channel);
 
@@ -78,7 +78,7 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
 
     private boolean fillBuffer() throws IOException {
         buffer.position(0);
-        int limit = (int)Math.min((channel.size() - channel.position()), buffer.capacity());
+        int limit = (int) Math.min((channel.size() - channel.position()), buffer.capacity());
         buffer.limit(limit);
         if (limit == 0) return false;
         bufferPos = channel.position();
@@ -92,7 +92,7 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
         if (buffer.remaining() == 0) {
             if (!fillBuffer()) return -1;
         }
-        return buffer.get()&0xFF;
+        return buffer.get() & 0xFF;
     }
 
     @Override
@@ -106,7 +106,7 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
     }
 
     public long position() throws IOException {
-        return bufferPos+buffer.position();
+        return bufferPos + buffer.position();
     }
 
     public long length() throws IOException {
@@ -114,8 +114,8 @@ public final class BufferedFileDataInputStream extends InputStream implements Da
     }
 
     public void seek(long addr) throws IOException {
-        if (addr >= bufferPos && addr <= bufferPos+buffer.limit()) {
-            buffer.position((int)(addr-bufferPos));
+        if (addr >= bufferPos && addr <= bufferPos + buffer.limit()) {
+            buffer.position((int) (addr - bufferPos));
         } else {
             channel.position(addr);
             bufferPos = addr;

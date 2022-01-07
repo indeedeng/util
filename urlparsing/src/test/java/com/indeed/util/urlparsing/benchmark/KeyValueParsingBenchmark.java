@@ -10,27 +10,28 @@ import java.lang.management.ManagementFactory;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
 
-/**
- * @author: preetha
- */
+/** @author: preetha */
 public class KeyValueParsingBenchmark {
-
 
     public static void main(String[] args) throws IOException {
         final KeyValueParser kpv;
-        if (args.length> 0 &&  "ind".equals(args[0]) ) {
+        if (args.length > 0 && "ind".equals(args[0])) {
             kpv = new IndeedKeyValueParser();
         } else {
             kpv = new StringSplitKeyValueParser();
         }
 
         runBenchMark(kpv);
-
     }
 
     private static void runBenchMark(final KeyValueParser kvParser) throws IOException {
 
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(KeyValueParsingBenchmark.class.getResourceAsStream("/logentries.txt.gz"))));
+        final BufferedReader reader =
+                new BufferedReader(
+                        new InputStreamReader(
+                                new GZIPInputStream(
+                                        KeyValueParsingBenchmark.class.getResourceAsStream(
+                                                "/logentries.txt.gz"))));
 
         final Stopwatch stopwatch = Stopwatch.createUnstarted();
 
@@ -44,13 +45,18 @@ public class KeyValueParsingBenchmark {
         }
         reader.close();
 
-        System.out.println("Parsed "+ count+" url params in "+  stopwatch);
-        final List<GarbageCollectorMXBean> garbageCollectorMXBeans = ManagementFactory.getGarbageCollectorMXBeans();
+        System.out.println("Parsed " + count + " url params in " + stopwatch);
+        final List<GarbageCollectorMXBean> garbageCollectorMXBeans =
+                ManagementFactory.getGarbageCollectorMXBeans();
 
         for (GarbageCollectorMXBean mxBean : garbageCollectorMXBeans) {
-            System.out.println(mxBean.getName()+"\t"+mxBean.getCollectionCount()+" gc collections in \t"+mxBean.getCollectionTime()+ " milliseconds");
+            System.out.println(
+                    mxBean.getName()
+                            + "\t"
+                            + mxBean.getCollectionCount()
+                            + " gc collections in \t"
+                            + mxBean.getCollectionTime()
+                            + " milliseconds");
         }
     }
-
-
 }

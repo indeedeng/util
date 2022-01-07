@@ -17,20 +17,18 @@ import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-/**
- * @author ketan
- *
- */
+/** @author ketan */
 public class NetUtils {
     private static final Logger log = LoggerFactory.getLogger(NetUtils.class);
     private static volatile Optional<String> OPT_HOSTNAME = Optional.absent();
 
     /**
-     * Determine the hostname of the machine that we are on. Do not allow, blank or 0.0.0.0
-     * as valid hostnames. The host name will be save into the OPT_HOSTNAME static variable.
+     * Determine the hostname of the machine that we are on. Do not allow, blank or 0.0.0.0 as valid
+     * hostnames. The host name will be save into the OPT_HOSTNAME static variable.
      *
-     * We should not have to worry about threading, because the worst that should happen is multiple threads
-     * lookup the hostname at the same time, and its pointer is changed multiple times. The optional is immutable.
+     * <p>We should not have to worry about threading, because the worst that should happen is
+     * multiple threads lookup the hostname at the same time, and its pointer is changed multiple
+     * times. The optional is immutable.
      *
      * @return hostname
      * @throws java.net.UnknownHostException unable to lookup a host name correctly
@@ -40,7 +38,8 @@ public class NetUtils {
         if (!OPT_HOSTNAME.isPresent()) {
             final String hostName = InetAddress.getLocalHost().getHostName();
             if (Strings.isNullOrEmpty(hostName)) {
-                throw new UnknownHostException("Unable to lookup localhost, got back empty hostname");
+                throw new UnknownHostException(
+                        "Unable to lookup localhost, got back empty hostname");
             }
             if (Strings.nullToEmpty(hostName).equals("0.0.0.0")) {
                 throw new UnknownHostException("Unable to resolve correct hostname saw bad host");
@@ -53,9 +52,10 @@ public class NetUtils {
     }
 
     /**
-     * Same as determineHostName, but will use default value instead of throwing UnknownHostException
+     * Same as determineHostName, but will use default value instead of throwing
+     * UnknownHostException
      *
-     * @param defaultValue    The default hostname to use in the event one is not preset.
+     * @param defaultValue The default hostname to use in the event one is not preset.
      * @return The detected hostname if present, or the default value.
      */
     @Nonnull
@@ -65,7 +65,9 @@ public class NetUtils {
             try {
                 return determineHostName(); // this will get and save it.
             } catch (final UnknownHostException e) {
-                log.error("Unable to find hostname " + e.getMessage(), e); // exception to pick up in logsig
+                log.error(
+                        "Unable to find hostname " + e.getMessage(),
+                        e); // exception to pick up in logsig
             }
         }
         return OPT_HOSTNAME.or(defaultValue);
@@ -74,30 +76,37 @@ public class NetUtils {
     /**
      * Make a best effort to determine the IP address of this machine.
      *
-     * @return The ip address of the machine if we could determine it. Null
-     *         otherwise.
-     * @throws SocketException In the event that we fail to extract an ip from
-     *                         a network interface.
+     * @return The ip address of the machine if we could determine it. Null otherwise.
+     * @throws SocketException In the event that we fail to extract an ip from a network interface.
      */
     @Nullable
     public static String determineIpAddress() throws SocketException {
         SocketException caughtException = null;
-        for (final Enumeration<NetworkInterface> networkInterfaces = NetworkInterface.getNetworkInterfaces(); networkInterfaces.hasMoreElements();) {
+        for (final Enumeration<NetworkInterface> networkInterfaces =
+                        NetworkInterface.getNetworkInterfaces();
+                networkInterfaces.hasMoreElements(); ) {
             try {
                 final NetworkInterface nextInterface = networkInterfaces.nextElement();
-                if (! nextInterface.isLoopback() && ! nextInterface.isVirtual() && ! nextInterface.isPointToPoint()) {
-                    for (final Enumeration<InetAddress> addresses = nextInterface.getInetAddresses(); addresses.hasMoreElements(); ) {
+                if (!nextInterface.isLoopback()
+                        && !nextInterface.isVirtual()
+                        && !nextInterface.isPointToPoint()) {
+                    for (final Enumeration<InetAddress> addresses =
+                                    nextInterface.getInetAddresses();
+                            addresses.hasMoreElements(); ) {
                         final InetAddress inetAddress = addresses.nextElement();
                         final byte[] address = inetAddress.getAddress();
                         if ((address.length == 4) //  we don't need no steenking IPv6
-                                && ((address[0] != 127) || (address[1] != 0))) {    //  don't want localhost IP
+                                && ((address[0] != 127)
+                                        || (address[1] != 0))) { //  don't want localhost IP
                             return inetAddress.getHostAddress();
                         }
                     }
                 }
             } catch (SocketException ex) {
-                // We're not going to extract an IP address from this interface, so move on to the next one.
-                // If we find a qualifying interface, we won't care that some other interface gave us problems.
+                // We're not going to extract an IP address from this interface, so move on to the
+                // next one.
+                // If we find a qualifying interface, we won't care that some other interface gave
+                // us problems.
                 // If we don't find one, this exception might be informative.
                 caughtException = ex;
             }
@@ -109,10 +118,12 @@ public class NetUtils {
         return null;
     }
 
-    private static final Pattern IPV4_ADDRESS = Pattern.compile("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
+    private static final Pattern IPV4_ADDRESS =
+            Pattern.compile("(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})");
 
     /**
-     * Converts an IPv4 address to raw bytes, returning a byte[4], or null if the input is malformed.
+     * Converts an IPv4 address to raw bytes, returning a byte[4], or null if the input is
+     * malformed.
      *
      * @param ipv4Address The string representation of an ipv4 address.
      * @return A {@code byte[]} containing the parts of the v4 ip address.
@@ -124,7 +135,7 @@ public class NetUtils {
         }
         final byte[] addr = new byte[4];
         for (int i = 0; i < 4; i++) {
-            final int intVal = Integer.parseInt(m.group(i+1)) & 0x00ff;
+            final int intVal = Integer.parseInt(m.group(i + 1)) & 0x00ff;
             addr[i] = (byte) intVal;
         }
         return addr;

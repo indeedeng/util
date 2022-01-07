@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 
 /**
  * Not bounds checked. Should be bounds checked externally.
+ *
  * @author jplaisance
  */
 final class NativeEndianHeapDataAccess implements HeapDataAccess {
@@ -27,7 +28,7 @@ final class NativeEndianHeapDataAccess implements HeapDataAccess {
         try {
             Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
-            UNSAFE = (Unsafe)theUnsafe.get(null);
+            UNSAFE = (Unsafe) theUnsafe.get(null);
             BYTE_ARRAY_BASE_OFFSET = UNSAFE.arrayBaseOffset(byte[].class);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
@@ -63,7 +64,7 @@ final class NativeEndianHeapDataAccess implements HeapDataAccess {
 
     @Override
     public double getDouble(byte[] b, int off) {
-        return UNSAFE.getDouble(b, BYTE_ARRAY_BASE_OFFSET+off);
+        return UNSAFE.getDouble(b, BYTE_ARRAY_BASE_OFFSET + off);
     }
 
     @Override

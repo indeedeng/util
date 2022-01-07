@@ -5,9 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 final class NativeMemoryUtils {
     private static final Logger log = LoggerFactory.getLogger(NativeMemoryUtils.class);
 
@@ -15,7 +13,7 @@ final class NativeMemoryUtils {
         LoadIndeedMMap.loadLibrary();
     }
 
-    //copied from java.nio.Bits
+    // copied from java.nio.Bits
     private static final long UNSAFE_COPY_THRESHOLD = 1024L * 1024L;
 
     private static final int ENOMEM = 1;
@@ -31,7 +29,7 @@ final class NativeMemoryUtils {
     static void copyFromArray(byte[] src, int offset, long dstAddr, int length) {
         while (length > 0) {
             long size = (length > UNSAFE_COPY_THRESHOLD) ? UNSAFE_COPY_THRESHOLD : length;
-            copyFromByteArray(src, offset, (int)size, dstAddr);
+            copyFromByteArray(src, offset, (int) size, dstAddr);
             length -= size;
             offset += size;
             dstAddr += size;
@@ -41,7 +39,7 @@ final class NativeMemoryUtils {
     static void copyToArray(long srcAddr, byte[] dst, int offset, int length) {
         while (length > 0) {
             long size = (length > UNSAFE_COPY_THRESHOLD) ? UNSAFE_COPY_THRESHOLD : length;
-            copyToByteArray(srcAddr, (int)size, dst, offset);
+            copyToByteArray(srcAddr, (int) size, dst, offset);
             length -= size;
             srcAddr += size;
             offset += size;
@@ -76,20 +74,33 @@ final class NativeMemoryUtils {
         int err = mincore(addr, length, memory.getAddress());
         if (err != 0) {
             switch (err) {
-                case ENOMEM: throw new IllegalArgumentException("illegal arguments: address: "+addr+" length: "+length+" vec: "+memory.getAddress());
+                case ENOMEM:
+                    throw new IllegalArgumentException(
+                            "illegal arguments: address: "
+                                    + addr
+                                    + " length: "
+                                    + length
+                                    + " vec: "
+                                    + memory.getAddress());
                 case EAGAIN:
                     mincore(addr, length, memory);
                     return;
-                case EFAULT: throw new IllegalArgumentException("memory at "+memory.getAddress()+" is not valid");
-                case EINVAL: throw new IllegalArgumentException("address "+addr+" is not a multiple of the page size");
-                default: throw new IllegalArgumentException("unknown error");
+                case EFAULT:
+                    throw new IllegalArgumentException(
+                            "memory at " + memory.getAddress() + " is not valid");
+                case EINVAL:
+                    throw new IllegalArgumentException(
+                            "address " + addr + " is not a multiple of the page size");
+                default:
+                    throw new IllegalArgumentException("unknown error");
             }
         }
     }
 
     static native void copyToDirectBuffer(long srcAddr, ByteBuffer dest, int offset, int length);
 
-    static native void copyFromDirectBuffer(ByteBuffer source, int offset, long destAddr, int length);
+    static native void copyFromDirectBuffer(
+            ByteBuffer source, int offset, long destAddr, int length);
 
     private static native void copyFromByteArray(byte[] src, int offset, int length, long addr);
 

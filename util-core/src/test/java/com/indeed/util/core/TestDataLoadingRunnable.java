@@ -10,9 +10,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author casey (casey@indeed.com)
- */
+/** @author casey (casey@indeed.com) */
 public class TestDataLoadingRunnable {
     private FakeDataLoadingRunnable dataLoadingRunnable;
 
@@ -76,19 +74,24 @@ public class TestDataLoadingRunnable {
         final String expectedDataVersion = "data version";
         dataLoadingRunnable.finishLoadWithReloadState(ReloadState.RELOADED, expectedDataVersion);
         assertEquals(ReloadState.RELOADED, dataLoadingRunnable.getReloadState());
-        assertEquals("Data version was not set", expectedDataVersion, dataLoadingRunnable.getDataVersion());
+        assertEquals(
+                "Data version was not set",
+                expectedDataVersion,
+                dataLoadingRunnable.getDataVersion());
     }
 
     @Test
     public void testFinishLoadWithReloadState_Failed_UpdatesReloadState() {
-        dataLoadingRunnable.finishLoadWithReloadState(ReloadState.FAILED, "Data version that should not propagate");
+        dataLoadingRunnable.finishLoadWithReloadState(
+                ReloadState.FAILED, "Data version that should not propagate");
         assertEquals(ReloadState.FAILED, dataLoadingRunnable.getReloadState());
         assertNull(dataLoadingRunnable.getDataVersion());
     }
 
     @Test
     public void testFinishLoadWithReloadState_NoChange_UpdatesReloadState() {
-        dataLoadingRunnable.finishLoadWithReloadState(ReloadState.NO_CHANGE, "Data version that should not propagate");
+        dataLoadingRunnable.finishLoadWithReloadState(
+                ReloadState.NO_CHANGE, "Data version that should not propagate");
         assertEquals(ReloadState.NO_CHANGE, dataLoadingRunnable.getReloadState());
         assertNull(dataLoadingRunnable.getDataVersion());
     }
@@ -98,24 +101,40 @@ public class TestDataLoadingRunnable {
         final String expectedDataVersion = "data version";
         dataLoadingRunnable.finishLoadWithReloadState(ReloadState.RELOADED, expectedDataVersion);
         assertEquals(ReloadState.RELOADED, dataLoadingRunnable.getReloadState());
-        assertEquals("Data version was not set", expectedDataVersion, dataLoadingRunnable.getDataVersion());
+        assertEquals(
+                "Data version was not set",
+                expectedDataVersion,
+                dataLoadingRunnable.getDataVersion());
 
-        dataLoadingRunnable.finishLoadWithReloadState(ReloadState.NO_CHANGE, "Data version that should not propagate");
+        dataLoadingRunnable.finishLoadWithReloadState(
+                ReloadState.NO_CHANGE, "Data version that should not propagate");
         assertEquals(ReloadState.NO_CHANGE, dataLoadingRunnable.getReloadState());
-        assertEquals("Data version was not set", expectedDataVersion, dataLoadingRunnable.getDataVersion());
+        assertEquals(
+                "Data version was not set",
+                expectedDataVersion,
+                dataLoadingRunnable.getDataVersion());
 
-        dataLoadingRunnable.finishLoadWithReloadState(ReloadState.FAILED, "Data version that should not propagate");
+        dataLoadingRunnable.finishLoadWithReloadState(
+                ReloadState.FAILED, "Data version that should not propagate");
         assertEquals(ReloadState.FAILED, dataLoadingRunnable.getReloadState());
-        assertEquals("Data version was not set", expectedDataVersion, dataLoadingRunnable.getDataVersion());
+        assertEquals(
+                "Data version was not set",
+                expectedDataVersion,
+                dataLoadingRunnable.getDataVersion());
     }
 
     @Test
     public void testRun_Reloaded() {
         dataLoadingRunnable.run();
 
-        assertNotNull(dataLoadingRunnable.getSecondsSinceLastLoadCheck());  // Assert that updateLastLoadCheck was called
+        assertNotNull(
+                dataLoadingRunnable
+                        .getSecondsSinceLastLoadCheck()); // Assert that updateLastLoadCheck was
+        // called
         assertTrue(dataLoadingRunnable.lastLoadWasSuccessful);
-        assertNotNull(dataLoadingRunnable.getSecondsSinceLastLoad());       // Assert that loadComplete was called
+        assertNotNull(
+                dataLoadingRunnable
+                        .getSecondsSinceLastLoad()); // Assert that loadComplete was called
         assertEquals(ReloadState.RELOADED, dataLoadingRunnable.getReloadState());
     }
 
@@ -129,9 +148,11 @@ public class TestDataLoadingRunnable {
             dataLoadingRunnable.run();
             secondsSinceLastLoadCheck = dataLoadingRunnable.getSecondsSinceLastLoadCheck();
             secondsSinceLastLoad = dataLoadingRunnable.getSecondsSinceLastLoad();
-            assertNotNull(secondsSinceLastLoadCheck);  // Assert that updateLastLoadCheck was called
-            assertTrue("last load was successful, because it was", dataLoadingRunnable.lastLoadWasSuccessful);
-            assertNotNull(secondsSinceLastLoad);       // Assert that loadComplete was called
+            assertNotNull(secondsSinceLastLoadCheck); // Assert that updateLastLoadCheck was called
+            assertTrue(
+                    "last load was successful, because it was",
+                    dataLoadingRunnable.lastLoadWasSuccessful);
+            assertNotNull(secondsSinceLastLoad); // Assert that loadComplete was called
             assertEquals(ReloadState.RELOADED, dataLoadingRunnable.getReloadState());
         }
 
@@ -140,11 +161,17 @@ public class TestDataLoadingRunnable {
             dataLoadingRunnable.loadBehavior = ReloadState.NO_CHANGE;
             dataLoadingRunnable.run();
 
-            assertEquals(secondsSinceLastLoad, dataLoadingRunnable.getSecondsSinceLastLoad());       // Assert that loadComplete was not called
-            assertTrue("last load was successful, and unchanged from what is currently in memory", dataLoadingRunnable.lastLoadWasSuccessful);
+            assertEquals(
+                    secondsSinceLastLoad,
+                    dataLoadingRunnable
+                            .getSecondsSinceLastLoad()); // Assert that loadComplete was not called
+            assertTrue(
+                    "last load was successful, and unchanged from what is currently in memory",
+                    dataLoadingRunnable.lastLoadWasSuccessful);
             assertEquals(ReloadState.NO_CHANGE, dataLoadingRunnable.getReloadState());
         }
     }
+
     @Test
     public void testRun_NoChange_afterFailure() {
         // SETUP - we've loaded something at some point in the past and it worked
@@ -155,9 +182,11 @@ public class TestDataLoadingRunnable {
             dataLoadingRunnable.run();
             secondsSinceLastLoadCheck = dataLoadingRunnable.getSecondsSinceLastLoadCheck();
             secondsSinceLastLoad = dataLoadingRunnable.getSecondsSinceLastLoad();
-            assertNotNull(secondsSinceLastLoadCheck);  // Assert that updateLastLoadCheck was called
-            assertTrue("last load was successful, because it was", dataLoadingRunnable.lastLoadWasSuccessful);
-            assertNotNull(secondsSinceLastLoad);       // Assert that loadComplete was called
+            assertNotNull(secondsSinceLastLoadCheck); // Assert that updateLastLoadCheck was called
+            assertTrue(
+                    "last load was successful, because it was",
+                    dataLoadingRunnable.lastLoadWasSuccessful);
+            assertNotNull(secondsSinceLastLoad); // Assert that loadComplete was called
             assertEquals(ReloadState.RELOADED, dataLoadingRunnable.getReloadState());
         }
 
@@ -166,9 +195,14 @@ public class TestDataLoadingRunnable {
             dataLoadingRunnable.loadBehavior = ReloadState.FAILED;
             dataLoadingRunnable.run();
 
-            assertEquals(secondsSinceLastLoad, dataLoadingRunnable.getSecondsSinceLastLoad());       // Assert that loadComplete was not called
+            assertEquals(
+                    secondsSinceLastLoad,
+                    dataLoadingRunnable
+                            .getSecondsSinceLastLoad()); // Assert that loadComplete was not called
             assertFalse(dataLoadingRunnable.lastLoadWasSuccessful);
-            assertFalse("last load failed because the hard drive is gone", dataLoadingRunnable.lastLoadWasSuccessful);
+            assertFalse(
+                    "last load failed because the hard drive is gone",
+                    dataLoadingRunnable.lastLoadWasSuccessful);
             assertEquals(ReloadState.FAILED, dataLoadingRunnable.getReloadState());
         }
 
@@ -177,8 +211,13 @@ public class TestDataLoadingRunnable {
             dataLoadingRunnable.loadBehavior = ReloadState.NO_CHANGE;
             dataLoadingRunnable.run();
 
-            assertEquals(secondsSinceLastLoad, dataLoadingRunnable.getSecondsSinceLastLoad());       // Assert that loadComplete was not called
-            assertTrue("last load was successful, in that it loaded something but it was unchanged from what is currently in memory", dataLoadingRunnable.lastLoadWasSuccessful);
+            assertEquals(
+                    secondsSinceLastLoad,
+                    dataLoadingRunnable
+                            .getSecondsSinceLastLoad()); // Assert that loadComplete was not called
+            assertTrue(
+                    "last load was successful, in that it loaded something but it was unchanged from what is currently in memory",
+                    dataLoadingRunnable.lastLoadWasSuccessful);
             assertEquals(ReloadState.NO_CHANGE, dataLoadingRunnable.getReloadState());
         }
     }
@@ -188,8 +227,9 @@ public class TestDataLoadingRunnable {
         dataLoadingRunnable.loadBehavior = ReloadState.FAILED;
         dataLoadingRunnable.run();
 
-
-        assertNull(dataLoadingRunnable.getSecondsSinceLastLoad());       // Assert that loadComplete was not called
+        assertNull(
+                dataLoadingRunnable
+                        .getSecondsSinceLastLoad()); // Assert that loadComplete was not called
         assertFalse(dataLoadingRunnable.lastLoadWasSuccessful);
         assertEquals(ReloadState.FAILED, dataLoadingRunnable.getReloadState());
     }
@@ -197,9 +237,9 @@ public class TestDataLoadingRunnable {
     /**
      * Class used to test {@link DataLoadingRunnable}.
      *
-     * Set {@link #loadBehavior} to determine how {@link FakeDataLoadingRunnable} should respond
+     * <p>Set {@link #loadBehavior} to determine how {@link FakeDataLoadingRunnable} should respond
      */
-    private class FakeDataLoadingRunnable extends DataLoadingRunnable{
+    private class FakeDataLoadingRunnable extends DataLoadingRunnable {
         public ReloadState loadBehavior = ReloadState.RELOADED;
 
         public FakeDataLoadingRunnable(final String namespace) {

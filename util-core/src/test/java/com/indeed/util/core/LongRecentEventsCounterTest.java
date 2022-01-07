@@ -3,10 +3,7 @@ package com.indeed.util.core;
 import com.indeed.util.core.LongRecentEventsCounter.Ticker;
 import junit.framework.TestCase;
 
-/**
- * @author ketan
- *
- */
+/** @author ketan */
 public class LongRecentEventsCounterTest extends TestCase {
     class TestTicker implements Ticker {
         private int tick = 0;
@@ -135,7 +132,7 @@ public class LongRecentEventsCounterTest extends TestCase {
         }
 
         testTicker.setTick(6);
-        counter.increment(11);    //  { 13, 5, 0, 11 }
+        counter.increment(11); //  { 13, 5, 0, 11 }
         {
             assertEquals(29, counter.sum());
             final long[] snapshot = counter.snapshot();
@@ -148,7 +145,7 @@ public class LongRecentEventsCounterTest extends TestCase {
         }
 
         testTicker.setTick(7);
-        counter.increment(4);    //  { 5, 0, 11, 4 }
+        counter.increment(4); //  { 5, 0, 11, 4 }
         {
             assertEquals(20, counter.sum());
             final long[] snapshot = counter.snapshot();
@@ -161,7 +158,7 @@ public class LongRecentEventsCounterTest extends TestCase {
         }
 
         testTicker.setTick(10);
-        counter.increment(2);    //  { 4, 0, 0, 2}
+        counter.increment(2); //  { 4, 0, 0, 2}
         {
             assertEquals(6, counter.sum());
             final long[] snapshot = counter.snapshot();
@@ -174,7 +171,7 @@ public class LongRecentEventsCounterTest extends TestCase {
         }
 
         testTicker.setTick(15);
-        counter.increment(99);    //  { 0, 0, 0, 99}
+        counter.increment(99); //  { 0, 0, 0, 99}
         {
             assertEquals(99, counter.sum());
             final long[] snapshot = counter.snapshot();
@@ -188,7 +185,7 @@ public class LongRecentEventsCounterTest extends TestCase {
 
         //  NO tick
 
-        counter.increment(14);    //  { 0, 0, 0, 99}
+        counter.increment(14); //  { 0, 0, 0, 99}
         {
             assertEquals(113, counter.sum());
             final long[] snapshot = counter.snapshot();

@@ -9,12 +9,10 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class CharArraySerializer implements Serializer<char[]> {
     private static final Logger log = LoggerFactory.getLogger(CharArraySerializer.class);
-    
+
     private static final LengthVIntSerializer lengthSerializer = new LengthVIntSerializer();
 
     @Override

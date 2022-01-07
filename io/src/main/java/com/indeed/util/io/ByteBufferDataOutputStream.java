@@ -8,10 +8,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-/**
- * @author jplaisance
- */
-public final class ByteBufferDataOutputStream extends OutputStream implements DataOutput, Positioned {
+/** @author jplaisance */
+public final class ByteBufferDataOutputStream extends OutputStream
+        implements DataOutput, Positioned {
 
     private ByteBuffer buffer;
     private final boolean direct;
@@ -36,7 +35,7 @@ public final class ByteBufferDataOutputStream extends OutputStream implements Da
 
     public void write(final int b) {
         ensureCapacity(1);
-        buffer.put((byte)b);
+        buffer.put((byte) b);
     }
 
     public void write(final byte[] b, final int off, final int len) {
@@ -59,7 +58,7 @@ public final class ByteBufferDataOutputStream extends OutputStream implements Da
 
     public void writeByte(final int v) {
         ensureCapacity(1);
-        buffer.put((byte)v);
+        buffer.put((byte) v);
     }
 
     public void writeShort(final int v) {
@@ -119,7 +118,8 @@ public final class ByteBufferDataOutputStream extends OutputStream implements Da
     private void ensureCapacity(int size) {
         if (buffer.remaining() < size) {
             final int newSize = Math.max(buffer.capacity() * 2, buffer.capacity() + size);
-            final ByteBuffer newBuffer = direct ? ByteBuffer.allocateDirect(newSize) : ByteBuffer.allocate(newSize);
+            final ByteBuffer newBuffer =
+                    direct ? ByteBuffer.allocateDirect(newSize) : ByteBuffer.allocate(newSize);
             buffer.flip();
             newBuffer.put(buffer);
             buffer = newBuffer;

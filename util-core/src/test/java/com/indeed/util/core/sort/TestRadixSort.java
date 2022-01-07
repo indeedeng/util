@@ -7,9 +7,7 @@ import java.util.Random;
 
 import static org.junit.Assert.*;
 
-/**
- * @author jsgroth
- */
+/** @author jsgroth */
 public class TestRadixSort {
     @Test
     public void test() {
@@ -28,12 +26,12 @@ public class TestRadixSort {
             long elapsed = -System.currentTimeMillis();
             Arrays.sort(test1);
             elapsed += System.currentTimeMillis();
-            System.out.println("quicksort elapsed = "+elapsed+"ms");
+            System.out.println("quicksort elapsed = " + elapsed + "ms");
             elapsed = -System.currentTimeMillis();
             RadixSort.radixSort(test2, n, scratch, countScratch);
             elapsed += System.currentTimeMillis();
-            System.out.println("radixsort elapsed = "+elapsed+"ms");
-            for (int i = 0; i < n; i ++) {
+            System.out.println("radixsort elapsed = " + elapsed + "ms");
+            for (int i = 0; i < n; i++) {
                 assertEquals(test1[i], test2[i]);
             }
         }

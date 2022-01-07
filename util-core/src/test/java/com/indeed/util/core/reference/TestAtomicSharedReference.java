@@ -4,16 +4,14 @@ import junit.framework.TestCase;
 
 import java.io.IOException;
 
-/**
- * @author pwp
- */
-
+/** @author pwp */
 public class TestAtomicSharedReference extends TestCase {
     public void testCreateClose() throws IOException {
         TestSharedReference.TestObj testObj = new TestSharedReference.TestObj();
         assertTrue(testObj.isOpen());
 
-        AtomicSharedReference<TestSharedReference.TestObj> refOne = AtomicSharedReference.create(testObj);
+        AtomicSharedReference<TestSharedReference.TestObj> refOne =
+                AtomicSharedReference.create(testObj);
         assertEquals(1, refOne.getRefCount());
 
         SharedReference<TestSharedReference.TestObj> copyRef = refOne.getCopy();
@@ -35,13 +33,15 @@ public class TestAtomicSharedReference extends TestCase {
         TestSharedReference.TestObj objOne = new TestSharedReference.TestObj();
         assertTrue(objOne.isOpen());
 
-        AtomicSharedReference<TestSharedReference.TestObj> refOne = AtomicSharedReference.create(objOne);
+        AtomicSharedReference<TestSharedReference.TestObj> refOne =
+                AtomicSharedReference.create(objOne);
         assertEquals(1, refOne.getRefCount());
 
         TestSharedReference.TestObj objTwo = new TestSharedReference.TestObj();
         assertTrue(objTwo.isOpen());
 
-        refOne.set(objTwo);               // Note that we are setting refOne to the same object that it already holds.
+        refOne.set(objTwo); // Note that we are setting refOne to the same object that it already
+        // holds.
         assertFalse(objOne.isOpen());
         assertTrue(objTwo.isOpen());
 
@@ -53,13 +53,16 @@ public class TestAtomicSharedReference extends TestCase {
         TestSharedReference.TestObj objOne = new TestSharedReference.TestObj();
         assertTrue(objOne.isOpen());
 
-        AtomicSharedReference<TestSharedReference.TestObj> refOne = AtomicSharedReference.create(objOne);
+        AtomicSharedReference<TestSharedReference.TestObj> refOne =
+                AtomicSharedReference.create(objOne);
         assertEquals(1, refOne.getRefCount());
 
         TestSharedReference.TestObj objTwo = new TestSharedReference.TestObj();
         assertTrue(objTwo.isOpen());
 
-        refOne.setQuietly(objTwo);               // Note that we are setting refOne to the same object that it already holds.
+        refOne.setQuietly(
+                objTwo); // Note that we are setting refOne to the same object that it already
+        // holds.
         assertFalse(objOne.isOpen());
         assertTrue(objTwo.isOpen());
 
@@ -71,10 +74,12 @@ public class TestAtomicSharedReference extends TestCase {
         TestSharedReference.TestObj testObj = new TestSharedReference.TestObj();
         assertTrue(testObj.isOpen());
 
-        AtomicSharedReference<TestSharedReference.TestObj> refOne = AtomicSharedReference.create(testObj);
+        AtomicSharedReference<TestSharedReference.TestObj> refOne =
+                AtomicSharedReference.create(testObj);
         assertEquals(1, refOne.getRefCount());
 
-        refOne.set(testObj);               // Note that we are setting refOne to the same object that it already holds.
+        refOne.set(testObj); // Note that we are setting refOne to the same object that it already
+        // holds.
         assertTrue(testObj.isOpen());
 
         refOne.unset();
@@ -85,10 +90,13 @@ public class TestAtomicSharedReference extends TestCase {
         TestSharedReference.TestObj testObj = new TestSharedReference.TestObj();
         assertTrue(testObj.isOpen());
 
-        AtomicSharedReference<TestSharedReference.TestObj> refOne = AtomicSharedReference.create(testObj);
+        AtomicSharedReference<TestSharedReference.TestObj> refOne =
+                AtomicSharedReference.create(testObj);
         assertEquals(1, refOne.getRefCount());
 
-        refOne.setQuietly(testObj);               // Note that we are setting refOne to the same object that it already holds.
+        refOne.setQuietly(
+                testObj); // Note that we are setting refOne to the same object that it already
+        // holds.
         assertTrue(testObj.isOpen());
 
         refOne.unset();
@@ -99,7 +107,8 @@ public class TestAtomicSharedReference extends TestCase {
         TestSharedReference.TestObj objOne = new TestSharedReference.TestObj();
         assertTrue(objOne.isOpen());
 
-        AtomicSharedReference<TestSharedReference.TestObj> refOne = AtomicSharedReference.create(objOne);
+        AtomicSharedReference<TestSharedReference.TestObj> refOne =
+                AtomicSharedReference.create(objOne);
         assertEquals(1, refOne.getRefCount());
 
         TestSharedReference.TestObj objTwo = new TestSharedReference.TestObj();
@@ -135,11 +144,13 @@ public class TestAtomicSharedReference extends TestCase {
         TestSharedReference.TestObj testObj = new TestSharedReference.TestObj();
         assertTrue(testObj.isOpen());
 
-        AtomicSharedReference<TestSharedReference.TestObj> refOne = AtomicSharedReference.create(testObj);
+        AtomicSharedReference<TestSharedReference.TestObj> refOne =
+                AtomicSharedReference.create(testObj);
         assertEquals(1, refOne.getRefCount());
 
         // Note that we are setting refOne to the same object that it already holds.
-        // We expect getAndSet to return a copy of the SharedRef to the thing that is already in there.
+        // We expect getAndSet to return a copy of the SharedRef to the thing that is already in
+        // there.
         SharedReference<TestSharedReference.TestObj> refFromGnS = refOne.getAndSet(testObj);
         assertNotNull(refFromGnS);
         assertSame(testObj, refFromGnS.get());
@@ -163,5 +174,4 @@ public class TestAtomicSharedReference extends TestCase {
         refOne.unset();
         assertFalse(testObj.isOpen());
     }
-
 }

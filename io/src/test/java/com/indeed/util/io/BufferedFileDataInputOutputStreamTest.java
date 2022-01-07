@@ -8,20 +8,16 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 
-/**
- * @author kenh
- */
-
+/** @author kenh */
 public class BufferedFileDataInputOutputStreamTest {
-    @Rule
-    public TemporaryFolder tempDir = new TemporaryFolder();
-
+    @Rule public TemporaryFolder tempDir = new TemporaryFolder();
 
     @Test
     public void testFileInputOutput() throws IOException {
         final File somefile = tempDir.newFile("somefile");
 
-        try (final BufferedFileDataOutputStream outputStream = new BufferedFileDataOutputStream(somefile)) {
+        try (final BufferedFileDataOutputStream outputStream =
+                new BufferedFileDataOutputStream(somefile)) {
             outputStream.writeInt(1);
             outputStream.writeInt(2);
             outputStream.writeInt(3);
@@ -36,8 +32,8 @@ public class BufferedFileDataInputOutputStreamTest {
             outputStream.writeLong(Long.MAX_VALUE);
         }
 
-
-        try (final BufferedFileDataInputStream inputStream = new BufferedFileDataInputStream(somefile)) {
+        try (final BufferedFileDataInputStream inputStream =
+                new BufferedFileDataInputStream(somefile)) {
             Assert.assertEquals(1, inputStream.readInt());
             Assert.assertEquals(2, inputStream.readInt());
             Assert.assertEquals(3, inputStream.readInt());
@@ -59,7 +55,8 @@ public class BufferedFileDataInputOutputStreamTest {
     public void testPathInputOutput() throws IOException {
         final File somefile = tempDir.newFile("somefile");
 
-        try (final BufferedFileDataOutputStream outputStream = new BufferedFileDataOutputStream(somefile.toPath())) {
+        try (final BufferedFileDataOutputStream outputStream =
+                new BufferedFileDataOutputStream(somefile.toPath())) {
             outputStream.writeInt(1);
             outputStream.writeInt(2);
             outputStream.writeInt(3);
@@ -74,8 +71,8 @@ public class BufferedFileDataInputOutputStreamTest {
             outputStream.writeLong(Long.MAX_VALUE);
         }
 
-
-        try (final BufferedFileDataInputStream inputStream = new BufferedFileDataInputStream(somefile.toPath())) {
+        try (final BufferedFileDataInputStream inputStream =
+                new BufferedFileDataInputStream(somefile.toPath())) {
             Assert.assertEquals(1, inputStream.readInt());
             Assert.assertEquals(2, inputStream.readInt());
             Assert.assertEquals(3, inputStream.readInt());

@@ -11,8 +11,8 @@ import java.io.OutputStream;
 import java.nio.ByteOrder;
 
 /**
- * Zero Copy is sort of a lie, it's zero copy if realloc decides not to copy for sizes less than MMAP_THRESHOLD (default 256 k) and
- * then after that it's totally zero copy
+ * Zero Copy is sort of a lie, it's zero copy if realloc decides not to copy for sizes less than
+ * MMAP_THRESHOLD (default 256 k) and then after that it's totally zero copy
  *
  * @author jplaisance
  */
@@ -35,89 +35,89 @@ public final class ZeroCopyOutputStream extends OutputStream implements DataOutp
 
     public void writeBoolean(final boolean v) throws IOException {
         if (currentAddress + 1 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeBoolean(v);
         } else {
-            memory.putByte(currentAddress, (byte)(v ? 1 : 0));
+            memory.putByte(currentAddress, (byte) (v ? 1 : 0));
             currentAddress++;
         }
     }
 
     public void writeByte(final int v) throws IOException {
         if (currentAddress + 1 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeByte(v);
         } else {
-            memory.putByte(currentAddress, (byte)v);
+            memory.putByte(currentAddress, (byte) v);
             currentAddress++;
         }
     }
 
     public void writeShort(final int v) throws IOException {
         if (currentAddress + 2 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeShort(v);
         } else {
-            memory.putShort(currentAddress, (short)v);
-            currentAddress+=2;
+            memory.putShort(currentAddress, (short) v);
+            currentAddress += 2;
         }
     }
 
     public void writeChar(final int v) throws IOException {
         if (currentAddress + 2 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeChar(v);
         } else {
-            memory.putChar(currentAddress, (char)v);
-            currentAddress+=2;
+            memory.putChar(currentAddress, (char) v);
+            currentAddress += 2;
         }
     }
 
     public void writeInt(final int v) throws IOException {
         if (currentAddress + 4 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeInt(v);
         } else {
             memory.putInt(currentAddress, v);
-            currentAddress+=4;
+            currentAddress += 4;
         }
     }
 
     public void writeLong(final long v) throws IOException {
         if (currentAddress + 8 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeLong(v);
         } else {
             memory.putLong(currentAddress, v);
-            currentAddress+=8;
+            currentAddress += 8;
         }
     }
 
     public void writeFloat(final float v) throws IOException {
         if (currentAddress + 4 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeFloat(v);
         } else {
             memory.putFloat(currentAddress, v);
-            currentAddress+=4;
+            currentAddress += 4;
         }
     }
 
     public void writeDouble(final double v) throws IOException {
         if (currentAddress + 8 > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             writeDouble(v);
         } else {
             memory.putDouble(currentAddress, v);
-            currentAddress+=8;
+            currentAddress += 8;
         }
     }
 
@@ -139,16 +139,16 @@ public final class ZeroCopyOutputStream extends OutputStream implements DataOutp
 
     @Override
     public void write(final byte[] b, final int off, final int len) throws IOException {
-        if (off < 0 || len < 0 || off+len > b.length) {
+        if (off < 0 || len < 0 || off + len > b.length) {
             throw new IndexOutOfBoundsException();
         }
         if (currentAddress + len > memory.length()) {
-            buffer = buffer.realloc(memory.length()*2);
+            buffer = buffer.realloc(memory.length() * 2);
             memory = buffer.memory();
             write(b, off, len);
         } else {
             memory.putBytes(currentAddress, b, off, len);
-            currentAddress+=len;
+            currentAddress += len;
         }
     }
 
@@ -161,11 +161,12 @@ public final class ZeroCopyOutputStream extends OutputStream implements DataOutp
         return currentAddress;
     }
 
-    //the memory object returned by this call is invalidated by closing or writing additional data to this output stream
+    // the memory object returned by this call is invalidated by closing or writing additional data
+    // to this output stream
     public DirectMemory memory() {
         return memory.slice(0, currentAddress);
     }
-    
+
     public NativeBuffer getBuffer() {
         return this.buffer;
     }
@@ -175,9 +176,9 @@ public final class ZeroCopyOutputStream extends OutputStream implements DataOutp
         ByteStreams.copy(in, outputStream);
     }
 
-    //the input stream returned by this call is invalidated by closing or writing additional data to this output stream
+    // the input stream returned by this call is invalidated by closing or writing additional data
+    // to this output stream
     public InputStream getInputStream() {
         return new MemoryInputStream(memory());
     }
-    
 }

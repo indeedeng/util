@@ -12,12 +12,11 @@ import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class DynamicMMapBufferDataOutputStream extends OutputStream implements DataOutput {
 
-    private static final Logger log = LoggerFactory.getLogger(DynamicMMapBufferDataOutputStream.class);
+    private static final Logger log =
+            LoggerFactory.getLogger(DynamicMMapBufferDataOutputStream.class);
 
     private MMapBuffer buffer;
 
@@ -31,17 +30,25 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
 
     private List<MMapBuffer> toClose = new ArrayList<MMapBuffer>();
 
-    public DynamicMMapBufferDataOutputStream(final File file, final ByteOrder byteOrder) throws IOException {
+    public DynamicMMapBufferDataOutputStream(final File file, final ByteOrder byteOrder)
+            throws IOException {
         this.file = file;
         this.byteOrder = byteOrder;
         buffer = new MMapBuffer(file, 0, 4096, FileChannel.MapMode.READ_WRITE, byteOrder);
         memory = buffer.memory();
     }
 
-    public DynamicMMapBufferDataOutputStream(final File file, final ByteOrder byteOrder, long offset) throws IOException {
+    public DynamicMMapBufferDataOutputStream(
+            final File file, final ByteOrder byteOrder, long offset) throws IOException {
         this.file = file;
         this.byteOrder = byteOrder;
-        buffer = new MMapBuffer(file, 0, Math.max(4096, file.length()), FileChannel.MapMode.READ_WRITE, byteOrder);
+        buffer =
+                new MMapBuffer(
+                        file,
+                        0,
+                        Math.max(4096, file.length()),
+                        FileChannel.MapMode.READ_WRITE,
+                        byteOrder);
         memory = buffer.memory();
         currentAddress = offset;
     }
@@ -52,11 +59,17 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
 
     public void writeBoolean(final boolean v) throws IOException {
         try {
-            memory.putByte(currentAddress, (byte)(v ? 1 : 0));
+            memory.putByte(currentAddress, (byte) (v ? 1 : 0));
             currentAddress++;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeBoolean(v);
         }
@@ -64,11 +77,17 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
 
     public void writeByte(final int v) throws IOException {
         try {
-            memory.putByte(currentAddress, (byte)v);
+            memory.putByte(currentAddress, (byte) v);
             currentAddress++;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeByte(v);
         }
@@ -76,11 +95,17 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
 
     public void writeShort(final int v) throws IOException {
         try {
-            memory.putShort(currentAddress, (short)v);
-            currentAddress+=2;
+            memory.putShort(currentAddress, (short) v);
+            currentAddress += 2;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeShort(v);
         }
@@ -88,11 +113,17 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
 
     public void writeChar(final int v) throws IOException {
         try {
-            memory.putChar(currentAddress, (char)v);
-            currentAddress+=2;
+            memory.putChar(currentAddress, (char) v);
+            currentAddress += 2;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeChar(v);
         }
@@ -101,10 +132,16 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
     public void writeInt(final int v) throws IOException {
         try {
             memory.putInt(currentAddress, v);
-            currentAddress+=4;
+            currentAddress += 4;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeInt(v);
         }
@@ -113,10 +150,16 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
     public void writeLong(final long v) throws IOException {
         try {
             memory.putLong(currentAddress, v);
-            currentAddress+=8;
+            currentAddress += 8;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeLong(v);
         }
@@ -125,10 +168,16 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
     public void writeFloat(final float v) throws IOException {
         try {
             memory.putFloat(currentAddress, v);
-            currentAddress+=4;
+            currentAddress += 4;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeFloat(v);
         }
@@ -137,10 +186,16 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
     public void writeDouble(final double v) throws IOException {
         try {
             memory.putDouble(currentAddress, v);
-            currentAddress+=8;
+            currentAddress += 8;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             writeDouble(v);
         }
@@ -164,15 +219,21 @@ public final class DynamicMMapBufferDataOutputStream extends OutputStream implem
 
     @Override
     public void write(final byte[] b, final int off, final int len) throws IOException {
-        if (off < 0 || len < 0 || off+len > b.length) {
+        if (off < 0 || len < 0 || off + len > b.length) {
             throw new IndexOutOfBoundsException();
         }
         try {
             memory.putBytes(currentAddress, b, off, len);
-            currentAddress+=len;
+            currentAddress += len;
         } catch (IndexOutOfBoundsException e) {
             toClose.add(buffer);
-            buffer = new MMapBuffer(file, 0, memory.length() * 2, FileChannel.MapMode.READ_WRITE, byteOrder);
+            buffer =
+                    new MMapBuffer(
+                            file,
+                            0,
+                            memory.length() * 2,
+                            FileChannel.MapMode.READ_WRITE,
+                            byteOrder);
             memory = buffer.memory();
             write(b, off, len);
         }

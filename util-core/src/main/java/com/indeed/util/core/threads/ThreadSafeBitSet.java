@@ -5,18 +5,18 @@ import java.io.Serializable;
 import java.util.Arrays;
 
 /**
- * a bit set that is thread safe readable
- * but not thread safe writable
+ * a bit set that is thread safe readable but not thread safe writable
+ *
  * @author ahudson
  */
 public class ThreadSafeBitSet implements Serializable {
     private static final long serialVersionUID = -7685178028568216346L;
-    private final int [] bits;
+    private final int[] bits;
     private final int size;
 
     public ThreadSafeBitSet(int size) {
         this.size = size;
-        this.bits = new int[(size+31)>>>5];
+        this.bits = new int[(size + 31) >>> 5];
     }
 
     private ThreadSafeBitSet(int[] bits, int size) {
@@ -46,8 +46,8 @@ public class ThreadSafeBitSet implements Serializable {
     }
 
     public final boolean get(int index) {
-        final int t = 1<<(index&0x1F);
-        return (bits[index>>5]&t) != 0;
+        final int t = 1 << (index & 0x1F);
+        return (bits[index >> 5] & t) != 0;
     }
 
     public ThreadSafeBitSet copy() {
@@ -59,11 +59,11 @@ public class ThreadSafeBitSet implements Serializable {
     }
 
     public final void set(int index) {
-        bits[index>>>5] |= (1<<(index&0x1F));
+        bits[index >>> 5] |= (1 << (index & 0x1F));
     }
 
     public final void clear(int index) {
-        bits[index>>>5] &= ~(1<<(index&0x1F));
+        bits[index >>> 5] &= ~(1 << (index & 0x1F));
     }
 
     public final void clearAll() {
@@ -117,8 +117,7 @@ public class ThreadSafeBitSet implements Serializable {
     public final void copyFrom(ThreadSafeBitSet other) {
         if (other.size == this.size) {
             System.arraycopy(other.bits, 0, bits, 0, other.bits.length);
-        }
-        else if (other.size < this.size) {
+        } else if (other.size < this.size) {
             if (other.size > 0) {
                 // we copy the array but handle the last int separately
                 System.arraycopy(other.bits, 0, bits, 0, other.bits.length - 1);
@@ -128,13 +127,17 @@ public class ThreadSafeBitSet implements Serializable {
                 final int lastInt = (mask & otherLastInt) | ((~mask) & myLastModifiedInt);
                 this.bits[other.bits.length - 1] = lastInt;
             }
-        }
-        else {
-            throw new IllegalArgumentException("Copy from array bigger than destination is forbidden");
+        } else {
+            throw new IllegalArgumentException(
+                    "Copy from array bigger than destination is forbidden");
         }
     }
 
-    public final void copyFromRange(final ThreadSafeBitSet other, final int startIndex, final int otherStartIndex, final int length) {
+    public final void copyFromRange(
+            final ThreadSafeBitSet other,
+            final int startIndex,
+            final int otherStartIndex,
+            final int length) {
 
         if (length == 0) {
             return;
@@ -151,10 +154,17 @@ public class ThreadSafeBitSet implements Serializable {
 
         if ((startIndex & 0x1F) == (otherStartIndex & 0x1F)) {
             if (bitsStartIndex != bitsEndIndex) {
-                System.arraycopy(other.bits, otherBitsStartIndex + 1, bits, bitsStartIndex + 1, bitsEndIndex - bitsStartIndex - 1);
+                System.arraycopy(
+                        other.bits,
+                        otherBitsStartIndex + 1,
+                        bits,
+                        bitsStartIndex + 1,
+                        bitsEndIndex - bitsStartIndex - 1);
 
-                simpleCopyFromRange(other, startIndex, otherStartIndex, Integer.SIZE - (startIndex & 0x1F));
-                simpleCopyFromRange(other, endIndex & ~0x1F, otherEndIndex & ~0x1F, (endIndex & 0x1F) + 1);
+                simpleCopyFromRange(
+                        other, startIndex, otherStartIndex, Integer.SIZE - (startIndex & 0x1F));
+                simpleCopyFromRange(
+                        other, endIndex & ~0x1F, otherEndIndex & ~0x1F, (endIndex & 0x1F) + 1);
             } else {
                 simpleCopyFromRange(other, startIndex, otherStartIndex, length);
             }
@@ -167,20 +177,42 @@ public class ThreadSafeBitSet implements Serializable {
                 final int absDifferenceMask = -1 << absDifference;
 
                 if (difference > 0) {
-                    bits[bitsStartIndex] = (bits[bitsStartIndex] & ~(-1 << (startIndex & 0x1F))) |
-                            ((other.bits[otherBitsStartIndex] & (-1 << (otherStartIndex & 0x1F))) << difference);
-                    for (int bitsIndex = bitsStartIndex + 1, otherBitsIndex = otherBitsStartIndex; bitsIndex < bitsEndIndex; ++bitsIndex, ++otherBitsIndex) {
-                        bits[bitsIndex] = ((other.bits[otherBitsIndex] & reverseDifferenceMask) >>> reverseDifference) |
-                                ((other.bits[otherBitsIndex + 1] & ~reverseDifferenceMask) << difference);
+                    bits[bitsStartIndex] =
+                            (bits[bitsStartIndex] & ~(-1 << (startIndex & 0x1F)))
+                                    | ((other.bits[otherBitsStartIndex]
+                                                    & (-1 << (otherStartIndex & 0x1F)))
+                                            << difference);
+                    for (int bitsIndex = bitsStartIndex + 1, otherBitsIndex = otherBitsStartIndex;
+                            bitsIndex < bitsEndIndex;
+                            ++bitsIndex, ++otherBitsIndex) {
+                        bits[bitsIndex] =
+                                ((other.bits[otherBitsIndex] & reverseDifferenceMask)
+                                                >>> reverseDifference)
+                                        | ((other.bits[otherBitsIndex + 1] & ~reverseDifferenceMask)
+                                                << difference);
                     }
-                    simpleCopyFromRange(other, endIndex & ~0x1F, otherEndIndex - (endIndex & 0x1F), (endIndex & 0x1F) + 1);
+                    simpleCopyFromRange(
+                            other,
+                            endIndex & ~0x1F,
+                            otherEndIndex - (endIndex & 0x1F),
+                            (endIndex & 0x1F) + 1);
                 } else {
-                    simpleCopyFromRange(other, startIndex, otherStartIndex, Integer.SIZE - (startIndex & 0x1F));
-                    for (int bitsIndex = bitsStartIndex + 1, otherBitsIndex = otherBitsStartIndex + 1; bitsIndex < bitsEndIndex; ++bitsIndex, ++otherBitsIndex) {
-                        bits[bitsIndex] = ((other.bits[otherBitsIndex] & absDifferenceMask) >>> absDifference) |
-                                ((other.bits[otherBitsIndex + 1] & ~absDifferenceMask) << reverseDifference);
+                    simpleCopyFromRange(
+                            other, startIndex, otherStartIndex, Integer.SIZE - (startIndex & 0x1F));
+                    for (int bitsIndex = bitsStartIndex + 1,
+                                    otherBitsIndex = otherBitsStartIndex + 1;
+                            bitsIndex < bitsEndIndex;
+                            ++bitsIndex, ++otherBitsIndex) {
+                        bits[bitsIndex] =
+                                ((other.bits[otherBitsIndex] & absDifferenceMask) >>> absDifference)
+                                        | ((other.bits[otherBitsIndex + 1] & ~absDifferenceMask)
+                                                << reverseDifference);
                     }
-                    simpleCopyFromRange(other, endIndex & ~0x1F, otherEndIndex - (endIndex & 0x1F), (endIndex & 0x1F) + 1);
+                    simpleCopyFromRange(
+                            other,
+                            endIndex & ~0x1F,
+                            otherEndIndex - (endIndex & 0x1F),
+                            (endIndex & 0x1F) + 1);
                 }
             } else {
                 simpleCopyFromRange(other, startIndex, otherStartIndex, length);
@@ -188,12 +220,15 @@ public class ThreadSafeBitSet implements Serializable {
         }
     }
 
-    private void simpleCopyFromRange(final ThreadSafeBitSet other, final int startIndex, final int otherStartIndex, final int length) {
+    private void simpleCopyFromRange(
+            final ThreadSafeBitSet other,
+            final int startIndex,
+            final int otherStartIndex,
+            final int length) {
         for (int i = 0; i < length; ++i) {
             set(startIndex + i, other.get(otherStartIndex + i));
         }
     }
-
 
     public final int cardinality() {
         int sum = 0;

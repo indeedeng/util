@@ -7,9 +7,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ScatteringByteChannel;
 
-/**
-* @author jplaisance
-*/
+/** @author jplaisance */
 public final class MemoryScatteringByteChannel implements ScatteringByteChannel {
 
     private static final Logger log = LoggerFactory.getLogger(MemoryScatteringByteChannel.class);
@@ -27,9 +25,10 @@ public final class MemoryScatteringByteChannel implements ScatteringByteChannel 
     public long read(ByteBuffer[] dsts, final int offset, final int length) throws IOException {
         if (offset < 0) throw new IndexOutOfBoundsException(String.valueOf(offset));
         if (length < 0) throw new IndexOutOfBoundsException(String.valueOf(length));
-        if (offset+length > dsts.length) throw new IndexOutOfBoundsException(String.valueOf(offset+length));
+        if (offset + length > dsts.length)
+            throw new IndexOutOfBoundsException(String.valueOf(offset + length));
         long total = 0;
-        for (int i = offset; i < offset+length; i++) {
+        for (int i = offset; i < offset + length; i++) {
             final int read = read(dsts[i]);
             if (read < 0) {
                 if (total == 0) {
@@ -38,7 +37,7 @@ public final class MemoryScatteringByteChannel implements ScatteringByteChannel 
                     return total;
                 }
             } else {
-                total+=read;
+                total += read;
             }
         }
         return total;
@@ -51,11 +50,11 @@ public final class MemoryScatteringByteChannel implements ScatteringByteChannel 
 
     @Override
     public int read(ByteBuffer dst) throws IOException {
-        if (memory.length()-position <= 0) return -1;
-        final int length = (int)Math.min(dst.remaining(), memory.length()-position);
+        if (memory.length() - position <= 0) return -1;
+        final int length = (int) Math.min(dst.remaining(), memory.length() - position);
         dst.limit(length);
         memory.getBytes(position, dst);
-        position+=length;
+        position += length;
         return length;
     }
 

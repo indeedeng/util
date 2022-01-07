@@ -5,9 +5,7 @@ import junit.framework.TestCase;
 import java.util.Arrays;
 import java.util.Random;
 
-/**
- * @author ahudson
- */
+/** @author ahudson */
 public class TestQuicksortables extends TestCase {
     public void testTopK() {
         int n = 1000;
@@ -20,13 +18,13 @@ public class TestQuicksortables extends TestCase {
         Quicksortables.shuffle(qs, n);
         Quicksortables.topK(qs, n, k);
         for (int i = 0; i < k; i++) {
-            assertEquals(n-i-1, values[i]);
+            assertEquals(n - i - 1, values[i]);
         }
 
         Quicksortables.shuffle(qs, n);
-        Quicksortables.topK(qs, n, n*2);
+        Quicksortables.topK(qs, n, n * 2);
         for (int i = 0; i < n; i++) {
-            assertEquals(n-i-1, values[i]);
+            assertEquals(n - i - 1, values[i]);
         }
 
         // tests for exceptions
@@ -36,17 +34,21 @@ public class TestQuicksortables extends TestCase {
 
     private static void testVersesJavaBinarySearch(final int target, final int[] values) {
         int pos1 = Arrays.binarySearch(values, target);
-        int pos2 = Quicksortables.binarySearch(new Quicksortable() {
-            public void swap(int i, int j) {
-                assertTrue("This should never be called", false);
-            }
-            public int compare(int i, int j) {
-                assertEquals(-1, j);
-                if (values[i] < target) return -1;
-                if (values[i] > target) return 1;
-                else return 0;
-            }
-        }, values.length);
+        int pos2 =
+                Quicksortables.binarySearch(
+                        new Quicksortable() {
+                            public void swap(int i, int j) {
+                                assertTrue("This should never be called", false);
+                            }
+
+                            public int compare(int i, int j) {
+                                assertEquals(-1, j);
+                                if (values[i] < target) return -1;
+                                if (values[i] > target) return 1;
+                                else return 0;
+                            }
+                        },
+                        values.length);
         assertEquals(pos1, pos2);
     }
 
@@ -69,7 +71,7 @@ public class TestQuicksortables extends TestCase {
         Double[] foo = new Double[n];
         Quicksortable qs = Quicksortables.getQuicksortableObjectArray(foo);
         for (int i = 0; i < n; i++) {
-            foo[i] = (double)i;
+            foo[i] = (double) i;
         }
         for (int k = 0; k < 3; k++) {
             for (int i = 0; i < 5; i++) {
@@ -81,7 +83,7 @@ public class TestQuicksortables extends TestCase {
                     elapsed += System.currentTimeMillis();
                     assertSorted(foo);
                 }
-                //System.out.println("java sort: elapsed = "+elapsed+"ms");
+                // System.out.println("java sort: elapsed = "+elapsed+"ms");
             }
             for (int i = 0; i < 5; i++) {
                 long elapsed = 0;
@@ -92,14 +94,14 @@ public class TestQuicksortables extends TestCase {
                     elapsed += System.currentTimeMillis();
                     assertSorted(foo);
                 }
-                //System.out.println("quicksortables sort: elapsed = "+elapsed+"ms");
+                // System.out.println("quicksortables sort: elapsed = "+elapsed+"ms");
             }
         }
     }
 
     private static void assertSorted(Double[] list) {
         for (int i = 0; i < list.length; i++) {
-            assertEquals((double)i, list[i]);
+            assertEquals((double) i, list[i]);
         }
     }
 }

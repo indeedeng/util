@@ -11,9 +11,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class LongArrayStringifier implements Stringifier<long[]> {
     private static final Logger log = LoggerFactory.getLogger(LongArrayStringifier.class);
 
@@ -25,8 +23,11 @@ public final class LongArrayStringifier implements Stringifier<long[]> {
     @Override
     public long[] fromString(String str) {
         List<Long> longs = Lists.newArrayList();
-        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
-        Iterator<String> split = splitter.split(str.substring(1, str.length()-1));
+        EscapeAwareSplitter splitter =
+                new EscapeAwareSplitter(
+                        CharMatcher.whitespace().or(CharMatcher.is(',')),
+                        EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
+        Iterator<String> split = splitter.split(str.substring(1, str.length() - 1));
         while (split.hasNext()) {
             longs.add(Long.parseLong(split.next()));
         }

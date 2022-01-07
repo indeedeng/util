@@ -6,9 +6,7 @@ import sun.misc.Unsafe;
 
 import java.lang.reflect.Field;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 final class NativeEndianDirectDataAccess implements DirectDataAccess {
     private static final Logger log = LoggerFactory.getLogger(NativeEndianDirectDataAccess.class);
 
@@ -23,7 +21,7 @@ final class NativeEndianDirectDataAccess implements DirectDataAccess {
         try {
             Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
-            UNSAFE = (Unsafe)theUnsafe.get(null);
+            UNSAFE = (Unsafe) theUnsafe.get(null);
         } catch (NoSuchFieldException e) {
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {

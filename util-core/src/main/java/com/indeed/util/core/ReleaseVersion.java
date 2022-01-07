@@ -4,44 +4,36 @@ import javax.annotation.Nullable;
 import java.util.Arrays;
 
 /**
- * Represents a multi-part version number internally as a 64-bit integer for fast
- * comparison. Can represent a numeric version number with up to four components:
+ * Represents a multi-part version number internally as a 64-bit integer for fast comparison. Can
+ * represent a numeric version number with up to four components:
  * majorVersion.minorVersion.patchVersion.buildNumber.
  *
  * <ul>
- *     <li>majorVersion can be a positive integer between 0 and 32767 (inclusive)</li>
- *     <li>minorVersion can be a positive integer between 0 and 65535 (inclusive)</li>
- *     <li>patchVersion can be a positive integer between 0 and 65535 (inclusive)</li>
- *     <li>buildNumber can be a positive integer between 0 and 65535 (inclusive)</li>
+ *   <li>majorVersion can be a positive integer between 0 and 32767 (inclusive)
+ *   <li>minorVersion can be a positive integer between 0 and 65535 (inclusive)
+ *   <li>patchVersion can be a positive integer between 0 and 65535 (inclusive)
+ *   <li>buildNumber can be a positive integer between 0 and 65535 (inclusive)
  * </ul>
  *
- * <p>
- * Supports comparison using wild-card expressions, using the special character 'x'. The wild card
- * character can only be using at the end of a version string.
- * <code>
+ * <p>Supports comparison using wild-card expressions, using the special character 'x'. The wild
+ * card character can only be using at the end of a version string. <code>
  *     assert ReleaseVersion.fromString("1.0").compareTo(ReleaseVersion.fromString("1.1.x") == 1;
  *     assert ReleaseVersion.fromString("1.0.x").compareTo(ReleaseVersion.fromString("1.0.0.1") == 0;
  *     assert ReleaseVersion.fromString("1.0.0.1").compareTo(ReleaseVersion.fromString("1.0.x") == 0;
  *     assert ReleaseVersion.fromString("1.0.x").compareTo(ReleaseVersion.fromString("1.0.0.x") == 0;
  * </code>
- * </p>
  *
- * <p>
- * Supports interpreting a version string. The version must be fully qualified (e.g. "1.0.0.0")
+ * <p>Supports interpreting a version string. The version must be fully qualified (e.g. "1.0.0.0")
  * or end with a wild card ("x") to be parsed correctly.
- * </p>
  *
- * <p>
- * When using the Builder, you can use the wild card behavior by calling setMatchPrecision with the
- * lowest level to use in comparison. Default match matchPrecision is BUILD.
- * <code>
+ * <p>When using the Builder, you can use the wild card behavior by calling setMatchPrecision with
+ * the lowest level to use in comparison. Default match matchPrecision is BUILD. <code>
  *     ReleaseVersion lhs = newBuilder().setMajorVersion(1).build(); // equivalent to fromString("1.0.0.0")
  *     ReleaseVersion rhs = newBuilder().setMajorVersion(1).setMinorVersion(1).build(); // equivalent to fromString("1.1.0.0")
  *     assert lhs.compareTo(rhs) == -1;
  *     lhs = newBuilder().setMajorVersion(1).setMatchPrecision(MAJOR).build(); // equivalent to fromString("1.x")
  *     assert lhs.compareTo(rhs) == 0;
  * </code>
- * </p>
  *
  * @author jack@indeed.com (Jack Humphrey)
  */
@@ -50,8 +42,9 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
     private static final char WILDCARD = 'x';
 
     private static boolean isWildcard(@Nullable String versionComponent) {
-        return versionComponent != null && versionComponent.length() == 1 &&
-                WILDCARD == versionComponent.charAt(0);
+        return versionComponent != null
+                && versionComponent.length() == 1
+                && WILDCARD == versionComponent.charAt(0);
     }
 
     private final long version;
@@ -87,8 +80,17 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
         }
     }
 
-    private ReleaseVersion(short majorVersion, int minorVersion, int patchVersion, int buildNumber, MatchPrecision matchPrecision) {
-        version = ((long)majorVersion << 48) | ((long)minorVersion << 32) | ((long)patchVersion << 16) | (long)buildNumber;
+    private ReleaseVersion(
+            short majorVersion,
+            int minorVersion,
+            int patchVersion,
+            int buildNumber,
+            MatchPrecision matchPrecision) {
+        version =
+                ((long) majorVersion << 48)
+                        | ((long) minorVersion << 32)
+                        | ((long) patchVersion << 16)
+                        | (long) buildNumber;
         this.matchPrecision = matchPrecision;
     }
 
@@ -125,7 +127,8 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
     @Override
     public int compareTo(ReleaseVersion other) {
         final MatchPrecision minPrecision =
-                MatchPrecision.forLength(Math.min(matchPrecision.length, other.matchPrecision.length));
+                MatchPrecision.forLength(
+                        Math.min(matchPrecision.length, other.matchPrecision.length));
 
         final long lhs = version & minPrecision.mask;
         final long rhs = other.version & minPrecision.mask;
@@ -141,33 +144,31 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
     }
 
     /**
-     * Turn a version string into an object. Enforces strict interpretation: string must either
-     * be fully qualified (x.x.x.x) or use a wildcard (like 3.2.x) or an IllegalArgumentException will
-     * be thrown. All numbers must parse as integers or a NumberFormatException will be thrown.
-     * This method is typically for use in code when dealing with explicit string literals.
+     * Turn a version string into an object. Enforces strict interpretation: string must either be
+     * fully qualified (x.x.x.x) or use a wildcard (like 3.2.x) or an IllegalArgumentException will
+     * be thrown. All numbers must parse as integers or a NumberFormatException will be thrown. This
+     * method is typically for use in code when dealing with explicit string literals.
      *
      * @param versionString fully-qualified or wild-card version string
      * @return The parsed version of the provided {@code versionString}
-     *
-     * @throws IllegalArgumentException if version string is not fully-qualified or a wild card, or if a
-     * version number does not parse as an integer
+     * @throws IllegalArgumentException if version string is not fully-qualified or a wild card, or
+     *     if a version number does not parse as an integer
      */
     public static ReleaseVersion fromString(String versionString) {
         return new Builder().fromString(versionString, false).build();
     }
 
     /**
-     * Turn a version string into an object. Does lenient parsing: "1.2.rc1"
-     * will turn into "1.2.0.0", for example. Will not throw
-     * {@link IllegalArgumentException}.
+     * Turn a version string into an object. Does lenient parsing: "1.2.rc1" will turn into
+     * "1.2.0.0", for example. Will not throw {@link IllegalArgumentException}.
      *
-     * @param versionString The version string that we should attempt to
-     *                      parse into a release version.
-     * @param defaultVersion The default version to use in the event parsing
-     *                       of versionString fails.
+     * @param versionString The version string that we should attempt to parse into a release
+     *     version.
+     * @param defaultVersion The default version to use in the event parsing of versionString fails.
      * @return The parsed ReleaseVersion or the defaultVersion if parsing failed.
      */
-    public static ReleaseVersion fromStringSafely(String versionString, ReleaseVersion defaultVersion) {
+    public static ReleaseVersion fromStringSafely(
+            String versionString, ReleaseVersion defaultVersion) {
         try {
             return new Builder().fromString(versionString, true).build();
         } catch (Exception e) {
@@ -184,7 +185,7 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
     public static final int MAX_PATCH_VERSION = (Short.MAX_VALUE << 1) + 1;
     public static final int MAX_BUILD_NUMBER = (Short.MAX_VALUE << 1) + 1;
 
-    public final static class Builder {
+    public static final class Builder {
         private short majorVersion;
         private int minorVersion;
         private int patchVersion;
@@ -230,12 +231,10 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
 
         /**
          * @param versionString The string representation of a release version.
-         * @param lenient if false, will throw exceptions if not proper version
-         *                string.
-         * @return The builder class so we can update components of the version
-         *         before building.
+         * @param lenient if false, will throw exceptions if not proper version string.
+         * @return The builder class so we can update components of the version before building.
          * @throws IllegalArgumentException if version string is invalid and !lenient (if it can't
-         * parse a major version, will throw this exception even if lenient.
+         *     parse a major version, will throw this exception even if lenient.
          */
         public Builder fromString(String versionString, boolean lenient) {
             String[] parts = versionString.split("\\.");
@@ -246,7 +245,11 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
                 }
             } else if (!lenient && parts.length < 4) {
                 // Will allow parts.length > 4 and discard the extra parts
-                throw new IllegalArgumentException("ReleaseVersion string must have 4 numbers or end in " + WILDCARD + ": " + versionString);
+                throw new IllegalArgumentException(
+                        "ReleaseVersion string must have 4 numbers or end in "
+                                + WILDCARD
+                                + ": "
+                                + versionString);
             }
 
             // this part can't be lenient
@@ -272,6 +275,8 @@ public class ReleaseVersion implements Comparable<ReleaseVersion> {
         }
 
         public ReleaseVersion build() {
-            return new ReleaseVersion(majorVersion, minorVersion, patchVersion, buildNumber, matchPrecision);
+            return new ReleaseVersion(
+                    majorVersion, minorVersion, patchVersion, buildNumber, matchPrecision);
         }
-    }}
+    }
+}

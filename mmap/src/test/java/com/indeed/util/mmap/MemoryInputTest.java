@@ -9,9 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
-/**
- * @author goodwin
- */
+/** @author goodwin */
 public class MemoryInputTest extends TestCase {
     private static final Logger log = LoggerFactory.getLogger(MemoryInputTest.class);
 
@@ -24,18 +22,22 @@ public class MemoryInputTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        File file = File.createTempFile("tmp", "" , new File("."));
-        File file2 = File.createTempFile("tmp", "" , new File("."));
+        File file = File.createTempFile("tmp", "", new File("."));
+        File file2 = File.createTempFile("tmp", "", new File("."));
         file.deleteOnExit();
         file2.deleteOnExit();
 
         memoryArray = new Memory[6];
         memoryArray[0] = new HeapMemory(length, ByteOrder.LITTLE_ENDIAN);
-        BufferResource bufferResource = new MMapBuffer(file, 0L, length, FileChannel.MapMode.READ_WRITE, ByteOrder.LITTLE_ENDIAN);
+        BufferResource bufferResource =
+                new MMapBuffer(
+                        file, 0L, length, FileChannel.MapMode.READ_WRITE, ByteOrder.LITTLE_ENDIAN);
         memoryArray[1] = bufferResource.memory();
         memoryArray[2] = new NativeBuffer(length, ByteOrder.LITTLE_ENDIAN).memory();
         memoryArray[3] = new HeapMemory(length, ByteOrder.BIG_ENDIAN);
-        BufferResource bufferResource2 = new MMapBuffer(file2, 0L, length, FileChannel.MapMode.READ_WRITE, ByteOrder.BIG_ENDIAN);
+        BufferResource bufferResource2 =
+                new MMapBuffer(
+                        file2, 0L, length, FileChannel.MapMode.READ_WRITE, ByteOrder.BIG_ENDIAN);
         memoryArray[4] = bufferResource2.memory();
         memoryArray[5] = new NativeBuffer(length, ByteOrder.BIG_ENDIAN).memory();
 
@@ -47,7 +49,6 @@ public class MemoryInputTest extends TestCase {
             memoryInputStreamArray[i] = new MemoryInputStream(memoryArray[i]);
             memoryScatteringByteChannelArray[i] = new MemoryScatteringByteChannel(memoryArray[i]);
         }
-
     }
 
     public void testMemoryDataInput() throws Exception {
@@ -60,7 +61,7 @@ public class MemoryInputTest extends TestCase {
 
         for (MemoryDataInput memoryDataInput : memoryDataInputArray) {
             assertEquals(length, memoryDataInput.length());
-            for (int i = 0; i < memoryDataInput.length(); i+=2) {
+            for (int i = 0; i < memoryDataInput.length(); i += 2) {
                 int value = i % 256;
                 if (value >= 128) {
                     value -= 256;
@@ -77,7 +78,7 @@ public class MemoryInputTest extends TestCase {
                 assertEquals(value, memoryInputStream.read());
             }
             memoryInputStream.seek(0);
-            for (int i = 0; i < memoryInputStream.length()-8; i += 16) {
+            for (int i = 0; i < memoryInputStream.length() - 8; i += 16) {
                 byte[] byteArray = new byte[8];
 
                 //noinspection ResultOfMethodCallIgnored
@@ -86,7 +87,7 @@ public class MemoryInputTest extends TestCase {
                 //noinspection ResultOfMethodCallIgnored
                 memoryInputStream.skip(8);
                 for (int j = 0; j < byteArray.length; j++) {
-                    int value = (i+j) % 256;
+                    int value = (i + j) % 256;
                     if (value >= 128) {
                         value -= 256;
                     }
@@ -95,18 +96,19 @@ public class MemoryInputTest extends TestCase {
             }
         }
 
-        for (MemoryScatteringByteChannel memoryScatteringByteChannel : memoryScatteringByteChannelArray) {
+        for (MemoryScatteringByteChannel memoryScatteringByteChannel :
+                memoryScatteringByteChannelArray) {
             assertTrue(memoryScatteringByteChannel.isOpen());
-            for (int i = 0; memoryScatteringByteChannel.isOpen(); i+=3) {
+            for (int i = 0; memoryScatteringByteChannel.isOpen(); i += 3) {
                 int value = i % 256;
                 if (value >= 128) {
                     value -= 256;
                 }
-                int value2 = (i+1) % 256;
+                int value2 = (i + 1) % 256;
                 if (value2 >= 128) {
                     value2 -= 256;
                 }
-                int value3 = (i+2) % 256;
+                int value3 = (i + 2) % 256;
                 if (value3 >= 128) {
                     value3 -= 256;
                 }

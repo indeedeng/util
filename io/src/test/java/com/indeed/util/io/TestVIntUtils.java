@@ -7,14 +7,12 @@ import org.slf4j.LoggerFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class TestVIntUtils extends TestCase {
 
     private static final Logger log = LoggerFactory.getLogger(TestVIntUtils.class);
 
-    int[] ints = new int[]{1, -1, 0, Integer.MAX_VALUE, Integer.MIN_VALUE, 63, -64, 64, -65};
+    int[] ints = new int[] {1, -1, 0, Integer.MAX_VALUE, Integer.MIN_VALUE, 63, -64, 64, -65};
 
     public void testSVInt() throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();

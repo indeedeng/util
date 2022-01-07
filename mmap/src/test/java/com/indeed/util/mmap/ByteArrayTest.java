@@ -6,9 +6,7 @@ import java.io.File;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
-/**
- * @author goodwin
- */
+/** @author goodwin */
 public class ByteArrayTest extends TestCase {
 
     int length = 10000;
@@ -22,8 +20,17 @@ public class ByteArrayTest extends TestCase {
 
         byteArrays = new ByteArray[3];
         byteArrays[0] = new HeapMemory(length, ByteOrder.LITTLE_ENDIAN).byteArray(0, length);
-        byteArrays[1] = new MMapBuffer(file, 0, length, FileChannel.MapMode.READ_WRITE, ByteOrder.LITTLE_ENDIAN).memory().byteArray(0L, length);
-        byteArrays[2] = new NativeBuffer(length, ByteOrder.LITTLE_ENDIAN).memory().byteArray(0L, length);
+        byteArrays[1] =
+                new MMapBuffer(
+                                file,
+                                0,
+                                length,
+                                FileChannel.MapMode.READ_WRITE,
+                                ByteOrder.LITTLE_ENDIAN)
+                        .memory()
+                        .byteArray(0L, length);
+        byteArrays[2] =
+                new NativeBuffer(length, ByteOrder.LITTLE_ENDIAN).memory().byteArray(0L, length);
     }
 
     public void testByteArray() throws Exception {
@@ -36,9 +43,9 @@ public class ByteArrayTest extends TestCase {
             assertEquals(1, byteArray.get(1));
             assertEquals(2, byteArray.get(2));
             assertEquals(length, byteArray.length());
-            byteArray.set(3, new byte[]{3, 4});
+            byteArray.set(3, new byte[] {3, 4});
             assertEquals(3, byteArray.get(3));
-            byteArray.set(5, new byte[]{0, 1, 2, 3, 4, 5, 6}, 5, 2);
+            byteArray.set(5, new byte[] {0, 1, 2, 3, 4, 5, 6}, 5, 2);
 
             for (int i = 7; i < length; i++) {
                 byteArray.set(i, (byte) i);
@@ -64,7 +71,7 @@ public class ByteArrayTest extends TestCase {
                 }
             }
 
-            ByteArray second = byteArray.slice(2, length-2);
+            ByteArray second = byteArray.slice(2, length - 2);
             assertEquals(2, second.get(0));
         }
     }
@@ -74,31 +81,38 @@ public class ByteArrayTest extends TestCase {
             try {
                 byteArray.set(-1, (byte) 1);
                 fail();
-            } catch (IndexOutOfBoundsException success) {}
+            } catch (IndexOutOfBoundsException success) {
+            }
             try {
                 byteArray.set(-1, new byte[4], 0, 2);
                 fail();
-            } catch (IndexOutOfBoundsException success) {}
+            } catch (IndexOutOfBoundsException success) {
+            }
             try {
                 byteArray.set(-1, new byte[2]);
                 fail();
-            } catch (IndexOutOfBoundsException success) {}
+            } catch (IndexOutOfBoundsException success) {
+            }
             try {
                 byteArray.get(-1);
                 fail();
-            } catch (IndexOutOfBoundsException success) {}
+            } catch (IndexOutOfBoundsException success) {
+            }
             try {
                 byteArray.get(-1, new byte[4], 0, 2);
                 fail();
-            } catch (IndexOutOfBoundsException success) {}
+            } catch (IndexOutOfBoundsException success) {
+            }
             try {
                 byteArray.get(-1, new byte[4], 0, 2);
                 fail();
-            } catch (IndexOutOfBoundsException success) {}
+            } catch (IndexOutOfBoundsException success) {
+            }
             try {
                 byteArray.slice(-1, length);
                 fail();
-            } catch (IndexOutOfBoundsException success) {}
+            } catch (IndexOutOfBoundsException success) {
+            }
         }
     }
 }

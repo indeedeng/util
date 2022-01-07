@@ -12,9 +12,7 @@ import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.util.Random;
 
-/**
- * @author jsgroth
- */
+/** @author jsgroth */
 public class TestNativeMethods extends TestCase {
     private File file;
 
@@ -32,7 +30,8 @@ public class TestNativeMethods extends TestCase {
     public void testMMapMUnmapErrno() throws IOException {
         write10BytesToFile();
 
-        MMapBuffer buffer = new MMapBuffer(file, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
+        MMapBuffer buffer =
+                new MMapBuffer(file, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
         try {
             buffer.getErrno();
         } finally {
@@ -51,7 +50,9 @@ public class TestNativeMethods extends TestCase {
 
     @Test
     public void testCopyFromAndToByteArray() throws IOException {
-        MMapBuffer buffer = new MMapBuffer(file, 0L, 10L, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
+        MMapBuffer buffer =
+                new MMapBuffer(
+                        file, 0L, 10L, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
         Memory memory = buffer.memory();
         byte[] bytes = new byte[10];
         try {
@@ -62,7 +63,8 @@ public class TestNativeMethods extends TestCase {
             buffer.close();
         }
 
-        MMapBuffer buffer2 = new MMapBuffer(file, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
+        MMapBuffer buffer2 =
+                new MMapBuffer(file, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
         Memory memory2 = buffer2.memory();
         try {
             byte[] bytes2 = new byte[bytes.length];
@@ -75,7 +77,9 @@ public class TestNativeMethods extends TestCase {
 
     @Test
     public void testSyncAdvise() throws IOException {
-        MMapBuffer buffer = new MMapBuffer(file, 0L, 10L, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
+        MMapBuffer buffer =
+                new MMapBuffer(
+                        file, 0L, 10L, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
         Memory memory = buffer.memory();
         try {
             memory.putBytes(0L, new byte[10]);
@@ -84,7 +88,8 @@ public class TestNativeMethods extends TestCase {
             buffer.close();
         }
 
-        MMapBuffer buffer2 = new MMapBuffer(file, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
+        MMapBuffer buffer2 =
+                new MMapBuffer(file, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
         Memory memory2 = buffer2.memory();
         try {
             buffer2.advise(0L, 10L);
@@ -97,12 +102,14 @@ public class TestNativeMethods extends TestCase {
 
     @Test
     public void testMLock() throws IOException {
-        MMapBuffer buffer = new MMapBuffer(file, 0L, 10L, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
-        buffer.memory().putByte(0, (byte)1);
+        MMapBuffer buffer =
+                new MMapBuffer(
+                        file, 0L, 10L, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
+        buffer.memory().putByte(0, (byte) 1);
         buffer.mlock(0, buffer.memory().length());
-        buffer.memory().putByte(0, (byte)2);
+        buffer.memory().putByte(0, (byte) 2);
         buffer.munlock(0, buffer.memory().length());
-        buffer.memory().putByte(0, (byte)3);
+        buffer.memory().putByte(0, (byte) 3);
         buffer.close();
     }
 }

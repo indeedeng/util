@@ -12,17 +12,15 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class Stat {
 
     private static final Logger log = LoggerFactory.getLogger(Stat.class);
 
     private static final Field fdField;
 
-    //st_mode flags
-    private static final int S_IFMT  = 0xf000;
+    // st_mode flags
+    private static final int S_IFMT = 0xf000;
     private static final int S_IFSOCK = 0xc000;
     private static final int S_IFLNK = 0xa000;
     private static final int S_IFREG = 0x8000;
@@ -46,7 +44,18 @@ public final class Stat {
     private static final int S_IWOTH = 0x2;
     private static final int S_IXOTH = 0x1;
 
-    private static final ImmutableList<String> errstr = ImmutableList.of("OK", "EACCES", "EBADF", "EFAULT", "ELOOP", "ENAMETOOLONG", "ENOENT", "ENOMEM", "ENOTDIR", "EOVERFLOW");
+    private static final ImmutableList<String> errstr =
+            ImmutableList.of(
+                    "OK",
+                    "EACCES",
+                    "EBADF",
+                    "EFAULT",
+                    "ELOOP",
+                    "ENAMETOOLONG",
+                    "ENOENT",
+                    "ENOMEM",
+                    "ENOTDIR",
+                    "EOVERFLOW");
 
     static {
         try {
@@ -68,9 +77,13 @@ public final class Stat {
             int err = stat(file, direct.getAddress());
             if (err != 0) {
                 if (err == errstr.indexOf("ENOENT")) {
-                    throw new FileNotFoundException("No such file or directory: "+file);
+                    throw new FileNotFoundException("No such file or directory: " + file);
                 }
-                throw new IOException("stat on path "+file+" failed with error "+(err < 0 ? "unknown" : errstr.get(err)));
+                throw new IOException(
+                        "stat on path "
+                                + file
+                                + " failed with error "
+                                + (err < 0 ? "unknown" : errstr.get(err)));
             }
             return new Stat(direct);
         } finally {
@@ -88,10 +101,14 @@ public final class Stat {
             DirectMemory direct = nativeBuffer.memory();
             int err = lstat(file, direct.getAddress());
             if (err == errstr.indexOf("ENOENT")) {
-                throw new FileNotFoundException("No such file or directory: "+file);
+                throw new FileNotFoundException("No such file or directory: " + file);
             }
             if (err != 0) {
-                throw new IOException("stat on path "+file+" failed with error "+(err < 0 ? "unknown" : errstr.get(err)));
+                throw new IOException(
+                        "stat on path "
+                                + file
+                                + " failed with error "
+                                + (err < 0 ? "unknown" : errstr.get(err)));
             }
             return new Stat(direct);
         } finally {
@@ -113,7 +130,11 @@ public final class Stat {
                     throw new FileNotFoundException("No such file or directory");
                 }
                 if (err != 0) {
-                    throw new IOException("fstat on file descriptor "+fd+" failed with error "+(err < 0 ? "unknown" : errstr.get(err)));
+                    throw new IOException(
+                            "fstat on file descriptor "
+                                    + fd
+                                    + " failed with error "
+                                    + (err < 0 ? "unknown" : errstr.get(err)));
                 }
             } catch (IllegalAccessException e) {
                 throw Throwables.propagate(e);
@@ -125,7 +146,9 @@ public final class Stat {
     }
 
     private static native int stat(String path, long addr);
+
     private static native int lstat(String path, long addr);
+
     private static native int fstat(int fd, long addr);
 
     private final long device;
@@ -143,19 +166,8 @@ public final class Stat {
     private final long cTime;
 
     /**
-     * st_dev: 8
-     * st_ino: 8
-     * st_mode: 4
-     * st_nlink: 8
-     * st_uid: 4
-     * st_gid: 4
-     * st_rdev: 8
-     * st_size: 8
-     * st_blksize: 8
-     * st_blocks: 8
-     * st_atime: 8
-     * st_mtime: 8
-     * st_ctime: 8
+     * st_dev: 8 st_ino: 8 st_mode: 4 st_nlink: 8 st_uid: 4 st_gid: 4 st_rdev: 8 st_size: 8
+     * st_blksize: 8 st_blocks: 8 st_atime: 8 st_mtime: 8 st_ctime: 8
      */
     private Stat(DirectMemory direct) {
         device = direct.getLong(0);
@@ -307,33 +319,33 @@ public final class Stat {
 
     @Override
     public String toString() {
-        return "Stat{" +
-                "device=" +
-                device +
-                ", inode=" +
-                inode +
-                ", mode=" +
-                String.format("%x", mode) +
-                ", numLinks=" +
-                numLinks +
-                ", uid=" +
-                uid +
-                ", gid=" +
-                gid +
-                ", rdev=" +
-                rdev +
-                ", size=" +
-                size +
-                ", blockSize=" +
-                blockSize +
-                ", numBlocks=" +
-                numBlocks +
-                ", aTime=" +
-                aTime +
-                ", mTime=" +
-                mTime +
-                ", cTime=" +
-                cTime +
-                '}';
+        return "Stat{"
+                + "device="
+                + device
+                + ", inode="
+                + inode
+                + ", mode="
+                + String.format("%x", mode)
+                + ", numLinks="
+                + numLinks
+                + ", uid="
+                + uid
+                + ", gid="
+                + gid
+                + ", rdev="
+                + rdev
+                + ", size="
+                + size
+                + ", blockSize="
+                + blockSize
+                + ", numBlocks="
+                + numBlocks
+                + ", aTime="
+                + aTime
+                + ", mTime="
+                + mTime
+                + ", cTime="
+                + cTime
+                + '}';
     }
 }

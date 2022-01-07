@@ -3,15 +3,15 @@ package com.indeed.util.mmap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 final class ReverseEndianDirectDataAccess implements DirectDataAccess {
     private static final Logger log = LoggerFactory.getLogger(ReverseEndianDirectDataAccess.class);
 
-    private static final NativeEndianDirectDataAccess delegate = NativeEndianDirectDataAccess.getInstance();
+    private static final NativeEndianDirectDataAccess delegate =
+            NativeEndianDirectDataAccess.getInstance();
 
-    private static final ReverseEndianDirectDataAccess instance = new ReverseEndianDirectDataAccess();
+    private static final ReverseEndianDirectDataAccess instance =
+            new ReverseEndianDirectDataAccess();
 
     public static ReverseEndianDirectDataAccess getInstance() {
         return instance;

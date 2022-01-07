@@ -1,8 +1,6 @@
 package com.indeed.util.serialization;
 
-/**
-* @author jplaisance
-*/
+/** @author jplaisance */
 public class IntStringifier implements Stringifier<Integer> {
 
     @Override

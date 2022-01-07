@@ -2,10 +2,8 @@ package com.indeed.util.core;
 
 import com.google.common.base.Function;
 
-/**
-* @author jplaisance
-*/
-public interface Either<A extends Throwable,B> {
+/** @author jplaisance */
+public interface Either<A extends Throwable, B> {
 
     public <Z> Z match(Matcher<A, B, Z> matcher) throws A;
 
@@ -15,7 +13,7 @@ public interface Either<A extends Throwable,B> {
 
     public B get() throws A;
 
-    public static abstract class Matcher<A extends Throwable,B,Z> {
+    public abstract static class Matcher<A extends Throwable, B, Z> {
 
         protected Z left(A a) throws A {
             throw a;
@@ -26,11 +24,11 @@ public interface Either<A extends Throwable,B> {
         }
     }
 
-    public static final class Left<A extends Throwable,B> implements Either<A,B> {
+    public static final class Left<A extends Throwable, B> implements Either<A, B> {
 
         private final A a;
 
-        public static <A extends Throwable,B> Either<A,B> of(A a) {
+        public static <A extends Throwable, B> Either<A, B> of(A a) {
             return new Left<A, B>(a);
         }
 
@@ -44,12 +42,12 @@ public interface Either<A extends Throwable,B> {
 
         @Override
         public <C> Either<A, C> map(final Function<B, C> f) {
-            return (Either<A, C>)this;
+            return (Either<A, C>) this;
         }
 
         @Override
         public <C> Either<A, C> flatMap(final Function<B, Either<A, C>> f) {
-            return (Either<A, C>)this;
+            return (Either<A, C>) this;
         }
 
         @Override
@@ -58,11 +56,11 @@ public interface Either<A extends Throwable,B> {
         }
     }
 
-    public static final class Right<A extends Throwable,B> implements Either<A,B> {
+    public static final class Right<A extends Throwable, B> implements Either<A, B> {
 
         private final B b;
 
-        public static <A extends Throwable,B> Either<A,B> of(B b) {
+        public static <A extends Throwable, B> Either<A, B> of(B b) {
             return new Right<A, B>(b);
         }
 

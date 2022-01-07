@@ -1,9 +1,6 @@
 package com.indeed.util.core.io;
 
-/**
- * @author ketan
- *
- */
+/** @author ketan */
 public interface Terminable {
     public void shutdown();
 }

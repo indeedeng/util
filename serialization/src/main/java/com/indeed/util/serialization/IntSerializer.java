@@ -7,9 +7,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class IntSerializer implements Serializer<Integer> {
 
     private static final Logger log = LoggerFactory.getLogger(IntSerializer.class);

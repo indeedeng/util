@@ -7,33 +7,31 @@ import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Comparator;
 
-/**
- * @author ahudson
- */
+/** @author ahudson */
 public class Pair<A, B> implements Serializable {
-    
+
     private static final long serialVersionUID = -7675178028057823346L;
-    
+
     private final A a;
     private final B b;
-    
+
     public Pair(A a, B b) {
         this.a = a;
         this.b = b;
     }
-    
+
     public A getFirst() {
         return a;
     }
-    
+
     public B getSecond() {
         return b;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof Pair) {
-            Pair p = (Pair)obj;
+            Pair p = (Pair) obj;
             Object a = p.getFirst();
             Object b = p.getSecond();
             return (a == null ? this.a == null : a.equals(this.a))
@@ -52,7 +50,7 @@ public class Pair<A, B> implements Serializable {
 
     @Override
     public String toString() {
-        return "("+a+", "+b+")";
+        return "(" + a + ", " + b + ")";
     }
 
     public static <T1, T2> Pair<T1, T2> of(T1 first, T2 second) {
@@ -61,23 +59,21 @@ public class Pair<A, B> implements Serializable {
 
     public static class FullPairComparator implements Comparator<Pair> {
         public int compare(Pair o1, Pair o2) {
-            int ret = ((Comparable)o1.a).compareTo(o2.a);
-            if (ret == 0) return ((Comparable)o1.b).compareTo(o2.b);
+            int ret = ((Comparable) o1.a).compareTo(o2.a);
+            if (ret == 0) return ((Comparable) o1.b).compareTo(o2.b);
             return ret;
         }
     }
 
     public static class HalfPairComparator implements Comparator<Pair> {
         public int compare(Pair o1, Pair o2) {
-            return ((Comparable)o1.a).compareTo(o2.a);
+            return ((Comparable) o1.a).compareTo(o2.a);
         }
     }
 
     /**
-     * Makes grabbing the first value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(String, ?) objects:
-     *
-     * <br>
+     * Makes grabbing the first value out of a collection of Pairs a bit easier, e.g. given an
+     * iterable over Pair.of(String, ?) objects: <br>
      * <code>... = Iterables.transform(iterable, Pair.fst(String.class))</code>
      *
      * @param clazz The class type for a.
@@ -88,10 +84,13 @@ public class Pair<A, B> implements Serializable {
      */
     @Nonnull
     @Deprecated
-    public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T1> fst(@Nonnull final Class<T1> clazz) {
+    public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T1> fst(
+            @Nonnull final Class<T1> clazz) {
         return new First<>();
     }
-    private static final class First<T1, T2> implements Function<Pair<? extends T1, ? extends T2>, T1> {
+
+    private static final class First<T1, T2>
+            implements Function<Pair<? extends T1, ? extends T2>, T1> {
         @Nullable
         @Override
         public T1 apply(@Nullable Pair<? extends T1, ? extends T2> input) {
@@ -100,10 +99,8 @@ public class Pair<A, B> implements Serializable {
     }
 
     /**
-     * Makes grabbing the first value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(String, ?) objects:
-     *
-     * <br>
+     * Makes grabbing the first value out of a collection of Pairs a bit easier, e.g. given an
+     * iterable over Pair.of(String, ?) objects: <br>
      * <code>
      *     ... = Iterables.transform(iterable, Pair.&lt;String&gt;fst())
      * </code>
@@ -123,10 +120,8 @@ public class Pair<A, B> implements Serializable {
     }
 
     /**
-     * Makes grabbing the second value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(?, String) objects:
-     *
-     * <br>
+     * Makes grabbing the second value out of a collection of Pairs a bit easier, e.g. given an
+     * iterable over Pair.of(?, String) objects: <br>
      * <code>
      *     ... = Iterables.transform(iterable, Pair.snd(String.class))
      * </code>
@@ -138,10 +133,13 @@ public class Pair<A, B> implements Serializable {
      */
     @Nonnull
     @Deprecated
-    public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T2> snd(@Nonnull final Class<T2> clazz) {
+    public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T2> snd(
+            @Nonnull final Class<T2> clazz) {
         return new Second<>();
     }
-    private static final class Second<T1, T2> implements Function<Pair<? extends T1, ? extends T2>, T2> {
+
+    private static final class Second<T1, T2>
+            implements Function<Pair<? extends T1, ? extends T2>, T2> {
         @Nullable
         @Override
         public T2 apply(@Nullable Pair<? extends T1, ? extends T2> input) {
@@ -150,10 +148,8 @@ public class Pair<A, B> implements Serializable {
     }
 
     /**
-     * Makes grabbing the second value out of a collection of Pairs a bit easier, e.g.
-     * given an iterable over Pair.of(?, String) objects:
-     *
-     * <br>
+     * Makes grabbing the second value out of a collection of Pairs a bit easier, e.g. given an
+     * iterable over Pair.of(?, String) objects: <br>
      * <code>
      *     ... = Iterables.transform(iterable, Pair.&lt;String&gt;snd())
      * </code>
@@ -171,5 +167,4 @@ public class Pair<A, B> implements Serializable {
             }
         };
     }
-
 }

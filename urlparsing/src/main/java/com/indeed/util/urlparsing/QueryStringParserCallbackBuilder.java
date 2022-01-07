@@ -2,12 +2,14 @@
 package com.indeed.util.urlparsing;
 
 import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
 /**
- * Class for building a more complicated and efficient URLParamCallback that calls other callbacks registered for specific keys.  The
- * generated callback does not create any garbage during calls to parseKeyValuePair.
+ * Class for building a more complicated and efficient URLParamCallback that calls other callbacks
+ * registered for specific keys. The generated callback does not create any garbage during calls to
+ * parseKeyValuePair.
  *
  * @author ahudson
  * @author preetha
@@ -64,7 +66,7 @@ public class QueryStringParserCallbackBuilder<T> {
             for (KeyCallbackPair<T> keyCallbackPair : keyCallbackPairs) {
                 String key = keyCallbackPair.getKey();
                 int hash = hash(key, 0, key.length());
-                if (slotMap.containsKey(hash))  {
+                if (slotMap.containsKey(hash)) {
                     nextSlot[i] = slotMap.get(hash);
                 } else {
                     nextSlot[i] = -1;
@@ -76,17 +78,27 @@ public class QueryStringParserCallbackBuilder<T> {
             }
         }
 
-        public void parseKeyValuePair(String queryString, int keyStart, int keyEnd, int valueStart, int valueEnd, T storage) {
+        public void parseKeyValuePair(
+                String queryString,
+                int keyStart,
+                int keyEnd,
+                int valueStart,
+                int valueEnd,
+                T storage) {
             // equiv to String key = queryString.substring(keyStart, keyEnd);
-            int length = keyEnd-keyStart;
+            int length = keyEnd - keyStart;
             int hash = hash(queryString, keyStart, keyEnd); // equiv to key.hashCode();
             Integer slot = slotMap.get(hash);
             while (slot != null && slot != -1) {
                 String currentKey = keys[slot];
-                if (currentKey.length() == length && queryString.startsWith(currentKey, keyStart)) { // equiv to keys[slot].equals(key)
+                if (currentKey.length() == length
+                        && queryString.startsWith(
+                                currentKey, keyStart)) { // equiv to keys[slot].equals(key)
                     // call the callback
-                    QueryStringParserCallback<T> callback = (QueryStringParserCallback<T>)callbacks[slot];
-                    callback.parseKeyValuePair(queryString, keyStart, keyEnd, valueStart, valueEnd, storage);
+                    QueryStringParserCallback<T> callback =
+                            (QueryStringParserCallback<T>) callbacks[slot];
+                    callback.parseKeyValuePair(
+                            queryString, keyStart, keyEnd, valueStart, valueEnd, storage);
                 }
                 slot = nextSlot[slot];
             }
