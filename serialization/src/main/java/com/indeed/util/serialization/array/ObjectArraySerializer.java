@@ -10,9 +10,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.lang.reflect.Array;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class ObjectArraySerializer<E> implements Serializer<E[]> {
     private static final Logger log = LoggerFactory.getLogger(ObjectArraySerializer.class);
 

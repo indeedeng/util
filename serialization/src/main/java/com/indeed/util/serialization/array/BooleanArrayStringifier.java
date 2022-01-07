@@ -11,10 +11,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * @author jplaisance
- */
-public final class BooleanArrayStringifier implements Stringifier<boolean[]>{
+/** @author jplaisance */
+public final class BooleanArrayStringifier implements Stringifier<boolean[]> {
     private static final Logger log = LoggerFactory.getLogger(BooleanArrayStringifier.class);
 
     @Override
@@ -25,8 +23,11 @@ public final class BooleanArrayStringifier implements Stringifier<boolean[]>{
     @Override
     public boolean[] fromString(String str) {
         List<Boolean> booleans = Lists.newArrayList();
-        EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.is(',')), EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
-        Iterator<String> split = splitter.split(str.substring(1, str.length()-1));
+        EscapeAwareSplitter splitter =
+                new EscapeAwareSplitter(
+                        CharMatcher.whitespace().or(CharMatcher.is(',')),
+                        EscapeAwareSplitter.NO_ESCAPE_LEXER_SUPPLIER);
+        Iterator<String> split = splitter.split(str.substring(1, str.length() - 1));
         while (split.hasNext()) {
             booleans.add(Boolean.parseBoolean(split.next()));
         }

@@ -2,9 +2,7 @@ package com.indeed.util.io.checkpointer;
 
 import java.io.IOException;
 
-/**
- * @author tony
- */
+/** @author tony */
 public interface Checkpointer<T> {
 
     public T getCheckpoint();

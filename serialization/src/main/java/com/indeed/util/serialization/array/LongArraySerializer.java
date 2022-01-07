@@ -9,9 +9,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class LongArraySerializer implements Serializer<long[]> {
     private static final Logger log = LoggerFactory.getLogger(LongArraySerializer.class);
 

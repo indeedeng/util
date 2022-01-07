@@ -11,9 +11,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class NativeLibraryUtils {
 
     private static final Logger log = LoggerFactory.getLogger(NativeLibraryUtils.class);
@@ -28,13 +26,19 @@ public final class NativeLibraryUtils {
             final String arch = System.getProperty("os.arch");
             final String prefix = getLibraryPrefix(osName);
             final String extension = getLibraryType(osName);
-            final String libName = prefix+name+"."+extension+(Strings.isNullOrEmpty(version) ? "" : "."+version);
+            final String libName =
+                    prefix
+                            + name
+                            + "."
+                            + extension
+                            + (Strings.isNullOrEmpty(version) ? "" : "." + version);
             final String resourcePath = "/native/" + osName + "-" + arch + "/" + libName;
             final InputStream is = NativeLibraryUtils.class.getResourceAsStream(resourcePath);
             if (is == null) {
-                throw new FileNotFoundException("unable to find "+libName+" at resource path "+resourcePath);
+                throw new FileNotFoundException(
+                        "unable to find " + libName + " at resource path " + resourcePath);
             }
-            final File tempFile = File.createTempFile(prefix+name, "."+extension);
+            final File tempFile = File.createTempFile(prefix + name, "." + extension);
             final OutputStream os = new FileOutputStream(tempFile);
             ByteStreams.copy(is, os);
             os.close();
@@ -44,7 +48,9 @@ public final class NativeLibraryUtils {
             tempFile.delete();
         } catch (Throwable e) {
             e.printStackTrace();
-            log.warn("unable to load "+name+" using class loader, looking in java.library.path", e);
+            log.warn(
+                    "unable to load " + name + " using class loader, looking in java.library.path",
+                    e);
             System.loadLibrary(name); // if this fails it throws UnsatisfiedLinkError
         }
     }
@@ -56,7 +62,8 @@ public final class NativeLibraryUtils {
         return "lib";
     }
 
-    //i only tested linux, the others are here just in case. i got them from http://lopica.sourceforge.net/os.html
+    // i only tested linux, the others are here just in case. i got them from
+    // http://lopica.sourceforge.net/os.html
     static String getLibraryType(String os) {
         if (os.startsWith("Linux")) {
             return "so";

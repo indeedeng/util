@@ -9,18 +9,18 @@ import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class ReloadableSharedReference<T, E extends Throwable> {
 
     private static final Logger log = LoggerFactory.getLogger(ReloadableSharedReference.class);
 
-    public static <T extends Closeable, E extends Throwable> ReloadableSharedReference<T, E> create(Loader<T, E> loader) {
+    public static <T extends Closeable, E extends Throwable> ReloadableSharedReference<T, E> create(
+            Loader<T, E> loader) {
         return new ReloadableSharedReference<T, E>(loader, Closer.<T>closeableCloser());
     }
 
-    public static <T, E extends Throwable> ReloadableSharedReference<T, E> create(Loader<T, E> loader, Closer<T> closer) {
+    public static <T, E extends Throwable> ReloadableSharedReference<T, E> create(
+            Loader<T, E> loader, Closer<T> closer) {
         return new ReloadableSharedReference<T, E>(loader, closer);
     }
 
@@ -35,17 +35,18 @@ public final class ReloadableSharedReference<T, E extends Throwable> {
         this.closer = closer;
     }
 
-    public static abstract class Closer<T> {
+    public abstract static class Closer<T> {
 
-        private static final Closer<Closeable> closeableCloser = new Closer<Closeable>() {
-            @Override
-            public void close(final Closeable closeable) {
-                Closeables2.close(closeable);
-            }
-        };
+        private static final Closer<Closeable> closeableCloser =
+                new Closer<Closeable>() {
+                    @Override
+                    public void close(final Closeable closeable) {
+                        Closeables2.close(closeable);
+                    }
+                };
 
         private static <T extends Closeable> Closer<T> closeableCloser() {
-            return (Closer<T>)closeableCloser;
+            return (Closer<T>) closeableCloser;
         }
 
         public abstract void close(T t);
@@ -60,7 +61,7 @@ public final class ReloadableSharedReference<T, E extends Throwable> {
         }
     }
 
-    public static abstract class Loader<T, E extends Throwable> {
+    public abstract static class Loader<T, E extends Throwable> {
 
         public static <T> Loader<T, RuntimeException> fromSupplier(final Supplier<T> supplier) {
             return new Loader<T, RuntimeException>() {
@@ -86,15 +87,18 @@ public final class ReloadableSharedReference<T, E extends Throwable> {
             synchronized (loader) {
                 if (w == weakRef) {
                     final T t = loader.load();
-                    final SharedReference<T> ret = SharedReference.create(t, new Closeable() {
-                        @Override
-                        public void close() throws IOException {
-                            synchronized (loader) {
-                                weakRef = null;
-                                closer.close(t);
-                            }
-                        }
-                    });
+                    final SharedReference<T> ret =
+                            SharedReference.create(
+                                    t,
+                                    new Closeable() {
+                                        @Override
+                                        public void close() throws IOException {
+                                            synchronized (loader) {
+                                                weakRef = null;
+                                                closer.close(t);
+                                            }
+                                        }
+                                    });
                     weakRef = WeakSharedReference.create(ret);
                     return ret;
                 }

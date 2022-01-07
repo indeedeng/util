@@ -8,7 +8,6 @@ import static junit.framework.Assert.assertEquals;
  * @author ahudson
  * @author preetha
  */
-
 public class TestQueryStringParser {
 
     private static final class URLParamsBuilder {
@@ -35,11 +34,16 @@ public class TestQueryStringParser {
         }
     }
 
-    private static final class URLBuilderCallback implements QueryStringParserCallback<URLParamsBuilder> {
+    private static final class URLBuilderCallback
+            implements QueryStringParserCallback<URLParamsBuilder> {
         @Override
         public void parseKeyValuePair(
-                String urlParams, int keyStart, int keyEnd, int valueStart, int valueEnd, URLParamsBuilder paramsBuilder
-        ) {
+                String urlParams,
+                int keyStart,
+                int keyEnd,
+                int valueStart,
+                int valueEnd,
+                URLParamsBuilder paramsBuilder) {
             paramsBuilder.append(urlParams, keyStart, valueEnd);
         }
     }
@@ -49,7 +53,8 @@ public class TestQueryStringParser {
         QueryStringParser.parseQueryString(input, new URLBuilderCallback(), paramsBuilder);
         assertEquals(input, paramsBuilder.toString());
         paramsBuilder = new URLParamsBuilder();
-        QueryStringParser.parseQueryString(input, new URLBuilderCallback(), paramsBuilder, 0, input.length(), "&", "=");
+        QueryStringParser.parseQueryString(
+                input, new URLBuilderCallback(), paramsBuilder, 0, input.length(), "&", "=");
         assertEquals(input, paramsBuilder.toString());
     }
 
@@ -61,11 +66,15 @@ public class TestQueryStringParser {
 
     @Test
     public void testSomeKeysParsing() {
-        QueryStringParserCallbackBuilder<URLParamsBuilder> callbackBuilder = new QueryStringParserCallbackBuilder<URLParamsBuilder>();
+        QueryStringParserCallbackBuilder<URLParamsBuilder> callbackBuilder =
+                new QueryStringParserCallbackBuilder<URLParamsBuilder>();
         URLParamsBuilder paramsBuilder = new URLParamsBuilder();
         callbackBuilder.addCallback("x35lk", new URLBuilderCallback());
         callbackBuilder.addCallback("x", new URLBuilderCallback());
-        QueryStringParser.parseQueryString("a=b&x7x&x&x35lk=sadjlkj&blah=blah=blah&x=y", callbackBuilder.buildCallback(), paramsBuilder);
+        QueryStringParser.parseQueryString(
+                "a=b&x7x&x&x35lk=sadjlkj&blah=blah=blah&x=y",
+                callbackBuilder.buildCallback(),
+                paramsBuilder);
         assertEquals("x&x35lk=sadjlkj&x=y", paramsBuilder.toString());
     }
 
@@ -89,7 +98,8 @@ public class TestQueryStringParser {
         }
 
         @Override
-        public void parseKeyValuePair(String qs, int keyStart, int keyEnd, int valueStart, int valueEnd, Object ignored) {
+        public void parseKeyValuePair(
+                String qs, int keyStart, int keyEnd, int valueStart, int valueEnd, Object ignored) {
             storage.value = ParseUtils.parseInt(qs, valueStart, valueEnd);
         }
     }
@@ -98,9 +108,11 @@ public class TestQueryStringParser {
     */
     @Test
     public void testCustomDelimiter() {
-        final String url = "a%3Djspls%26tk%3D13l9q49sk065g2tu%26re%3D22%26pe%3D547%26pl%3D688%26pt%3D1235";
+        final String url =
+                "a%3Djspls%26tk%3D13l9q49sk065g2tu%26re%3D22%26pe%3D547%26pl%3D688%26pt%3D1235";
         final TestRecord record = new TestRecord();
-        final QueryStringParserCallbackBuilder<Object> builder = new QueryStringParserCallbackBuilder<Object>();
+        final QueryStringParserCallbackBuilder<Object> builder =
+                new QueryStringParserCallbackBuilder<Object>();
         builder.addCallback("re", new MutableIntParser(record.re));
         builder.addCallback("pe", new MutableIntParser(record.pe));
         builder.addCallback("pl", new MutableIntParser(record.pl));
@@ -115,6 +127,4 @@ public class TestQueryStringParser {
         assertEquals(1235, record.pt.value);
         assertEquals(0, record.zero.value);
     }
-
 }
-

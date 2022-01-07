@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * Utilities for working with directory {@link Path} objects.
- * 
+ *
  * @author rboyer
  */
 public final class Directories {
@@ -38,11 +38,11 @@ public final class Directories {
 
     /**
      * Convenience method to return all paths in a SMALL directory.
-     * <p>
-     * DO NOT USE THIS TO TRAVERSE LARGE (multi-thousand inode) DIRECTORIES!
-     * <p>
-     * For starters you shouldn't be making directories that big at all, but if you did please use
-     * {@link Files#newDirectoryStream(Path)} directly in your code.
+     *
+     * <p>DO NOT USE THIS TO TRAVERSE LARGE (multi-thousand inode) DIRECTORIES!
+     *
+     * <p>For starters you shouldn't be making directories that big at all, but if you did please
+     * use {@link Files#newDirectoryStream(Path)} directly in your code.
      *
      * @param dir directory to evaluate
      * @return all files in that directory
@@ -62,5 +62,7 @@ public final class Directories {
         return contents;
     }
 
-    private Directories() { /* no */ }
+    private Directories() {
+        /* no */
+    }
 }

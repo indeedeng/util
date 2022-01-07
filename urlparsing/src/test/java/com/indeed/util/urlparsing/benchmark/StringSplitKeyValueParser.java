@@ -8,9 +8,7 @@ import java.net.URLDecoder;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * @author: preetha
- */
+/** @author: preetha */
 public class StringSplitKeyValueParser implements KeyValueParser {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StringSplitKeyValueParser.class);
@@ -26,8 +24,8 @@ public class StringSplitKeyValueParser implements KeyValueParser {
                 final String value = URLDecoder.decode(pair.substring(idx + 1), "UTF-8");
                 query_pairs.put(key, value);
             }
-        } catch(UnsupportedEncodingException ex) {
-            LOGGER.error("Unable to url decode ",ex);
+        } catch (UnsupportedEncodingException ex) {
+            LOGGER.error("Unable to url decode ", ex);
         }
     }
 }

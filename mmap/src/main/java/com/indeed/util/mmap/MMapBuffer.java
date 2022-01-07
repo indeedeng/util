@@ -17,9 +17,7 @@ import java.nio.file.Path;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class MMapBuffer implements BufferResource {
 
     private static final Field FD_FIELD;
@@ -44,17 +42,19 @@ public final class MMapBuffer implements BufferResource {
         }
     }
 
-    @VisibleForTesting
-    static Tracker openBuffersTracker;
+    @VisibleForTesting static Tracker openBuffersTracker;
+
     static {
-        final boolean shouldTrack = "true".equals(System.getProperty("com.indeed.util.mmap.MMapBuffer.enableTracking"));
+        final boolean shouldTrack =
+                "true".equals(System.getProperty("com.indeed.util.mmap.MMapBuffer.enableTracking"));
         setTrackingEnabled(shouldTrack);
     }
 
     private final long address;
     private final DirectMemory memory;
 
-    private static RandomAccessFile open(Path path, FileChannel.MapMode mapMode) throws FileNotFoundException {
+    private static RandomAccessFile open(Path path, FileChannel.MapMode mapMode)
+            throws FileNotFoundException {
         if (Files.notExists(path) && mapMode == FileChannel.MapMode.READ_ONLY) {
             throw new FileNotFoundException(path + " does not exist");
         }
@@ -64,7 +64,8 @@ public final class MMapBuffer implements BufferResource {
         } else if (mapMode == FileChannel.MapMode.READ_WRITE) {
             openMode = "rw";
         } else {
-            throw new IllegalArgumentException("only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
+            throw new IllegalArgumentException(
+                    "only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
         }
         return new RandomAccessFile(path.toFile(), openMode);
     }
@@ -73,7 +74,9 @@ public final class MMapBuffer implements BufferResource {
         this(file, 0, file.length(), mapMode, order);
     }
 
-    public MMapBuffer(File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+    public MMapBuffer(
+            File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order)
+            throws IOException {
         this(file.toPath(), offset, length, mapMode, order);
     }
 
@@ -81,27 +84,63 @@ public final class MMapBuffer implements BufferResource {
         this(path, 0, Files.size(path), mapMode, order);
     }
 
-    public MMapBuffer(Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+    public MMapBuffer(
+            Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order)
+            throws IOException {
         this(open(path, mapMode), path, offset, length, mapMode, order, true);
     }
 
-    public MMapBuffer(RandomAccessFile raf, File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+    public MMapBuffer(
+            RandomAccessFile raf,
+            File file,
+            long offset,
+            long length,
+            FileChannel.MapMode mapMode,
+            ByteOrder order)
+            throws IOException {
         this(raf, file, offset, length, mapMode, order, false);
     }
 
-    public MMapBuffer(RandomAccessFile raf, Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order) throws IOException {
+    public MMapBuffer(
+            RandomAccessFile raf,
+            Path path,
+            long offset,
+            long length,
+            FileChannel.MapMode mapMode,
+            ByteOrder order)
+            throws IOException {
         this(raf, path, offset, length, mapMode, order, false);
     }
 
-    public MMapBuffer(RandomAccessFile raf, File file, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order, boolean closeFile) throws IOException {
+    public MMapBuffer(
+            RandomAccessFile raf,
+            File file,
+            long offset,
+            long length,
+            FileChannel.MapMode mapMode,
+            ByteOrder order,
+            boolean closeFile)
+            throws IOException {
         this(raf, file.toPath(), offset, length, mapMode, order, closeFile);
     }
 
-    public MMapBuffer(RandomAccessFile raf, Path path, long offset, long length, FileChannel.MapMode mapMode, ByteOrder order, boolean closeFile) throws IOException {
+    public MMapBuffer(
+            RandomAccessFile raf,
+            Path path,
+            long offset,
+            long length,
+            FileChannel.MapMode mapMode,
+            ByteOrder order,
+            boolean closeFile)
+            throws IOException {
         try {
-            if (offset < 0) throw new IllegalArgumentException("error mapping [" + path + "]: offset must be >= 0");
+            if (offset < 0)
+                throw new IllegalArgumentException(
+                        "error mapping [" + path + "]: offset must be >= 0");
             if (length <= 0) {
-                if (length < 0) throw new IllegalArgumentException("error mapping [" + path + "]: length must be >= 0");
+                if (length < 0)
+                    throw new IllegalArgumentException(
+                            "error mapping [" + path + "]: length must be >= 0");
                 address = 0;
                 memory = new DirectMemory(0, 0, order);
             } else {
@@ -111,13 +150,17 @@ public final class MMapBuffer implements BufferResource {
                 } else if (mapMode == FileChannel.MapMode.READ_WRITE) {
                     prot = READ_WRITE;
                 } else {
-                    throw new IllegalArgumentException("only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
+                    throw new IllegalArgumentException(
+                            "only MapMode.READ_ONLY and MapMode.READ_WRITE are supported");
                 }
-                if (raf.length() < offset+length) {
+                if (raf.length() < offset + length) {
                     if (mapMode == FileChannel.MapMode.READ_WRITE) {
-                        raf.setLength(offset+length);
+                        raf.setLength(offset + length);
                     } else {
-                        throw new IllegalArgumentException("cannot open file [" + path + "] in read only mode with offset+length > file.length()");
+                        throw new IllegalArgumentException(
+                                "cannot open file ["
+                                        + path
+                                        + "] in read only mode with offset+length > file.length()");
                     }
                 }
                 final int fd;
@@ -129,7 +172,18 @@ public final class MMapBuffer implements BufferResource {
                 address = mmap(length, prot, MAP_SHARED, fd, offset);
                 if (address == MAP_FAILED) {
                     final int errno = errno();
-                    throw new IOException("mmap(" + path + ", " + offset + ", " + length + ", " + mapMode + ") failed [Errno " + errno + "]");
+                    throw new IOException(
+                            "mmap("
+                                    + path
+                                    + ", "
+                                    + offset
+                                    + ", "
+                                    + length
+                                    + ", "
+                                    + mapMode
+                                    + ") failed [Errno "
+                                    + errno
+                                    + "]");
                 }
                 memory = new DirectMemory(address, length, order);
             }
@@ -158,49 +212,50 @@ public final class MMapBuffer implements BufferResource {
 
     static native int errno();
 
-    //this is not particularly useful, the syscall takes forever
+    // this is not particularly useful, the syscall takes forever
     public void advise(long position, long length) throws IOException {
-        final long ap = address+position;
-        final long a = (ap)/PAGE_SIZE*PAGE_SIZE;
-        final long l = Math.min(length+(ap-a), address+memory.length()-ap);
+        final long ap = address + position;
+        final long a = (ap) / PAGE_SIZE * PAGE_SIZE;
+        final long l = Math.min(length + (ap - a), address + memory.length() - ap);
         final int err = madvise(a, l);
         if (err != 0) {
-            throw new IOException("madvise failed with error code: "+err);
+            throw new IOException("madvise failed with error code: " + err);
         }
     }
 
     public void sync(long position, long length) throws IOException {
-        final long ap = address+position;
-        final long a = (ap)/PAGE_SIZE*PAGE_SIZE;
-        final long l = Math.min(length+(ap-a), address+memory.length()-ap);
+        final long ap = address + position;
+        final long a = (ap) / PAGE_SIZE * PAGE_SIZE;
+        final long l = Math.min(length + (ap - a), address + memory.length() - ap);
         final int err = msync(a, l);
         if (err != 0) {
-            throw new IOException("msync failed with error code: "+err);
+            throw new IOException("msync failed with error code: " + err);
         }
     }
 
     public void mlock(long position, long length) {
         if (position < 0) throw new IndexOutOfBoundsException();
         if (length < 0) throw new IndexOutOfBoundsException();
-        if (position+length > memory.length()) throw new IndexOutOfBoundsException();
-        NativeMemoryUtils.mlock(address+position, length);
+        if (position + length > memory.length()) throw new IndexOutOfBoundsException();
+        NativeMemoryUtils.mlock(address + position, length);
     }
 
     public void munlock(long position, long length) {
         if (position < 0) throw new IndexOutOfBoundsException();
         if (length < 0) throw new IndexOutOfBoundsException();
-        if (position+length > memory.length()) throw new IndexOutOfBoundsException();
-        NativeMemoryUtils.munlock(address+position, length);
+        if (position + length > memory.length()) throw new IndexOutOfBoundsException();
+        NativeMemoryUtils.munlock(address + position, length);
     }
 
     public void mincore(long position, long length, DirectMemory direct) {
-        if (position+length > memory().length()) {
+        if (position + length > memory().length()) {
             throw new IndexOutOfBoundsException();
         }
-        final long ap = address+position;
-        final long a = ap/PAGE_SIZE*PAGE_SIZE;
-        final long l = length+(ap-a);
-        if ((l+PAGE_SIZE-1)/PAGE_SIZE > direct.length()) throw new IndexOutOfBoundsException();
+        final long ap = address + position;
+        final long a = ap / PAGE_SIZE * PAGE_SIZE;
+        final long l = length + (ap - a);
+        if ((l + PAGE_SIZE - 1) / PAGE_SIZE > direct.length())
+            throw new IndexOutOfBoundsException();
         NativeMemoryUtils.mincore(a, l, direct);
     }
 
@@ -215,20 +270,20 @@ public final class MMapBuffer implements BufferResource {
             openBuffersTracker.beforeMMapBufferClosed(this);
         }
 
-        //hack to deal with 0 byte files
+        // hack to deal with 0 byte files
         if (address != 0) {
-            if (munmap(address, memory.length()) != 0) throw new IOException("munmap failed [Errno " + errno() + "]");
+            if (munmap(address, memory.length()) != 0)
+                throw new IOException("munmap failed [Errno " + errno() + "]");
         }
     }
-    
+
     public DirectMemory memory() {
         return memory;
     }
 
     /**
      * @return true, if open buffers tracking is enabled, else false
-     *
-     * DO NOT USE THIS unless you know what you're doing.
+     *     <p>DO NOT USE THIS unless you know what you're doing.
      */
     @Deprecated
     public static boolean isTrackingEnabled() {
@@ -236,13 +291,13 @@ public final class MMapBuffer implements BufferResource {
     }
 
     /**
-     * If open buffers tracking is enabled, calls madvise with MADV_DONTNEED for all tracked buffers.
-     * If open buffers tracking is disabled, does nothing.
+     * If open buffers tracking is enabled, calls madvise with MADV_DONTNEED for all tracked
+     * buffers. If open buffers tracking is disabled, does nothing.
      *
-     * This can reduce resident set size of the process, but may significantly affect performance.
-     * See madvise(2) for more info.
+     * <p>This can reduce resident set size of the process, but may significantly affect
+     * performance. See madvise(2) for more info.
      *
-     * DO NOT USE THIS unless you know what you're doing.
+     * <p>DO NOT USE THIS unless you know what you're doing.
      */
     @Deprecated
     public static void madviseDontNeedTrackedBuffers() {
@@ -250,14 +305,15 @@ public final class MMapBuffer implements BufferResource {
             return;
         }
 
-        openBuffersTracker.forEachOpenTrackedBuffer(new Function<MMapBuffer, Void>() {
-            @Override
-            public Void apply(final MMapBuffer b) {
-                //noinspection deprecation
-                madviseDontNeed(b.memory.getAddress(), b.memory.length());
-                return null;
-            }
-        });
+        openBuffersTracker.forEachOpenTrackedBuffer(
+                new Function<MMapBuffer, Void>() {
+                    @Override
+                    public Void apply(final MMapBuffer b) {
+                        //noinspection deprecation
+                        madviseDontNeed(b.memory.getAddress(), b.memory.length());
+                        return null;
+                    }
+                });
     }
 
     @VisibleForTesting
@@ -267,8 +323,7 @@ public final class MMapBuffer implements BufferResource {
 
     @VisibleForTesting
     static class Tracker {
-        @VisibleForTesting
-        final Map<MMapBuffer, Void> mmapBufferSet = new IdentityHashMap<>();
+        @VisibleForTesting final Map<MMapBuffer, Void> mmapBufferSet = new IdentityHashMap<>();
 
         void mmapBufferOpened(final MMapBuffer buffer) {
             synchronized (mmapBufferSet) {

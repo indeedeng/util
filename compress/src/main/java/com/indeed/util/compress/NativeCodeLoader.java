@@ -4,9 +4,7 @@ import com.indeed.util.core.NativeLibraryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class NativeCodeLoader {
     private static final Logger log = LoggerFactory.getLogger(NativeCodeLoader.class);
 

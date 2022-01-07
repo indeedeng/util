@@ -12,14 +12,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Set;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class SetSerializer<E> implements Serializer<Set<E>> {
     private static final Logger log = LoggerFactory.getLogger(SetSerializer.class);
 
     private static final LengthVIntSerializer lengthSerializer = new LengthVIntSerializer();
-    
+
     public static <E> SetSerializer<E> hashSetSerializer(Serializer<E> serializer) {
         return new SetSerializer<E>(new CollectionSuppliers.HashSetSupplier(), serializer);
     }

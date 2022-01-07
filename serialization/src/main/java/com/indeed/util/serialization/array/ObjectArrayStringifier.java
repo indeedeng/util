@@ -9,15 +9,12 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
-/**
-* @author jplaisance
-*/
+/** @author jplaisance */
 public final class ObjectArrayStringifier<E> implements Stringifier<E[]> {
     private static final Logger log = LoggerFactory.getLogger(ObjectArrayStringifier.class);
 
     private final ListStringifier<E> listStringifier;
     private final Class<E> type;
-
 
     public ObjectArrayStringifier(Stringifier<E> stringifier, Class<E> type) {
         this.listStringifier = ListStringifier.arrayListStringifier(stringifier);

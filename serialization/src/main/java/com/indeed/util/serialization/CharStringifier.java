@@ -3,10 +3,8 @@ package com.indeed.util.serialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
-public final class CharStringifier implements Stringifier<Character>{
+/** @author jplaisance */
+public final class CharStringifier implements Stringifier<Character> {
     private static final Logger log = LoggerFactory.getLogger(CharStringifier.class);
 
     @Override

@@ -3,11 +3,9 @@ package com.indeed.util.mmap;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public interface Memory {
-    
+
     public byte getByte(final long l);
 
     public void putByte(final long l, final byte b);
@@ -39,9 +37,9 @@ public interface Memory {
     public void putBytes(final long l, final byte[] bytes);
 
     public void putBytes(final long l, final byte[] bytes, final int start, final int length);
-    
+
     public void putBytes(final long l, final Memory source);
-    
+
     public void putBytes(final long l, final Memory source, final long start, final long length);
 
     public void putBytes(final long l, final ByteBuffer source);
@@ -49,11 +47,11 @@ public interface Memory {
     public void getBytes(final long l, final byte[] bytes);
 
     public void getBytes(final long l, final byte[] bytes, final int start, final int length);
-    
+
     public void getBytes(final long l, final Memory dest);
 
     public void getBytes(final long l, final Memory dest, final long start, final long length);
-    
+
     public void getBytes(final long l, final ByteBuffer dest);
 
     public Memory slice(long startAddress, long sliceLength);
@@ -75,6 +73,6 @@ public interface Memory {
     public long length();
 
     public boolean isDirect();
-    
+
     public ByteOrder getOrder();
 }

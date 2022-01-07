@@ -8,8 +8,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation for types or packages which assumes all member variables are @Nonnull unless indicated otherwise
- * with @Nullable
+ * Annotation for types or packages which assumes all member variables are @Nonnull unless indicated
+ * otherwise with @Nullable
  *
  * @author rboyer
  */
@@ -17,5 +17,4 @@ import java.lang.annotation.RetentionPolicy;
 @Nonnull
 @TypeQualifierDefault({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FieldsAreNonnullByDefault {
-}
+public @interface FieldsAreNonnullByDefault {}

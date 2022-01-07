@@ -7,9 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
-/**
- * @author goodwin
- */
+/** @author goodwin */
 public class DirectMemoryTest extends TestCase {
     int length = 10000;
 
@@ -21,8 +19,22 @@ public class DirectMemoryTest extends TestCase {
         File file = File.createTempFile("tmp", "", new File("."));
         file.deleteOnExit();
 
-        directMemory = new MMapBuffer(file, 0L, length, FileChannel.MapMode.READ_WRITE, ByteOrder.LITTLE_ENDIAN).memory();
-        directMemory2 = new MMapBuffer(file, 0L, length, FileChannel.MapMode.READ_WRITE, ByteOrder.BIG_ENDIAN).memory();
+        directMemory =
+                new MMapBuffer(
+                                file,
+                                0L,
+                                length,
+                                FileChannel.MapMode.READ_WRITE,
+                                ByteOrder.LITTLE_ENDIAN)
+                        .memory();
+        directMemory2 =
+                new MMapBuffer(
+                                file,
+                                0L,
+                                length,
+                                FileChannel.MapMode.READ_WRITE,
+                                ByteOrder.BIG_ENDIAN)
+                        .memory();
     }
 
     public void testByte() throws Exception {
@@ -41,26 +53,33 @@ public class DirectMemoryTest extends TestCase {
     }
 
     public void testBytes() throws Exception {
-        for (int i = 0; i < length-8; i++) {
+        for (int i = 0; i < length - 8; i++) {
             byte[] bytes = new byte[8];
             for (int j = 0; j < 8; j++) {
-                bytes[j] = (byte) (i+j);
+                bytes[j] = (byte) (i + j);
             }
             directMemory.putBytes(i, bytes, 2, 6);
             directMemory2.putBytes(i, bytes, 2, 6);
             for (int j = 0; j < 6; j++) {
-                assertEquals((byte) (i+j+2), directMemory.getByte(i + j));
-                assertEquals((byte) (i+j+2), directMemory2.getByte(i + j));
+                assertEquals((byte) (i + j + 2), directMemory.getByte(i + j));
+                assertEquals((byte) (i + j + 2), directMemory2.getByte(i + j));
             }
         }
     }
 
     public void testDirectMemory() throws Exception {
-        for (int i = 0; i < length; i+= 8) {
+        for (int i = 0; i < length; i += 8) {
             File file = File.createTempFile("tmp", "", new File("."));
-            DirectMemory localDirectMemory = new MMapBuffer(file, 0L, 8, FileChannel.MapMode.READ_WRITE, ByteOrder.LITTLE_ENDIAN).memory();
+            DirectMemory localDirectMemory =
+                    new MMapBuffer(
+                                    file,
+                                    0L,
+                                    8,
+                                    FileChannel.MapMode.READ_WRITE,
+                                    ByteOrder.LITTLE_ENDIAN)
+                            .memory();
             for (int j = 0; j < 8; j++) {
-                localDirectMemory.putByte(j, (byte) (i+j));
+                localDirectMemory.putByte(j, (byte) (i + j));
             }
             directMemory.putBytes(i, localDirectMemory);
             directMemory2.putBytes(i, localDirectMemory);
@@ -77,10 +96,10 @@ public class DirectMemoryTest extends TestCase {
     }
 
     public void testHeapMemory() throws Exception {
-        for (int i = 0; i < length; i+=8) {
+        for (int i = 0; i < length; i += 8) {
             HeapMemory heapMemory = new HeapMemory(8, ByteOrder.LITTLE_ENDIAN);
             for (int j = 0; j < 8; j++) {
-                heapMemory.putByte(j, (byte) (i+j));
+                heapMemory.putByte(j, (byte) (i + j));
             }
             directMemory.putBytes(i, heapMemory);
             directMemory2.putBytes(i, heapMemory);
@@ -93,10 +112,10 @@ public class DirectMemoryTest extends TestCase {
     }
 
     public void testByteBuffer() throws Exception {
-        for (int i = 0; i < length; i+=8) {
+        for (int i = 0; i < length; i += 8) {
             ByteBuffer byteBuffer = ByteBuffer.allocate(8);
             for (int j = 0; j < 8; j++) {
-                byteBuffer.put(j, (byte) (i+j));
+                byteBuffer.put(j, (byte) (i + j));
             }
             directMemory.putBytes(i, byteBuffer);
             directMemory2.putBytes(i, byteBuffer);

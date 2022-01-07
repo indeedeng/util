@@ -8,16 +8,19 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * This class is intended to make resource tracking slightly easier than direct refcounting. If you want to retain a shared resource
- * that is referenced by this class, copy it and close the copy when you're done. When all copies and the original are closed, the resource
- * will be automatically freed.
+ * This class is intended to make resource tracking slightly easier than direct refcounting. If you
+ * want to retain a shared resource that is referenced by this class, copy it and close the copy
+ * when you're done. When all copies and the original are closed, the resource will be automatically
+ * freed.
  *
- * A particular instance of a SharedReference should be owned by a specific thread. If a reference is intended to be accessed by multiple
- * threads use AtomicSharedReference.
+ * <p>A particular instance of a SharedReference should be owned by a specific thread. If a
+ * reference is intended to be accessed by multiple threads use AtomicSharedReference.
  *
- * You should avoid storing the result of get() in variables so that is isn't accidentally prematurely freed.
+ * <p>You should avoid storing the result of get() in variables so that is isn't accidentally
+ * prematurely freed.
  *
- * Once we're using Java 7, this class should always be used with try-with-resources where possible to simplify resource cleanup.
+ * <p>Once we're using Java 7, this class should always be used with try-with-resources where
+ * possible to simplify resource cleanup.
  *
  * @author jplaisance
  */
@@ -25,7 +28,8 @@ public final class SharedReference<T> implements Closeable {
 
     private static final Logger log = LoggerFactory.getLogger(SharedReference.class);
 
-    private static final boolean debug = Boolean.getBoolean("com.indeed.common.util.reference.SharedReference.debug");
+    private static final boolean debug =
+            Boolean.getBoolean("com.indeed.common.util.reference.SharedReference.debug");
 
     private final T t;
     private final SharedReference<T> original;
@@ -34,7 +38,8 @@ public final class SharedReference<T> implements Closeable {
     private final Closeable closeable;
     private int refCount;
 
-    //this exists solely to debug reference leaks. when it is finalized, if the reference has not been closed, it will complain.
+    // this exists solely to debug reference leaks. when it is finalized, if the reference has not
+    // been closed, it will complain.
     @SuppressWarnings("unused")
     private final ReferenceLeakDebugger referenceLeakDebugger;
 
@@ -115,7 +120,12 @@ public final class SharedReference<T> implements Closeable {
     private final class ReferenceLeakDebugger {
         protected void finalize() throws Throwable {
             if (!SharedReference.this.closed) {
-                log.error("SharedReference to "+SharedReference.this.t.getClass()+" "+SharedReference.this.t+" was not closed! Closing in finalizer :(");
+                log.error(
+                        "SharedReference to "
+                                + SharedReference.this.t.getClass()
+                                + " "
+                                + SharedReference.this.t
+                                + " was not closed! Closing in finalizer :(");
             }
         }
     }

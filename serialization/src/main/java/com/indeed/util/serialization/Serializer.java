@@ -4,9 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public interface Serializer<T> {
     public void write(T t, DataOutput out) throws IOException;
 

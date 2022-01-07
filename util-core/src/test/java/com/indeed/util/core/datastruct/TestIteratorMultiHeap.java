@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Random;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class TestIteratorMultiHeap extends TestCase {
 
     private static final Logger log = LoggerFactory.getLogger(TestIteratorMultiHeap.class);
@@ -32,7 +30,7 @@ public final class TestIteratorMultiHeap extends TestCase {
 
         boolean next() {
             if (i >= length) return false;
-            value+=random.nextInt(4)+1;
+            value += random.nextInt(4) + 1;
             i++;
             return true;
         }
@@ -58,17 +56,19 @@ public final class TestIteratorMultiHeap extends TestCase {
         for (final Random random : randoms) {
             iterators.add(new RandomIntIterator(random, random.nextInt(128) + 128));
         }
-        final IteratorMultiHeap<RandomIntIterator> heap = new IteratorMultiHeap<RandomIntIterator>(iterators.size(), RandomIntIterator.class) {
-            @Override
-            protected boolean next(final RandomIntIterator randomIntIterator) {
-                return randomIntIterator.next();
-            }
+        final IteratorMultiHeap<RandomIntIterator> heap =
+                new IteratorMultiHeap<RandomIntIterator>(
+                        iterators.size(), RandomIntIterator.class) {
+                    @Override
+                    protected boolean next(final RandomIntIterator randomIntIterator) {
+                        return randomIntIterator.next();
+                    }
 
-            @Override
-            protected int compare(final RandomIntIterator a, final RandomIntIterator b) {
-                return Ints.compare(a.value(), b.value());
-            }
-        };
+                    @Override
+                    protected int compare(final RandomIntIterator a, final RandomIntIterator b) {
+                        return Ints.compare(a.value(), b.value());
+                    }
+                };
         for (RandomIntIterator iterator : iterators) {
             heap.add(iterator);
         }
@@ -89,14 +89,19 @@ public final class TestIteratorMultiHeap extends TestCase {
         for (int i = 0; i < randoms.length; i++) {
             randoms[i] = new Random(i);
         }
-        final PriorityQueue<RandomIntIterator> queue = new PriorityQueue<RandomIntIterator>(24, new Comparator<RandomIntIterator>() {
-            @Override
-            public int compare(final RandomIntIterator o1, final RandomIntIterator o2) {
-                return Ints.compare(o1.value(), o2.value());
-            }
-        });
+        final PriorityQueue<RandomIntIterator> queue =
+                new PriorityQueue<RandomIntIterator>(
+                        24,
+                        new Comparator<RandomIntIterator>() {
+                            @Override
+                            public int compare(
+                                    final RandomIntIterator o1, final RandomIntIterator o2) {
+                                return Ints.compare(o1.value(), o2.value());
+                            }
+                        });
         for (final Random random : randoms) {
-            final RandomIntIterator iterator = new RandomIntIterator(random, random.nextInt(128) + 128);
+            final RandomIntIterator iterator =
+                    new RandomIntIterator(random, random.nextInt(128) + 128);
             assertTrue(iterator.next());
             queue.add(iterator);
         }

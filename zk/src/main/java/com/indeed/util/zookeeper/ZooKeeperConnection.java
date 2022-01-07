@@ -17,9 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class ZooKeeperConnection {
 
     private static final Logger log = LoggerFactory.getLogger(ZooKeeperConnection.class);
@@ -36,16 +34,19 @@ public final class ZooKeeperConnection {
     }
 
     public void connect() throws IOException, InterruptedException {
-        final AtomicReference<Watcher.Event.KeeperState> connectionState = new AtomicReference<Watcher.Event.KeeperState>(null);
-        final Watcher watcher = new Watcher() {
-            @Override
-            public void process(final WatchedEvent watchedEvent) {
-                connectionState.set(watchedEvent.getState());
-            }
-        };
+        final AtomicReference<Watcher.Event.KeeperState> connectionState =
+                new AtomicReference<Watcher.Event.KeeperState>(null);
+        final Watcher watcher =
+                new Watcher() {
+                    @Override
+                    public void process(final WatchedEvent watchedEvent) {
+                        connectionState.set(watchedEvent.getState());
+                    }
+                };
         zooKeeper = new ZooKeeper(zookeeperNodes, timeout, watcher);
         final long startTime = System.currentTimeMillis();
-        while ((System.currentTimeMillis() - startTime) < timeout && connectionState.get() == null) Thread.sleep(500);
+        while ((System.currentTimeMillis() - startTime) < timeout && connectionState.get() == null)
+            Thread.sleep(500);
         if (connectionState.get() != Watcher.Event.KeeperState.SyncConnected) {
             zooKeeper.close();
             throw new IOException("connection failed");
@@ -80,7 +81,8 @@ public final class ZooKeeperConnection {
         if (zooKeeper != null) zooKeeper.close();
     }
 
-    public String create(final String path, final byte[] data, final List<ACL> acl, final CreateMode createMode)
+    public String create(
+            final String path, final byte[] data, final List<ACL> acl, final CreateMode createMode)
             throws KeeperException, InterruptedException {
         return zooKeeper.create(path, data, acl, createMode);
     }
@@ -91,88 +93,139 @@ public final class ZooKeeperConnection {
             final List<ACL> acl,
             final CreateMode createMode,
             final AsyncCallback.StringCallback cb,
-            final Object ctx
-    ) {
+            final Object ctx) {
         zooKeeper.create(path, data, acl, createMode, cb, ctx);
     }
 
-    public void delete(final String path, final int version) throws InterruptedException, KeeperException {
+    public void delete(final String path, final int version)
+            throws InterruptedException, KeeperException {
         zooKeeper.delete(path, version);
     }
 
-    public void delete(final String path, final int version, final AsyncCallback.VoidCallback cb, final Object ctx) {
+    public void delete(
+            final String path,
+            final int version,
+            final AsyncCallback.VoidCallback cb,
+            final Object ctx) {
         zooKeeper.delete(path, version, cb, ctx);
     }
 
-    public Stat exists(final String path, final Watcher watcher) throws KeeperException, InterruptedException {
+    public Stat exists(final String path, final Watcher watcher)
+            throws KeeperException, InterruptedException {
         return zooKeeper.exists(path, watcher);
     }
 
-    public Stat exists(final String path, final boolean watch) throws KeeperException, InterruptedException {
+    public Stat exists(final String path, final boolean watch)
+            throws KeeperException, InterruptedException {
         return zooKeeper.exists(path, watch);
     }
 
-    public void exists(final String path, final Watcher watcher, final AsyncCallback.StatCallback cb, final Object ctx) {
+    public void exists(
+            final String path,
+            final Watcher watcher,
+            final AsyncCallback.StatCallback cb,
+            final Object ctx) {
         zooKeeper.exists(path, watcher, cb, ctx);
     }
 
-    public void exists(final String path, final boolean watch, final AsyncCallback.StatCallback cb, final Object ctx) {
+    public void exists(
+            final String path,
+            final boolean watch,
+            final AsyncCallback.StatCallback cb,
+            final Object ctx) {
         zooKeeper.exists(path, watch, cb, ctx);
     }
 
-    public byte[] getData(final String path, final Watcher watcher, final Stat stat) throws KeeperException, InterruptedException {
+    public byte[] getData(final String path, final Watcher watcher, final Stat stat)
+            throws KeeperException, InterruptedException {
         return zooKeeper.getData(path, watcher, stat);
     }
 
-    public byte[] getData(final String path, final boolean watch, final Stat stat) throws KeeperException, InterruptedException {
+    public byte[] getData(final String path, final boolean watch, final Stat stat)
+            throws KeeperException, InterruptedException {
         return zooKeeper.getData(path, watch, stat);
     }
 
-    public void getData(final String path, final Watcher watcher, final AsyncCallback.DataCallback cb, final Object ctx) {
+    public void getData(
+            final String path,
+            final Watcher watcher,
+            final AsyncCallback.DataCallback cb,
+            final Object ctx) {
         zooKeeper.getData(path, watcher, cb, ctx);
     }
 
-    public void getData(final String path, final boolean watch, final AsyncCallback.DataCallback cb, final Object ctx) {
+    public void getData(
+            final String path,
+            final boolean watch,
+            final AsyncCallback.DataCallback cb,
+            final Object ctx) {
         zooKeeper.getData(path, watch, cb, ctx);
     }
 
-    public Stat setData(final String path, final byte[] data, final int version) throws KeeperException, InterruptedException {
+    public Stat setData(final String path, final byte[] data, final int version)
+            throws KeeperException, InterruptedException {
         return zooKeeper.setData(path, data, version);
     }
 
-    public void setData(final String path, final byte[] data, final int version, final AsyncCallback.StatCallback cb, final Object ctx) {
+    public void setData(
+            final String path,
+            final byte[] data,
+            final int version,
+            final AsyncCallback.StatCallback cb,
+            final Object ctx) {
         zooKeeper.setData(path, data, version, cb, ctx);
     }
 
-    public List<ACL> getACL(final String path, final Stat stat) throws KeeperException, InterruptedException {
+    public List<ACL> getACL(final String path, final Stat stat)
+            throws KeeperException, InterruptedException {
         return zooKeeper.getACL(path, stat);
     }
 
-    public void getACL(final String path, final Stat stat, final AsyncCallback.ACLCallback cb, final Object ctx) {
+    public void getACL(
+            final String path,
+            final Stat stat,
+            final AsyncCallback.ACLCallback cb,
+            final Object ctx) {
         zooKeeper.getACL(path, stat, cb, ctx);
     }
 
-    public Stat setACL(final String path, final List<ACL> acl, final int version) throws KeeperException, InterruptedException {
+    public Stat setACL(final String path, final List<ACL> acl, final int version)
+            throws KeeperException, InterruptedException {
         return zooKeeper.setACL(path, acl, version);
     }
 
-    public void setACL(final String path, final List<ACL> acl, final int version, final AsyncCallback.StatCallback cb, final Object ctx) {
+    public void setACL(
+            final String path,
+            final List<ACL> acl,
+            final int version,
+            final AsyncCallback.StatCallback cb,
+            final Object ctx) {
         zooKeeper.setACL(path, acl, version, cb, ctx);
     }
 
-    public List<String> getChildren(final String path, final Watcher watcher) throws KeeperException, InterruptedException {
+    public List<String> getChildren(final String path, final Watcher watcher)
+            throws KeeperException, InterruptedException {
         return zooKeeper.getChildren(path, watcher);
     }
 
-    public List<String> getChildren(final String path, final boolean watch) throws KeeperException, InterruptedException {
+    public List<String> getChildren(final String path, final boolean watch)
+            throws KeeperException, InterruptedException {
         return zooKeeper.getChildren(path, watch);
     }
 
-    public void getChildren(final String path, final Watcher watcher, final AsyncCallback.ChildrenCallback cb, final Object ctx) {
+    public void getChildren(
+            final String path,
+            final Watcher watcher,
+            final AsyncCallback.ChildrenCallback cb,
+            final Object ctx) {
         zooKeeper.getChildren(path, watcher, cb, ctx);
     }
 
-    public void getChildren(final String path, final boolean watch, final AsyncCallback.ChildrenCallback cb, final Object ctx) {
+    public void getChildren(
+            final String path,
+            final boolean watch,
+            final AsyncCallback.ChildrenCallback cb,
+            final Object ctx) {
         zooKeeper.getChildren(path, watch, cb, ctx);
     }
 
@@ -181,15 +234,24 @@ public final class ZooKeeperConnection {
         return zooKeeper.getChildren(path, watcher, stat);
     }
 
-    public List<String> getChildren(final String path, final boolean watch, final Stat stat) throws KeeperException, InterruptedException {
+    public List<String> getChildren(final String path, final boolean watch, final Stat stat)
+            throws KeeperException, InterruptedException {
         return zooKeeper.getChildren(path, watch, stat);
     }
 
-    public void getChildren(final String path, final Watcher watcher, final AsyncCallback.Children2Callback cb, final Object ctx) {
+    public void getChildren(
+            final String path,
+            final Watcher watcher,
+            final AsyncCallback.Children2Callback cb,
+            final Object ctx) {
         zooKeeper.getChildren(path, watcher, cb, ctx);
     }
 
-    public void getChildren(final String path, final boolean watch, final AsyncCallback.Children2Callback cb, final Object ctx) {
+    public void getChildren(
+            final String path,
+            final boolean watch,
+            final AsyncCallback.Children2Callback cb,
+            final Object ctx) {
         zooKeeper.getChildren(path, watch, cb, ctx);
     }
 
@@ -201,41 +263,57 @@ public final class ZooKeeperConnection {
         return zooKeeper.getState();
     }
 
-    public void createFullPath(String path, byte[] value, CreateMode createMode) throws KeeperException, InterruptedException {
+    public void createFullPath(String path, byte[] value, CreateMode createMode)
+            throws KeeperException, InterruptedException {
         createFullPath(this, path, value, createMode);
     }
 
-    public boolean createFullPath(String path, byte[] value, CreateMode createMode, boolean ignoreIfExists) throws KeeperException, InterruptedException {
+    public boolean createFullPath(
+            String path, byte[] value, CreateMode createMode, boolean ignoreIfExists)
+            throws KeeperException, InterruptedException {
         return createFullPath(this, path, value, createMode, ignoreIfExists);
     }
 
-    public static void createFullPath(ZooKeeperConnection zooKeeperConnection, String path, byte[] value, CreateMode createMode)
+    public static void createFullPath(
+            ZooKeeperConnection zooKeeperConnection,
+            String path,
+            byte[] value,
+            CreateMode createMode)
             throws InterruptedException, KeeperException {
         createFullPath(zooKeeperConnection, path, value, createMode, false);
     }
 
-    public static boolean createFullPath(ZooKeeperConnection zooKeeperConnection, String path, byte[] value, CreateMode createMode, boolean ignoreIfExists)
+    public static boolean createFullPath(
+            ZooKeeperConnection zooKeeperConnection,
+            String path,
+            byte[] value,
+            CreateMode createMode,
+            boolean ignoreIfExists)
             throws InterruptedException, KeeperException {
         final byte[] empty = new byte[0];
         final String[] nodes = path.split("/");
         final StringBuilder pathBuilder = new StringBuilder();
-        for (int i = 1; i < nodes.length-1; i++) {
+        for (int i = 1; i < nodes.length - 1; i++) {
             pathBuilder.append("/").append(nodes[i]);
-            createIfNotExists(zooKeeperConnection, pathBuilder.toString(), empty, CreateMode.PERSISTENT);
+            createIfNotExists(
+                    zooKeeperConnection, pathBuilder.toString(), empty, CreateMode.PERSISTENT);
         }
-        pathBuilder.append("/").append(nodes[nodes.length-1]);
+        pathBuilder.append("/").append(nodes[nodes.length - 1]);
         if (ignoreIfExists) {
             return createIfNotExists(zooKeeperConnection, path, value, createMode);
         }
-        zooKeeperConnection.create(pathBuilder.toString(), value, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
+        zooKeeperConnection.create(
+                pathBuilder.toString(), value, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
         return true;
     }
 
-    public boolean createIfNotExists(String path, byte[] value, CreateMode createMode) throws KeeperException, InterruptedException {
+    public boolean createIfNotExists(String path, byte[] value, CreateMode createMode)
+            throws KeeperException, InterruptedException {
         return createIfNotExists(this, path, value, createMode);
     }
 
-    public static boolean createIfNotExists(ZooKeeperConnection zooKeeper, String path, byte[] value, CreateMode createMode)
+    public static boolean createIfNotExists(
+            ZooKeeperConnection zooKeeper, String path, byte[] value, CreateMode createMode)
             throws InterruptedException, KeeperException {
         if (zooKeeper.exists(path, false) == null) {
             try {
@@ -249,11 +327,13 @@ public final class ZooKeeperConnection {
         return false;
     }
 
-    public void updateOrCreate(String path, byte[] value, CreateMode createMode) throws KeeperException, InterruptedException {
+    public void updateOrCreate(String path, byte[] value, CreateMode createMode)
+            throws KeeperException, InterruptedException {
         updateOrCreate(this, path, value, createMode);
     }
 
-    public static void updateOrCreate(ZooKeeperConnection zooKeeper, String path, byte[] value, CreateMode createMode)
+    public static void updateOrCreate(
+            ZooKeeperConnection zooKeeper, String path, byte[] value, CreateMode createMode)
             throws InterruptedException, KeeperException {
         boolean success = false;
         if (zooKeeper.exists(path, false) == null) {
@@ -264,11 +344,13 @@ public final class ZooKeeperConnection {
 
     public static String buildPath(String parent, String firstPart, String... restOfParts) {
         PathUtils.validatePath(parent);
-        if (firstPart.contains("/")) throw new IllegalArgumentException("only parent may contain / character");
-        String path = (parent.equals("/") ? parent : parent+"/")+firstPart;
+        if (firstPart.contains("/"))
+            throw new IllegalArgumentException("only parent may contain / character");
+        String path = (parent.equals("/") ? parent : parent + "/") + firstPart;
         for (String part : restOfParts) {
-            if (part.contains("/")) throw new IllegalArgumentException("only parent may contain / character");
-            path = path+"/"+part;
+            if (part.contains("/"))
+                throw new IllegalArgumentException("only parent may contain / character");
+            path = path + "/" + part;
         }
         PathUtils.validatePath(path);
         return path;
@@ -280,7 +362,7 @@ public final class ZooKeeperConnection {
             throw new IllegalArgumentException("name of / is undefined");
         }
         final int index = path.lastIndexOf('/');
-        return path.substring(index+1);
+        return path.substring(index + 1);
     }
 
     public static String getParent(String path) {

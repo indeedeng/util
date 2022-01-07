@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author jsgroth
- */
+/** @author jsgroth */
 public class MiniZooKeeperCluster {
     private final Hack server;
     private final Thread zkServerThread;
@@ -23,18 +21,21 @@ public class MiniZooKeeperCluster {
         zkNodes = "localhost:" + zkPort;
 
         server = new Hack();
-        zkServerThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    server.initializeAndRun(new String[]{Integer.toString(zkPort), dataDir});
-                } catch (QuorumPeerConfig.ConfigException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
+        zkServerThread =
+                new Thread(
+                        new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    server.initializeAndRun(
+                                            new String[] {Integer.toString(zkPort), dataDir});
+                                } catch (QuorumPeerConfig.ConfigException e) {
+                                    throw new RuntimeException(e);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
         zkServerThread.setDaemon(true);
         zkServerThread.start();
 
@@ -62,14 +63,18 @@ public class MiniZooKeeperCluster {
 
     private void waitForServerStartup() throws IOException {
         final AtomicBoolean connected = new AtomicBoolean(false);
-        final ZooKeeper zk = new ZooKeeper(zkNodes, 30000, new Watcher() {
-            @Override
-            public void process(WatchedEvent watchedEvent) {
-                if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
-                    connected.set(true);
-                }
-            }
-        });
+        final ZooKeeper zk =
+                new ZooKeeper(
+                        zkNodes,
+                        30000,
+                        new Watcher() {
+                            @Override
+                            public void process(WatchedEvent watchedEvent) {
+                                if (watchedEvent.getState() == Event.KeeperState.SyncConnected) {
+                                    connected.set(true);
+                                }
+                            }
+                        });
         try {
             long start = System.currentTimeMillis();
             while (!connected.get() && (System.currentTimeMillis() - start) < 30000) {}
@@ -94,7 +99,8 @@ public class MiniZooKeeperCluster {
 
     private static class Hack extends ZooKeeperServerMain {
         @Override
-        public void initializeAndRun(String[] args) throws QuorumPeerConfig.ConfigException, IOException {
+        public void initializeAndRun(String[] args)
+                throws QuorumPeerConfig.ConfigException, IOException {
             super.initializeAndRun(args);
         }
 

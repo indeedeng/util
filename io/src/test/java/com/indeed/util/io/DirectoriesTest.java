@@ -13,12 +13,9 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author rboyer
- */
+/** @author rboyer */
 public class DirectoriesTest {
-    @Rule
-    public TemporaryFolder tempDir = new TemporaryFolder();
+    @Rule public TemporaryFolder tempDir = new TemporaryFolder();
     private Path root;
 
     @Test

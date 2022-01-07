@@ -8,9 +8,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class CommonMethodsTester {
     private static final Logger log = LoggerFactory.getLogger(CommonMethodsTester.class);
 
@@ -59,7 +57,7 @@ public final class CommonMethodsTester {
             for (PropertyDescriptor propertyDescriptor : beanInfo.getPropertyDescriptors()) {
                 try {
                     final Method readMethod = propertyDescriptor.getReadMethod();
-                    if(readMethod != null) {
+                    if (readMethod != null) {
                         readMethod.invoke(o);
                     }
                 } catch (Throwable t) {
@@ -67,7 +65,7 @@ public final class CommonMethodsTester {
                 }
                 try {
                     final Method writeMethod = propertyDescriptor.getWriteMethod();
-                    if(writeMethod != null) {
+                    if (writeMethod != null) {
                         writeMethod.invoke(o, new Object[1]);
                     }
                 } catch (Throwable t) {

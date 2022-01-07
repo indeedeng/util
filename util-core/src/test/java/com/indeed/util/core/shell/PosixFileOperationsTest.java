@@ -19,26 +19,24 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author kenh
- */
-
+/** @author kenh */
 public class PosixFileOperationsTest {
-    @Rule
-    public final TemporaryFolder tempDir = new TemporaryFolder();
+    @Rule public final TemporaryFolder tempDir = new TemporaryFolder();
 
     private class CountFileVisitor extends SimpleFileVisitor<Path> {
         int dirs = 0;
         int files = 0;
 
         @Override
-        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+                throws IOException {
             ++dirs;
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+                throws IOException {
             ++files;
             return FileVisitResult.CONTINUE;
         }
@@ -48,12 +46,14 @@ public class PosixFileOperationsTest {
         final List<String> conents = new ArrayList<>();
 
         @Override
-        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs)
+                throws IOException {
             return FileVisitResult.CONTINUE;
         }
 
         @Override
-        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+                throws IOException {
             conents.add(new String(Files.readAllBytes(file), Charsets.UTF_8));
             return FileVisitResult.CONTINUE;
         }
@@ -105,7 +105,6 @@ public class PosixFileOperationsTest {
             Assert.assertEquals(1, countFileVisitor.dirs); // root
             Assert.assertEquals(0, countFileVisitor.files);
         }
-
     }
 
     private void writeToFile(final Path path, final String contents) throws IOException {
@@ -150,16 +149,8 @@ public class PosixFileOperationsTest {
 
             Assert.assertEquals(
                     Arrays.asList(
-                            "file1",
-                            "file1",
-                            "file2",
-                            "file3",
-                            "file4",
-                            "file5",
-                            "file6",
-                            "file7",
-                            "file8"
-                    ),
+                            "file1", "file1", "file2", "file3", "file4", "file5", "file6", "file7",
+                            "file8"),
                     concatFileVisitor.conents);
         }
 
@@ -174,16 +165,8 @@ public class PosixFileOperationsTest {
 
                 Assert.assertEquals(
                         Arrays.asList(
-                                "file1",
-                                "file1",
-                                "file2",
-                                "file3",
-                                "file4",
-                                "file5",
-                                "file6",
-                                "file7",
-                                "file8"
-                        ),
+                                "file1", "file1", "file2", "file3", "file4", "file5", "file6",
+                                "file7", "file8"),
                         concatFileVisitor.conents);
             }
 
@@ -202,16 +185,8 @@ public class PosixFileOperationsTest {
 
                 Assert.assertEquals(
                         Arrays.asList(
-                                "file1",
-                                "file1",
-                                "file2",
-                                "file3",
-                                "file4",
-                                "file5",
-                                "file6",
-                                "file7",
-                                "file8"
-                        ),
+                                "file1", "file1", "file2", "file3", "file4", "file5", "file6",
+                                "file7", "file8"),
                         concatFileVisitor.conents);
             }
 
@@ -236,13 +211,11 @@ public class PosixFileOperationsTest {
                                 "file5",
                                 "file6-modified",
                                 "file7",
-                                "file8-modified"
-                        ),
+                                "file8-modified"),
                         concatFileVisitor2.conents);
             }
         }
     }
-
 
     @Test
     public void testRecursiveCopy() throws IOException {
@@ -278,15 +251,7 @@ public class PosixFileOperationsTest {
 
             Assert.assertEquals(
                     Arrays.asList(
-                            "file1",
-                            "file2",
-                            "file3",
-                            "file4",
-                            "file5",
-                            "file6",
-                            "file7",
-                            "file8"
-                    ),
+                            "file1", "file2", "file3", "file4", "file5", "file6", "file7", "file8"),
                     concatFileVisitor.conents);
         }
 
@@ -301,19 +266,13 @@ public class PosixFileOperationsTest {
 
                 Assert.assertEquals(
                         Arrays.asList(
-                                "file1",
-                                "file2",
-                                "file3",
-                                "file4",
-                                "file5",
-                                "file6",
-                                "file7",
-                                "file8"
-                        ),
+                                "file1", "file2", "file3", "file4", "file5", "file6", "file7",
+                                "file8"),
                         concatFileVisitor.conents);
             }
 
-            // adding new contents modifying existing contents, it should not be reflected in the copy
+            // adding new contents modifying existing contents, it should not be reflected in the
+            // copy
             writeToFile(aDir.resolve("file22"), "file22");
             writeToFile(aDir.resolve("file2"), "file2-modified");
 
@@ -324,15 +283,8 @@ public class PosixFileOperationsTest {
 
                 Assert.assertEquals(
                         Arrays.asList(
-                                "file1",
-                                "file2",
-                                "file3",
-                                "file4",
-                                "file5",
-                                "file6",
-                                "file7",
-                                "file8"
-                        ),
+                                "file1", "file2", "file3", "file4", "file5", "file6", "file7",
+                                "file8"),
                         concatFileVisitor.conents);
             }
         }

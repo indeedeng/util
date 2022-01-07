@@ -13,9 +13,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class CollectionSuppliers {
     private static final Logger log = LoggerFactory.getLogger(CollectionSuppliers.class);
 
@@ -33,13 +31,14 @@ public final class CollectionSuppliers {
         }
     }
 
-    public static class TreeMapSupplier<K extends Comparable, V> implements Supplier<TreeMap<K, V>> {
+    public static class TreeMapSupplier<K extends Comparable, V>
+            implements Supplier<TreeMap<K, V>> {
         @Override
         public TreeMap<K, V> get() {
             return Maps.newTreeMap();
         }
     }
-    
+
     public static class HashSetSupplier<T> implements Supplier<Set<T>> {
 
         @Override

@@ -53,7 +53,7 @@ public abstract class DataLoadingTimerTask extends TimerTask implements HasDataL
         return dataLoadTimer.getSecondsSinceLastFailedLoad();
     }
 
-    public Integer getSecondsSinceLastLoadCheck(){
+    public Integer getSecondsSinceLastLoadCheck() {
         return dataLoadTimer.getSecondsSinceLastLoadCheck();
     }
 

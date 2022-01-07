@@ -3,9 +3,7 @@ package com.indeed.util.mmap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class CharArray {
     private static final Logger log = LoggerFactory.getLogger(CharArray.class);
 
@@ -17,18 +15,20 @@ public final class CharArray {
     public CharArray(Memory buffer, long address, long length) {
         if (address < 0) throw new IndexOutOfBoundsException("address must be >= 0");
         if (length < 0) throw new IllegalArgumentException("length must be >= 0");
-        if (address+length*TYPE_SIZE > buffer.length()) throw new IndexOutOfBoundsException(String.format("address+length*%d must be <= buffer.length()", TYPE_SIZE));
-        this.buffer = buffer.slice(address, length*TYPE_SIZE);
+        if (address + length * TYPE_SIZE > buffer.length())
+            throw new IndexOutOfBoundsException(
+                    String.format("address+length*%d must be <= buffer.length()", TYPE_SIZE));
+        this.buffer = buffer.slice(address, length * TYPE_SIZE);
         this.length = length;
     }
 
     public char get(final long index) {
-        return buffer.getChar(index*TYPE_SIZE);
+        return buffer.getChar(index * TYPE_SIZE);
     }
 
     public void get(final long index, final char[] chars, final int start, final int length) {
         for (int i = 0; i < length; i++) {
-            chars[start+i] = buffer.getChar((index+i)*TYPE_SIZE);
+            chars[start + i] = buffer.getChar((index + i) * TYPE_SIZE);
         }
     }
 
@@ -45,12 +45,12 @@ public final class CharArray {
     }
 
     public void set(final long index, final char value) {
-        buffer.putChar(index*TYPE_SIZE, value);
+        buffer.putChar(index * TYPE_SIZE, value);
     }
 
     public void set(final long index, final char[] chars, final int start, final int length) {
         for (int i = 0; i < length; i++) {
-            buffer.putChar((index+i)*TYPE_SIZE, chars[start+i]);
+            buffer.putChar((index + i) * TYPE_SIZE, chars[start + i]);
         }
     }
 
@@ -59,7 +59,8 @@ public final class CharArray {
     }
 
     public void set(final long index, final CharArray chars, final long start, final long length) {
-        chars.buffer.getBytes(index*TYPE_SIZE, this.buffer, start*TYPE_SIZE, length*TYPE_SIZE);
+        chars.buffer.getBytes(
+                index * TYPE_SIZE, this.buffer, start * TYPE_SIZE, length * TYPE_SIZE);
     }
 
     public void set(final long index, final CharArray chars) {
@@ -71,6 +72,6 @@ public final class CharArray {
     }
 
     public CharArray slice(final long start, final long length) {
-        return new CharArray(buffer, start*TYPE_SIZE, length);
+        return new CharArray(buffer, start * TYPE_SIZE, length);
     }
 }

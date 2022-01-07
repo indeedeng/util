@@ -9,10 +9,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * To be used instead of {@link com.indeed.util.varexport.Export} or the introspection methods
- * of {@link com.indeed.util.varexport.VarExporter} to export a manually updated variable.
- * <p>
- * Example usage:
+ * To be used instead of {@link com.indeed.util.varexport.Export} or the introspection methods of
+ * {@link com.indeed.util.varexport.VarExporter} to export a manually updated variable.
+ *
+ * <p>Example usage:
+ *
  * <pre>
  *   ManagedVariable&lt;Integer&gt; var = ManagedVariable.&lt;Integer&gt;builder().setName("myvar").setValue(524).build();
  *   // ...
@@ -30,7 +31,7 @@ public class LazilyManagedVariable<T> extends Variable<T> {
     public static <T> Builder<T> builder(final Class<T> c, String namespace) {
         return new Builder<T>(c, namespace);
     }
-    
+
     public static class Builder<T> {
         private final Class<T> c;
         private final String namespace;
@@ -77,22 +78,31 @@ public class LazilyManagedVariable<T> extends Variable<T> {
             if (tags == null) {
                 throw new RuntimeException("tags must not be null for ManagedVariable");
             }
-            return new LazilyManagedVariable<T>(name, tags, doc, expand, c, valueSupplier, namespace);
+            return new LazilyManagedVariable<T>(
+                    name, tags, doc, expand, c, valueSupplier, namespace);
         }
     }
 
     @VisibleForTesting
-    protected Supplier<Long> clock = new Supplier<Long>() {
-        public Long get() {
-            return System.currentTimeMillis();
-        }
-    };
+    protected Supplier<Long> clock =
+            new Supplier<Long>() {
+                public Long get() {
+                    return System.currentTimeMillis();
+                }
+            };
 
     private final Class<T> c;
     private final Supplier<T> valueSupplier;
     private Long lastUpdated = clock.get();
 
-    private LazilyManagedVariable(final String name, final Set<String> tags, final String doc, final boolean expand, final Class<T> c, final Supplier<T> valueSupplier, final String namespace) {
+    private LazilyManagedVariable(
+            final String name,
+            final Set<String> tags,
+            final String doc,
+            final boolean expand,
+            final Class<T> c,
+            final Supplier<T> valueSupplier,
+            final String namespace) {
         super(name, tags, doc, expand, namespace);
         this.c = c;
         this.valueSupplier = valueSupplier;

@@ -4,9 +4,7 @@ import junit.framework.TestCase;
 
 import java.nio.ByteOrder;
 
-/**
- * @author goodwin
- */
+/** @author goodwin */
 public class HeapMemoryTest extends TestCase {
     int length = 10;
 
@@ -17,7 +15,8 @@ public class HeapMemoryTest extends TestCase {
         try {
             src.putBytes(0, bytes);
             fail();
-        } catch (IndexOutOfBoundsException success) {}
+        } catch (IndexOutOfBoundsException success) {
+        }
         src.getBytes(0, dst);
     }
 }

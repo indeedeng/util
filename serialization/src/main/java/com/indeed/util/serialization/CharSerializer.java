@@ -7,9 +7,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class CharSerializer implements Serializer<Character> {
 
     private static final Logger log = LoggerFactory.getLogger(CharSerializer.class);

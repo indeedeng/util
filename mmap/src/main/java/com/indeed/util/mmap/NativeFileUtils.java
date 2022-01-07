@@ -7,9 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class NativeFileUtils {
 
     private static final Logger log = LoggerFactory.getLogger(NativeFileUtils.class);
@@ -31,7 +29,7 @@ public final class NativeFileUtils {
             File[] files = path.listFiles();
             if (files == null) return 0;
             for (File f : files) {
-                sum+=du(f);
+                sum += du(f);
             }
             return sum + 512 * stat.getNumBlocks();
         }

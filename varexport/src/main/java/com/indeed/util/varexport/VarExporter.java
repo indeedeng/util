@@ -41,9 +41,9 @@ import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
- * Enables exporting dynamic variables from classes (static fields/methods only) or objects (instance and
- * static fields/methods) that have been annotated with {@link Export}, as well as individual fields/methods that do
- * not have to be annotated.
+ * Enables exporting dynamic variables from classes (static fields/methods only) or objects
+ * (instance and static fields/methods) that have been annotated with {@link Export}, as well as
+ * individual fields/methods that do not have to be annotated.
  *
  * @author jack@indeed.com (Jack Humphrey)
  */
@@ -55,12 +55,15 @@ public class VarExporter implements VariableHost {
     protected static ManagedVariable<String> startTime = createStartTimeVariable(new Date());
 
     private static final Map<String, VarExporter> namespaces = Maps.newHashMap();
-    private static final Multimap<String, Variable> tags = Multimaps.newSetMultimap(new HashMap<String, Collection<Variable>>(), new Supplier<Set<Variable>>() {
-        @Override
-        public Set<Variable> get() {
-            return Sets.newCopyOnWriteArraySet();
-        }
-    });
+    private static final Multimap<String, Variable> tags =
+            Multimaps.newSetMultimap(
+                    new HashMap<String, Collection<Variable>>(),
+                    new Supplier<Set<Variable>>() {
+                        @Override
+                        public Set<Variable> get() {
+                            return Sets.newCopyOnWriteArraySet();
+                        }
+                    });
     private static final ReentrantReadWriteLock tagsLock = new ReentrantReadWriteLock();
 
     private final Class<?> namespaceClass;
@@ -74,7 +77,8 @@ public class VarExporter implements VariableHost {
         return namespaceClass;
     }
 
-    private static synchronized VarExporter getInstance(String namespace, final Class namespaceClass, final boolean declaredFieldsOnly) {
+    private static synchronized VarExporter getInstance(
+            String namespace, final Class namespaceClass, final boolean declaredFieldsOnly) {
         if (Strings.isNullOrEmpty(namespace)) {
             namespace = null;
         }
@@ -88,7 +92,9 @@ public class VarExporter implements VariableHost {
 
     /**
      * Load an exporter for a given namespace. For the global namespace, use {@link #global()}.
-     * @param namespace Namespace to load exporter from; use null for the global namespace or call {@link #global()}
+     *
+     * @param namespace Namespace to load exporter from; use null for the global namespace or call
+     *     {@link #global()}
      * @return exporter for the namespace; will be created if never before accessed.
      */
     public static synchronized VarExporter forNamespace(String namespace) {
@@ -99,19 +105,24 @@ public class VarExporter implements VariableHost {
      * Look up an exporter for the specified namespace.
      *
      * @param namespace the namespace to look up an exporter for
-     * @return the exporter for the specified namespace, or {@link Optional#empty()}, if the namespace does not exist
+     * @return the exporter for the specified namespace, or {@link Optional#empty()}, if the
+     *     namespace does not exist
      */
-    public static synchronized Optional<VarExporter> forNamespaceIfExists(@Nonnull final String namespace) {
+    public static synchronized Optional<VarExporter> forNamespaceIfExists(
+            @Nonnull final String namespace) {
         return Optional.ofNullable(namespaces.get(namespace));
     }
 
     /**
      * Load an exporter with a specified class.
+     *
      * @param clazz Class type from which variables will be exported.
-     * @param declaredFieldsOnly if true, will not export any variable belonging to superclasses of {@code clazz}.
+     * @param declaredFieldsOnly if true, will not export any variable belonging to superclasses of
+     *     {@code clazz}.
      * @return exporter for the given class will be created if never before accessed.
      */
-    public static synchronized VarExporter forNamespace(@Nonnull final Class<?> clazz, final boolean declaredFieldsOnly) {
+    public static synchronized VarExporter forNamespace(
+            @Nonnull final Class<?> clazz, final boolean declaredFieldsOnly) {
         return getInstance(clazz.getSimpleName(), clazz, declaredFieldsOnly);
     }
 
@@ -119,20 +130,25 @@ public class VarExporter implements VariableHost {
         return new ArrayList<String>(namespaces.keySet());
     }
 
-    /** @return exporter for the global namespace, use {@link #forNamespace(String)} for a specific exporter **/
+    /**
+     * @return exporter for the global namespace, use {@link #forNamespace(String)} for a specific
+     *     exporter *
+     */
     public static VarExporter global() {
         return forNamespace((String) null);
     }
 
     /**
-     *  Use with visitVariables methods to visit all variables in an exporter
-     *  @deprecated use {@link VariableVisitor} instead */
+     * Use with visitVariables methods to visit all variables in an exporter
+     *
+     * @deprecated use {@link VariableVisitor} instead
+     */
     @Deprecated
-    public static interface Visitor extends VariableVisitor {
-    }
+    public static interface Visitor extends VariableVisitor {}
 
     /**
      * Visit all variables in the given namespace
+     *
      * @param namespace namespace to visit
      * @param visitor visitor to receive callbacks
      */
@@ -161,15 +177,16 @@ public class VarExporter implements VariableHost {
             @Override
             @SuppressWarnings("unchecked")
             public <T> Variable<T> getVariable(final String variableName) {
-                final Variable[] foundVariable = new Variable[] { null };
-                visitVariables(new VariableVisitor() {
-                    public void visit(Variable var) {
-                        if (variableName.equals(var.getName())) {
-                            foundVariable[0] = var;
-                            return;
-                        }
-                    }
-                });
+                final Variable[] foundVariable = new Variable[] {null};
+                visitVariables(
+                        new VariableVisitor() {
+                            public void visit(Variable var) {
+                                if (variableName.equals(var.getName())) {
+                                    foundVariable[0] = var;
+                                    return;
+                                }
+                            }
+                        });
                 return foundVariable[0];
             }
         };
@@ -182,7 +199,10 @@ public class VarExporter implements VariableHost {
 
     private VarExporter parent = null;
 
-    private VarExporter(@Nullable final String namespace, @Nullable final Class namespaceClass, final boolean declaredFieldsOnly) {
+    private VarExporter(
+            @Nullable final String namespace,
+            @Nullable final Class namespaceClass,
+            final boolean declaredFieldsOnly) {
         this.namespace = namespace == null ? "" : namespace;
         this.namespaceClass = namespaceClass;
         this.declaredFieldsOnly = declaredFieldsOnly;
@@ -191,6 +211,7 @@ public class VarExporter implements VariableHost {
     /**
      * Export variables subsequently exported into this namespace into the global namespace using
      * "NAMESPACE-" as a prefix.
+     *
      * @return the current namespace (not the parent)
      */
     public VarExporter includeInGlobal() {
@@ -202,8 +223,9 @@ public class VarExporter implements VariableHost {
     }
 
     /**
-     * Export variables subsequently exported into this namespace into the given parent namespace using
-     * "NAMESPACE-" as a prefix.
+     * Export variables subsequently exported into this namespace into the given parent namespace
+     * using "NAMESPACE-" as a prefix.
+     *
      * @param namespace parent namespace
      * @return the current namespace (not the parent)
      */
@@ -223,8 +245,10 @@ public class VarExporter implements VariableHost {
     }
 
     /**
-     * Export all public fields and methods of a given object instance, including static fields, that are annotated
-     * with {@link com.indeed.util.varexport.Export}. Also finds annotation on interfaces.
+     * Export all public fields and methods of a given object instance, including static fields,
+     * that are annotated with {@link com.indeed.util.varexport.Export}. Also finds annotation on
+     * interfaces.
+     *
      * @param obj object instance to export
      * @param prefix prefix for variable names (e.g. "mywidget-")
      */
@@ -244,7 +268,8 @@ public class VarExporter implements VariableHost {
         getAllInterfaces(c, classAndInterfaces);
         classAndInterfaces.add(c);
         for (Class<?> cls : classAndInterfaces) {
-            for (final Method method : (declaredFieldsOnly ? cls.getDeclaredMethods() : cls.getMethods())) {
+            for (final Method method :
+                    (declaredFieldsOnly ? cls.getDeclaredMethods() : cls.getMethods())) {
                 Export export = method.getAnnotation(Export.class);
                 if (Modifier.isStatic(method.getModifiers())) {
                     loadMemberVariable(method, export, c, true, prefix, null);
@@ -258,7 +283,11 @@ public class VarExporter implements VariableHost {
     private void checkTypeCompatibility(final Class<?> clazz) {
         final boolean isNamespaceClassSet = namespaceClass != null;
         if (isNamespaceClassSet) {
-            Preconditions.checkArgument(namespaceClass.isAssignableFrom(clazz), "%s is not compatible with %s", clazz.getCanonicalName(), namespaceClass.getCanonicalName());
+            Preconditions.checkArgument(
+                    namespaceClass.isAssignableFrom(clazz),
+                    "%s is not compatible with %s",
+                    clazz.getCanonicalName(),
+                    namespaceClass.getCanonicalName());
         }
     }
 
@@ -272,8 +301,9 @@ public class VarExporter implements VariableHost {
     }
 
     /**
-     * Export all public static fields and methods of a given class that are annotated with
-     * {@link com.indeed.util.varexport.Export}.
+     * Export all public static fields and methods of a given class that are annotated with {@link
+     * com.indeed.util.varexport.Export}.
+     *
      * @param c class to export
      * @param prefix prefix for variable names (e.g. "mywidget-")
      */
@@ -294,9 +324,10 @@ public class VarExporter implements VariableHost {
     }
 
     /**
-     * Export a given public {@link Field} or {@link Method} of a given object instance. The member will be exported
-     * even if it does not have the {@link Export} annotation. This is mainly useful for exporting variables for which
-     * you cannot modify the code to add an annotation.
+     * Export a given public {@link Field} or {@link Method} of a given object instance. The member
+     * will be exported even if it does not have the {@link Export} annotation. This is mainly
+     * useful for exporting variables for which you cannot modify the code to add an annotation.
+     *
      * @param obj object instance
      * @param member Field of Method to export
      * @param prefix prefix for variable names (e.g. "mywidget-")
@@ -312,9 +343,10 @@ public class VarExporter implements VariableHost {
     }
 
     /**
-     * Export a given public static {@link Field} or {@link Method} of a given class. The member will be exported
-     * even if it does not have the {@link Export} annotation. This is mainly useful for exporting variables for which
-     * you cannot modify the code to add an annotation.
+     * Export a given public static {@link Field} or {@link Method} of a given class. The member
+     * will be exported even if it does not have the {@link Export} annotation. This is mainly
+     * useful for exporting variables for which you cannot modify the code to add an annotation.
+     *
      * @param c class from which to export
      * @param member Field of Method to export
      * @param prefix prefix for variable names (e.g. "mywidget-")
@@ -324,7 +356,7 @@ public class VarExporter implements VariableHost {
         if (!Modifier.isStatic(member.getModifiers())) {
             throw new UnsupportedOperationException(member + " is not static in " + c.getName());
         }
-        export((Object)c, member, prefix, name);
+        export((Object) c, member, prefix, name);
     }
 
     public void export(LazilyManagedVariable lazilyManagedVariable) {
@@ -334,6 +366,7 @@ public class VarExporter implements VariableHost {
 
     /**
      * Export a manually-managed variable.
+     *
      * @param managedVariable manually-managed variable
      */
     public void export(ManagedVariable managedVariable) {
@@ -343,6 +376,7 @@ public class VarExporter implements VariableHost {
 
     /**
      * Load the current value of a given variable.
+     *
      * @param variableName The name of the variable we are looking up.
      * @param <T> The data type of the exported variable.
      * @return Null if the variable was not found. The value otherwise.
@@ -355,6 +389,7 @@ public class VarExporter implements VariableHost {
 
     /**
      * Load the dynamic variable object.
+     *
      * @param variableName name of variable
      * @param <T> The data type of the exported variable.
      * @return Null if the variable was not found. The value otherwise.
@@ -378,6 +413,7 @@ public class VarExporter implements VariableHost {
 
     /**
      * Visit all the values exported by this exporter.
+     *
      * @param visitor visitor to receive visit callbacks
      */
     @Override
@@ -408,7 +444,8 @@ public class VarExporter implements VariableHost {
                     }
                 } catch (ConcurrentModificationException e) {
                     log.warn("Failed to iterate map entry set for variable " + v.getName(), e);
-                    Map.Entry<String, String> errorEntry = new AbstractMap.SimpleEntry<String, String>("error", e.getMessage());
+                    Map.Entry<String, String> errorEntry =
+                            new AbstractMap.SimpleEntry<String, String>("error", e.getMessage());
                     visitor.visit(new EntryVariable(errorEntry, v, namespace));
                 }
             } else {
@@ -423,50 +460,59 @@ public class VarExporter implements VariableHost {
     /** @return an iterator over the exported variables */
     public Iterable<Variable> getVariables() {
         final ImmutableList.Builder<Variable> builder = ImmutableList.builder();
-        visitVariables(new VariableVisitor() {
-            public void visit(Variable var) {
-                builder.add(var);
-            }
-        });
+        visitVariables(
+                new VariableVisitor() {
+                    public void visit(Variable var) {
+                        builder.add(var);
+                    }
+                });
         return builder.build();
     }
 
     /**
-     * Write all variables, one per line, to the given writer, in the format "name=value".
-     * Will escape values for compatibility with loading into {@link java.util.Properties}.
+     * Write all variables, one per line, to the given writer, in the format "name=value". Will
+     * escape values for compatibility with loading into {@link java.util.Properties}.
+     *
      * @param out writer
      * @param includeDoc true if documentation comments should be included
      */
     public void dump(final PrintWriter out, final boolean includeDoc) {
-        visitVariables(new Visitor() {
-            public void visit(Variable var) {
-                var.write(out, includeDoc);
-            }
-        });
+        visitVariables(
+                new Visitor() {
+                    public void visit(Variable var) {
+                        var.write(out, includeDoc);
+                    }
+                });
     }
 
     /**
-     * Write all variables as a JSON object. Will not escape names or values. All values are
-     * written as Strings.
+     * Write all variables as a JSON object. Will not escape names or values. All values are written
+     * as Strings.
+     *
      * @param out writer
      */
     public void dumpJson(final PrintWriter out) {
         out.append("{");
-        visitVariables(new Visitor() {
-            int count = 0;
+        visitVariables(
+                new Visitor() {
+                    int count = 0;
 
-            public void visit(Variable var) {
-                if (count++ > 0) { out.append(", "); }
-                out.append(var.getName()).append("='").append(String.valueOf(var.getValue())).append("'");
-            }
-        });
+                    public void visit(Variable var) {
+                        if (count++ > 0) {
+                            out.append(", ");
+                        }
+                        out.append(var.getName())
+                                .append("='")
+                                .append(String.valueOf(var.getValue()))
+                                .append("'");
+                    }
+                });
         out.append("}");
     }
 
     /**
-     *  Remove all exported variables (including those from child namespaces).
-     *  Also removes variables exported to a parent namespace.
-     *  Not recommended for use outside of tests.
+     * Remove all exported variables (including those from child namespaces). Also removes variables
+     * exported to a parent namespace. Not recommended for use outside of tests.
      */
     @SuppressWarnings("unchecked")
     @VisibleForTesting
@@ -486,7 +532,8 @@ public class VarExporter implements VariableHost {
     }
 
     /**
-     * @deprecated please just use {@link #resetGlobal()} instead to reset the entirety of VarExporter
+     * @deprecated please just use {@link #resetGlobal()} instead to reset the entirety of
+     *     VarExporter
      */
     @SuppressWarnings("unchecked")
     @Deprecated
@@ -560,7 +607,9 @@ public class VarExporter implements VariableHost {
     private void addChildVariable(String childNamespace, Variable variable) {
         // there is no need to propagate tags from the child
         final Set<String> noTags = ImmutableSet.of();
-        final ProxyVariable v = new ProxyVariable(childNamespace + "-" + variable.getName(), variable, noTags, namespace);
+        final ProxyVariable v =
+                new ProxyVariable(
+                        childNamespace + "-" + variable.getName(), variable, noTags, namespace);
         addVariable(v);
         synchronized (childVariables) {
             childVariables.add(v.getName());
@@ -574,8 +623,12 @@ public class VarExporter implements VariableHost {
             prev = variables.put(variable.getName(), variable);
         }
         if (prev != null) {
-            log.warn("In namespace '" + namespace + "': Exporting variable named " + variable.getName() +
-                    " hides a previously exported variable");
+            log.warn(
+                    "In namespace '"
+                            + namespace
+                            + "': Exporting variable named "
+                            + variable.getName()
+                            + " hides a previously exported variable");
         } else {
             if (log.isDebugEnabled()) {
                 log.debug("In namespace '" + namespace + "': Added variable " + variable.getName());
@@ -600,7 +653,13 @@ public class VarExporter implements VariableHost {
     }
 
     @SuppressWarnings("unchecked")
-    private void loadMemberVariable(Member member, Export export, Object obj, boolean requireAnnotation, String prefix, String name) {
+    private void loadMemberVariable(
+            Member member,
+            Export export,
+            Object obj,
+            boolean requireAnnotation,
+            String prefix,
+            String name) {
         if (!requireAnnotation || export != null) {
             Variable variable = variableFromMember(export, prefix, name, member, obj);
             if (export != null && export.cacheTimeoutMs() > 0) {
@@ -622,10 +681,13 @@ public class VarExporter implements VariableHost {
     }
 
     @SuppressWarnings("unchecked")
-    private Variable variableFromMember(Export export, String prefix, String suppliedName, Member member, Object obj) {
-        final String name = (prefix != null ? prefix : "") + getVarName(export, suppliedName, member);
+    private Variable variableFromMember(
+            Export export, String prefix, String suppliedName, Member member, Object obj) {
+        final String name =
+                (prefix != null ? prefix : "") + getVarName(export, suppliedName, member);
         final String doc = export != null ? export.doc() : "";
-        final Set<String> tags = ImmutableSet.copyOf(export != null ? export.tags() : new String[0]);
+        final Set<String> tags =
+                ImmutableSet.copyOf(export != null ? export.tags() : new String[0]);
         final boolean expand = export != null ? export.expand() : false;
         if (member instanceof Field) {
             return new FieldVariable(name, doc, tags, expand, (Field) member, obj, namespace);
@@ -638,25 +700,37 @@ public class VarExporter implements VariableHost {
 
     @VisibleForTesting
     protected static ManagedVariable<String> createStartTimeVariable(final Date date) {
-        final SimpleDateFormat timestampFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz"); // ISO 8601
+        final SimpleDateFormat timestampFormat =
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz"); // ISO 8601
         return ManagedVariable.<String>builder()
-            .setName("exporter-start-time")
-            .setDoc("global start time of variable exporter")
-            .setValue(timestampFormat.format(date))
-            .build();
+                .setName("exporter-start-time")
+                .setDoc("global start time of variable exporter")
+                .setValue(timestampFormat.format(date))
+                .build();
     }
 
     private static class FieldVariable<T> extends Variable<T> {
         private final Field field;
         private final WeakReference<Object> objectRef;
 
-        public FieldVariable(String name, String doc, Set<String> tags, boolean expand, Field field, Object object, String namespace) {
+        public FieldVariable(
+                String name,
+                String doc,
+                Set<String> tags,
+                boolean expand,
+                Field field,
+                Object object,
+                String namespace) {
             super(name, tags, doc, expand, namespace);
             this.field = field;
             field.setAccessible(true);
             this.objectRef = new WeakReference<Object>(object);
-            if (Map.class.isAssignableFrom(field.getType()) && !ImmutableMap.class.isAssignableFrom(field.getType())) {
-                log.warn("Variable " + getNamespaceAndName() + " is not an ImmutableMap, which may result in sporadic errors");
+            if (Map.class.isAssignableFrom(field.getType())
+                    && !ImmutableMap.class.isAssignableFrom(field.getType())) {
+                log.warn(
+                        "Variable "
+                                + getNamespaceAndName()
+                                + " is not an ImmutableMap, which may result in sporadic errors");
             }
         }
 
@@ -687,13 +761,24 @@ public class VarExporter implements VariableHost {
         private final Method method;
         private final WeakReference<Object> objectRef;
 
-        public MethodVariable(String name, String doc, Set<String> tags, boolean expand, Method method, Object object, String namespace) {
+        public MethodVariable(
+                String name,
+                String doc,
+                Set<String> tags,
+                boolean expand,
+                Method method,
+                Object object,
+                String namespace) {
             super(name, tags, doc, expand, namespace);
             this.method = method;
             method.setAccessible(true);
             this.objectRef = new WeakReference<Object>(object);
-            if (Map.class.isAssignableFrom(method.getReturnType()) && !ImmutableMap.class.isAssignableFrom(method.getReturnType())) {
-                log.warn("Variable " + getNamespaceAndName() + " is not an ImmutableMap, which may result in sporadic errors");
+            if (Map.class.isAssignableFrom(method.getReturnType())
+                    && !ImmutableMap.class.isAssignableFrom(method.getReturnType())) {
+                log.warn(
+                        "Variable "
+                                + getNamespaceAndName()
+                                + " is not an ImmutableMap, which may result in sporadic errors");
             }
         }
 
@@ -728,15 +813,24 @@ public class VarExporter implements VariableHost {
 
         @SuppressWarnings("unchecked")
         public EntryVariable(Map.Entry entry, Variable parent, String namespace) {
-            super(parent.getName() + "#" + entry.getKey(), parent.getTags(), null, false, namespace);
+            super(
+                    parent.getName() + "#" + entry.getKey(),
+                    parent.getTags(),
+                    null,
+                    false,
+                    namespace);
             this.valueRef = new WeakReference<Object>(entry.getValue());
             this.parent = parent;
             final Object value = valueRef.get();
-            if (value != null &&
-                    Map.class.isAssignableFrom(value.getClass()) &&
-                    !ImmutableMap.class.isAssignableFrom(value.getClass())) {
-                log.warn("Variable " + getNamespaceAndName() + "#" + entry.getKey() +
-                        " is not an ImmutableMap, which may result in sporadic errors");
+            if (value != null
+                    && Map.class.isAssignableFrom(value.getClass())
+                    && !ImmutableMap.class.isAssignableFrom(value.getClass())) {
+                log.warn(
+                        "Variable "
+                                + getNamespaceAndName()
+                                + "#"
+                                + entry.getKey()
+                                + " is not an ImmutableMap, which may result in sporadic errors");
             }
         }
 
@@ -776,11 +870,12 @@ public class VarExporter implements VariableHost {
         private T cachedValue = null;
         private long lastCached = 0;
 
-        private Supplier<Long> clock = new Supplier<Long>() {
-            public Long get() {
-                return System.currentTimeMillis();
-            }
-        };
+        private Supplier<Long> clock =
+                new Supplier<Long>() {
+                    public Long get() {
+                        return System.currentTimeMillis();
+                    }
+                };
 
         public CachingVariable(Variable<T> variable, long timeout, String namespace) {
             super(variable.getName(), variable, variable.getTags(), namespace);
@@ -814,7 +909,8 @@ public class VarExporter implements VariableHost {
     protected static class ProxyVariable<T> extends Variable<T> {
         private final Variable<T> variable;
 
-        public ProxyVariable(String name, Variable<T> variable, Set<String> tags, String namespace) {
+        public ProxyVariable(
+                String name, Variable<T> variable, Set<String> tags, String namespace) {
             super(name, tags, variable.getDoc(), variable.isExpandable(), namespace);
             this.variable = variable;
         }

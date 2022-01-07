@@ -1,7 +1,6 @@
 package com.indeed.util.urlparsing;
 
 import com.google.common.base.Preconditions;
-
 import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
@@ -11,10 +10,7 @@ import java.util.Random;
 
 import static junit.framework.Assert.assertEquals;
 
-/**
- * @author: preetha
- */
-
+/** @author: preetha */
 public class TestParseUtils {
 
     private static final int NUM_TRIALS = 50000;
@@ -53,17 +49,17 @@ public class TestParseUtils {
         assertEquals(0.23f, ParseUtils.parseFloat(expFloat, 1, expFloat.length()));
         assertEquals(0.03f, ParseUtils.parseFloat(expFloat, 2, expFloat.length()));
         assertEquals(0f, ParseUtils.parseFloat(expFloat, 3, expFloat.length()));
-        assertEquals(123f, ParseUtils.parseFloat(expFloat, 0, expFloat.length()-1));
+        assertEquals(123f, ParseUtils.parseFloat(expFloat, 0, expFloat.length() - 1));
 
         expFloat = "123e10";
         assertEquals(1230000000000f, ParseUtils.parseFloat(expFloat, 0, expFloat.length()));
         assertEquals(230000000000f, ParseUtils.parseFloat(expFloat, 1, expFloat.length()));
         assertEquals(30000000000f, ParseUtils.parseFloat(expFloat, 2, expFloat.length()));
         assertEquals(0f, ParseUtils.parseFloat(expFloat, 3, expFloat.length()));
-        assertEquals(1230f, ParseUtils.parseFloat(expFloat, 0, expFloat.length()-1));
-        assertEquals(230f, ParseUtils.parseFloat(expFloat, 1, expFloat.length()-1));
-        assertEquals(30f, ParseUtils.parseFloat(expFloat, 2, expFloat.length()-1));
-        assertEquals(0f, ParseUtils.parseFloat(expFloat, 3, expFloat.length()-1));
+        assertEquals(1230f, ParseUtils.parseFloat(expFloat, 0, expFloat.length() - 1));
+        assertEquals(230f, ParseUtils.parseFloat(expFloat, 1, expFloat.length() - 1));
+        assertEquals(30f, ParseUtils.parseFloat(expFloat, 2, expFloat.length() - 1));
+        assertEquals(0f, ParseUtils.parseFloat(expFloat, 3, expFloat.length() - 1));
     }
 
     @Test
@@ -76,8 +72,8 @@ public class TestParseUtils {
     @Test(expected = NumberFormatException.class)
     public void testParseBadAlphaInput() {
         ParseUtils.parseInt("abc", 0, 3);
-
     }
+
     @Test(expected = NumberFormatException.class)
     public void testParseBadAlphaNumericInput() {
         ParseUtils.parseUnsignedInt("-a123", 0, 4);
@@ -111,9 +107,18 @@ public class TestParseUtils {
 
     @Test
     public void testMixedMultiByteUrlDecode() throws UnsupportedEncodingException {
-        //tests four byte utf-8 chars by themselves, and mixed with other types
-        String[] inputs = new String[] {"\uD852\uDF62", "\uD800\uDD91", "aaa\uD800\uDD91ä", "\uD800\uDD94+zimmerm%C3%61dchen","\uD800\uDC00","\uD834\uDD61"} ;
-        //Includes code points  U+10000, U+24B62, U+10191 that need a surrogate pair to represent them
+        // tests four byte utf-8 chars by themselves, and mixed with other types
+        String[] inputs =
+                new String[] {
+                    "\uD852\uDF62",
+                    "\uD800\uDD91",
+                    "aaa\uD800\uDD91ä",
+                    "\uD800\uDD94+zimmerm%C3%61dchen",
+                    "\uD800\uDC00",
+                    "\uD834\uDD61"
+                };
+        // Includes code points  U+10000, U+24B62, U+10191 that need a surrogate pair to represent
+        // them
 
         for (String s : inputs) {
             testEncodeAndDecode(s, false, null);
@@ -121,7 +126,7 @@ public class TestParseUtils {
             testEncodeAndDecode(s, true, inplaceBuilder);
         }
 
-        //create a long string concatenating the above test input strings
+        // create a long string concatenating the above test input strings
         final StringBuilder longString = new StringBuilder(100);
         for (int k = 0; k < 50; k++) {
             for (String inp : inputs) {
@@ -129,14 +134,15 @@ public class TestParseUtils {
             }
         }
         testEncodeAndDecode(longString.toString(), false, null);
-
     }
 
-    private void testEncodeAndDecode(final String s, final boolean inPlace, final StringBuilder inPlaceBuilder) throws UnsupportedEncodingException {
+    private void testEncodeAndDecode(
+            final String s, final boolean inPlace, final StringBuilder inPlaceBuilder)
+            throws UnsupportedEncodingException {
         final String encode = URLEncoder.encode(s, "UTF-8");
         final String decoded = URLDecoder.decode(encode, "UTF-8");
 
-        final StringBuilder sb = inPlace ? inPlaceBuilder: new StringBuilder();
+        final StringBuilder sb = inPlace ? inPlaceBuilder : new StringBuilder();
         Preconditions.checkNotNull(sb);
         if (inPlace) {
             ParseUtils.urlDecodeInplace(sb);
@@ -144,7 +150,7 @@ public class TestParseUtils {
             ParseUtils.urlDecodeInto(encode, 0, encode.length(), sb);
         }
         final String actualDecoded = sb.toString();
-        //asserts that results are same as original, and same as what URLDecoder.decode returns
+        // asserts that results are same as original, and same as what URLDecoder.decode returns
         assertEquals(actualDecoded, decoded);
         assertEquals(actualDecoded, s);
     }
@@ -158,11 +164,10 @@ public class TestParseUtils {
         assertEquals(to, sb2.toString());
     }
 
-
     private static void testIntParser(Random random, boolean testSigned) {
         final int k;
         if (testSigned) {
-           k = random.nextInt();
+            k = random.nextInt();
         } else {
             k = random.nextInt(Integer.MAX_VALUE);
         }
@@ -185,14 +190,15 @@ public class TestParseUtils {
         assertEquals(expected, actual);
     }
 
-
     private static void testFloatParser(Random random, boolean testSigned) {
-        //test floats between 0 and 1
-        final float smallFloat = testSigned ? -random.nextFloat():random.nextFloat();
+        // test floats between 0 and 1
+        final float smallFloat = testSigned ? -random.nextFloat() : random.nextFloat();
         testFloat(smallFloat);
-        //test floats throughout the space
+        // test floats throughout the space
         final float f = Float.intBitsToFloat(random.nextInt());
-        if (!Float.isNaN(f)) { //we don't support parsing the string "NaN" into its floating point form, and intBitsToFloat returns NaN for certain bit ranges
+        if (!Float.isNaN(
+                f)) { // we don't support parsing the string "NaN" into its floating point form, and
+            // intBitsToFloat returns NaN for certain bit ranges
             testFloat(f);
         }
     }
@@ -203,6 +209,4 @@ public class TestParseUtils {
         final float expected = Float.parseFloat(s);
         assertEquals(expected, actual);
     }
-
-
 }

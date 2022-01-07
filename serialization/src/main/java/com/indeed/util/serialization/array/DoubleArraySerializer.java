@@ -9,9 +9,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class DoubleArraySerializer implements Serializer<double[]> {
     private static final Logger log = LoggerFactory.getLogger(DoubleArraySerializer.class);
 

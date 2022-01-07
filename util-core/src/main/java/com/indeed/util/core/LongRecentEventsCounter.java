@@ -17,13 +17,13 @@ public class LongRecentEventsCounter {
     private int tickOfOldest;
 
     /**
-     *
      * @param ticker size of a time interval
      * @param size number of intervals to record
      */
     public LongRecentEventsCounter(final Ticker ticker, final int size) {
         if (size < 2) {
-            throw new IllegalArgumentException("Size " + size + " is too small; must be at least 2");
+            throw new IllegalArgumentException(
+                    "Size " + size + " is too small; must be at least 2");
         }
         this.ticker = ticker;
         this.buckets = new long[size];
@@ -93,18 +93,23 @@ public class LongRecentEventsCounter {
     }
 
     /**
-     * Create a snapshot of the data from newest (at position 0) to the oldest
-     * (at end) data stored in this recent events counter.
+     * Create a snapshot of the data from newest (at position 0) to the oldest (at end) data stored
+     * in this recent events counter.
      *
      * @return An array of longs containing a copy of data in the window.
      */
     public long[] snapshot() {
-        this.increment(0);  //  refresh just in case it's been idle a long time
+        this.increment(0); //  refresh just in case it's been idle a long time
         final long[] range = new long[this.buckets.length];
         if (this.indexOfOldest != 0) {
             final int lengthOfFirstSection = this.buckets.length - this.indexOfOldest;
             System.arraycopy(this.buckets, this.indexOfOldest, range, 0, lengthOfFirstSection);
-            System.arraycopy(this.buckets, 0, range, lengthOfFirstSection, this.buckets.length - lengthOfFirstSection); //  wrap around
+            System.arraycopy(
+                    this.buckets,
+                    0,
+                    range,
+                    lengthOfFirstSection,
+                    this.buckets.length - lengthOfFirstSection); //  wrap around
         } else {
             System.arraycopy(this.buckets, this.indexOfOldest, range, 0, this.buckets.length);
         }
@@ -113,7 +118,7 @@ public class LongRecentEventsCounter {
     }
 
     public long sum() {
-        this.increment(0);  //  refresh just in case it's been idle a long time
+        this.increment(0); //  refresh just in case it's been idle a long time
         long sum = 0;
         for (int i = 0; i < this.buckets.length; i++) {
             sum += this.buckets[i];
@@ -129,12 +134,10 @@ public class LongRecentEventsCounter {
         int getTick();
     }
 
-    /**
-     * newest at 0, oldest at end
-     */
+    /** newest at 0, oldest at end */
     @Override
     public String toString() {
-        this.increment(0);  //  refresh just in case it's been idle a long time
+        this.increment(0); //  refresh just in case it's been idle a long time
         final StringBuilder sb = new StringBuilder(250);
         if (this.indexOfOldest == 0) {
             for (int i = this.buckets.length - 1; i >= 0; i--) {
@@ -159,30 +162,33 @@ public class LongRecentEventsCounter {
         return sb.toString();
     }
 
-    public static final Ticker SECOND_TICKER = new Ticker() {
-        @Override
-        public int getTick() {
-            return (int) (System.currentTimeMillis()/1000);
-        }
-    };
+    public static final Ticker SECOND_TICKER =
+            new Ticker() {
+                @Override
+                public int getTick() {
+                    return (int) (System.currentTimeMillis() / 1000);
+                }
+            };
 
-    public static final Ticker MINUTE_TICKER = new Ticker() {
-        @Override
-        public int getTick() {
-            return (int) (System.currentTimeMillis()/(60 *1000));
-        }
-    };
+    public static final Ticker MINUTE_TICKER =
+            new Ticker() {
+                @Override
+                public int getTick() {
+                    return (int) (System.currentTimeMillis() / (60 * 1000));
+                }
+            };
 
-    public static final Ticker FIFTEEN_MINUTE_TICKER = new Ticker() {
-        @Override
-        public int getTick() {
-            return (int) (System.currentTimeMillis()/(15 * 60 * 1000));
-        }
-    };
+    public static final Ticker FIFTEEN_MINUTE_TICKER =
+            new Ticker() {
+                @Override
+                public int getTick() {
+                    return (int) (System.currentTimeMillis() / (15 * 60 * 1000));
+                }
+            };
 
     /**
-     * If you want your time intervals (buckets) to be controlled by some external code,
-     * use this {@link Ticker} and just call {@link #tick()} to advance recording to a new interval.
+     * If you want your time intervals (buckets) to be controlled by some external code, use this
+     * {@link Ticker} and just call {@link #tick()} to advance recording to a new interval.
      */
     public static class ManualTicker implements Ticker {
         private volatile int tick = 0;
@@ -195,7 +201,7 @@ public class LongRecentEventsCounter {
         /**
          * REQUIRES EXTERNAL SYNCHRONIZATION.
          *
-         * This advances the ticker to the next interval/bucket/tick.
+         * <p>This advances the ticker to the next interval/bucket/tick.
          */
         public void tick() {
             tick++;

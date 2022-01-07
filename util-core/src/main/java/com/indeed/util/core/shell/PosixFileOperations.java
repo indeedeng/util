@@ -19,9 +19,7 @@ import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayDeque;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class PosixFileOperations {
 
     private static final Logger log = LoggerFactory.getLogger(PosixFileOperations.class);
@@ -42,19 +40,21 @@ public final class PosixFileOperations {
     public static void link(File target, File link) throws IOException {
         File linkParent = link.getParentFile();
         String relPath = relativePath(linkParent, target);
-        Process lnProc = Runtime.getRuntime().exec(
-                new String[]{"ln", "-sfn", relPath, link.getName()},
-                null,
-                linkParent
-        );
+        Process lnProc =
+                Runtime.getRuntime()
+                        .exec(
+                                new String[] {"ln", "-sfn", relPath, link.getName()},
+                                null,
+                                linkParent);
         try {
             int result = lnProc.waitFor();
             if (result != 0) {
                 throw new IOException(
                         formatWithStdStreams(
                                 lnProc,
-                                "error running ln process, exit code: " + result + "\nstdout:\n%s\nstderr:\n%s"
-                        ));
+                                "error running ln process, exit code: "
+                                        + result
+                                        + "\nstdout:\n%s\nstderr:\n%s"));
             }
         } catch (InterruptedException e) {
             log.error("exception during exec", e);
@@ -63,15 +63,17 @@ public final class PosixFileOperations {
     }
 
     public static void rmrf(File file) throws IOException {
-        Process rmProc = Runtime.getRuntime().exec(new String[]{"rm", "-rf", file.getAbsolutePath()}, null);
+        Process rmProc =
+                Runtime.getRuntime().exec(new String[] {"rm", "-rf", file.getAbsolutePath()}, null);
         try {
             int result = rmProc.waitFor();
             if (result != 0) {
                 throw new IOException(
                         formatWithStdStreams(
                                 rmProc,
-                                "error running rm process, exit code: " + result + "\nstdout:\n%s\nstderr:\n%s"
-                        ));
+                                "error running rm process, exit code: "
+                                        + result
+                                        + "\nstdout:\n%s\nstderr:\n%s"));
             }
         } catch (InterruptedException e) {
             log.error("exception during exec", e);
@@ -80,33 +82,44 @@ public final class PosixFileOperations {
     }
 
     public static void rmrf(Path path) throws IOException {
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-                super.visitFile(file, attrs);
-                Files.delete(file);
-                return FileVisitResult.CONTINUE;
-            }
+        Files.walkFileTree(
+                path,
+                new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult visitFile(
+                            final Path file, final BasicFileAttributes attrs) throws IOException {
+                        super.visitFile(file, attrs);
+                        Files.delete(file);
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
-                super.postVisitDirectory(dir, exc);
-                Files.delete(dir);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                    @Override
+                    public FileVisitResult postVisitDirectory(final Path dir, final IOException exc)
+                            throws IOException {
+                        super.postVisitDirectory(dir, exc);
+                        Files.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
     }
 
     public static void cplr(File src, File dest) throws IOException {
-        Process cpProc = Runtime.getRuntime().exec(new String[]{"cp", "-lr", src.getAbsolutePath(), dest.getAbsolutePath()}, null);
+        Process cpProc =
+                Runtime.getRuntime()
+                        .exec(
+                                new String[] {
+                                    "cp", "-lr", src.getAbsolutePath(), dest.getAbsolutePath()
+                                },
+                                null);
         try {
             int result = cpProc.waitFor();
             if (result != 0) {
                 throw new IOException(
                         formatWithStdStreams(
                                 cpProc,
-                                "error running cp process, exit code: " + result + "\nstdout:\n%s\nstderr:\n%s"
-                        ));
+                                "error running cp process, exit code: "
+                                        + result
+                                        + "\nstdout:\n%s\nstderr:\n%s"));
             }
         } catch (InterruptedException e) {
             log.error("exception during exec", e);
@@ -121,35 +134,46 @@ public final class PosixFileOperations {
     }
 
     public static void cplr(final Path src, final Path dest) throws IOException {
-        Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
-                super.preVisitDirectory(dir, attrs);
-                Files.createDirectory(dest.resolve(src.relativize(dir)));
-                return FileVisitResult.CONTINUE;
-            }
+        Files.walkFileTree(
+                src,
+                new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(
+                            final Path dir, final BasicFileAttributes attrs) throws IOException {
+                        super.preVisitDirectory(dir, attrs);
+                        Files.createDirectory(dest.resolve(src.relativize(dir)));
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-                super.visitFile(file, attrs);
-                Files.createLink(dest.resolve(src.relativize(file)), file);
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                    @Override
+                    public FileVisitResult visitFile(
+                            final Path file, final BasicFileAttributes attrs) throws IOException {
+                        super.visitFile(file, attrs);
+                        Files.createLink(dest.resolve(src.relativize(file)), file);
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
 
         fsyncDir(dest);
     }
 
     public static void recursiveCopy(File srcDir, File destDir) throws IOException {
-        Process cpProc = Runtime.getRuntime().exec(new String[]{"cp", "-Lr", srcDir.getAbsolutePath(), destDir.getAbsolutePath()}, null);
+        Process cpProc =
+                Runtime.getRuntime()
+                        .exec(
+                                new String[] {
+                                    "cp", "-Lr", srcDir.getAbsolutePath(), destDir.getAbsolutePath()
+                                },
+                                null);
         try {
             int result = cpProc.waitFor();
             if (result != 0) {
                 throw new IOException(
                         formatWithStdStreams(
                                 cpProc,
-                                "error running cp process, exit code: " + result + "\nstdout:\n%s\nstderr:\n%s"
-                        ));
+                                "error running cp process, exit code: "
+                                        + result
+                                        + "\nstdout:\n%s\nstderr:\n%s"));
             }
         } catch (InterruptedException e) {
             log.error("exception during exec", e);
@@ -158,35 +182,42 @@ public final class PosixFileOperations {
     }
 
     public static void recursiveCopy(final Path src, final Path dest) throws IOException {
-        Files.walkFileTree(src, new SimpleFileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
-                super.preVisitDirectory(dir, attrs);
-                Files.createDirectory(dest.resolve(src.relativize(dir)));
-                return FileVisitResult.CONTINUE;
-            }
+        Files.walkFileTree(
+                src,
+                new SimpleFileVisitor<Path>() {
+                    @Override
+                    public FileVisitResult preVisitDirectory(
+                            final Path dir, final BasicFileAttributes attrs) throws IOException {
+                        super.preVisitDirectory(dir, attrs);
+                        Files.createDirectory(dest.resolve(src.relativize(dir)));
+                        return FileVisitResult.CONTINUE;
+                    }
 
-            @Override
-            public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-                super.visitFile(file, attrs);
-                Files.copy(file, dest.resolve(src.relativize(file)));
-                return FileVisitResult.CONTINUE;
-            }
-        });
+                    @Override
+                    public FileVisitResult visitFile(
+                            final Path file, final BasicFileAttributes attrs) throws IOException {
+                        super.visitFile(file, attrs);
+                        Files.copy(file, dest.resolve(src.relativize(file)));
+                        return FileVisitResult.CONTINUE;
+                    }
+                });
 
         fsyncDir(dest);
     }
 
     public static long du(File path) throws IOException {
-        Process proc = Runtime.getRuntime().exec(new String[]{"du", "-bs", path.getPath()});
+        Process proc = Runtime.getRuntime().exec(new String[] {"du", "-bs", path.getPath()});
         try {
             int result = proc.waitFor();
             if (result != 0) {
                 throw new IOException(
                         formatWithStdStreams(
                                 proc,
-                                "error running du -bs "+path.getPath()+", exit code: " + result + "\nstdout:\n%s\nstderr:\n%s"
-                        ));
+                                "error running du -bs "
+                                        + path.getPath()
+                                        + ", exit code: "
+                                        + result
+                                        + "\nstdout:\n%s\nstderr:\n%s"));
             }
             StringWriter out = new StringWriter();
             CharStreams.copy(new InputStreamReader(proc.getInputStream(), Charsets.UTF_8), out);
@@ -207,7 +238,9 @@ public final class PosixFileOperations {
         ArrayDeque<String> baseParts = getParts(base);
         ArrayDeque<String> pathParts = getParts(path);
         StringBuilder ret = new StringBuilder();
-        while (!baseParts.isEmpty() && !pathParts.isEmpty() && baseParts.getLast().equals(pathParts.getLast())) {
+        while (!baseParts.isEmpty()
+                && !pathParts.isEmpty()
+                && baseParts.getLast().equals(pathParts.getLast())) {
             baseParts.removeLast();
             pathParts.removeLast();
         }
@@ -223,18 +256,18 @@ public final class PosixFileOperations {
         }
         return ret.toString();
     }
-    
+
     public static String lsla(File file) throws IOException {
-        Process proc = Runtime.getRuntime().exec(new String[]{"ls", "-la"}, null, file);
+        Process proc = Runtime.getRuntime().exec(new String[] {"ls", "-la"}, null, file);
         try {
             final int result = proc.waitFor();
             if (result != 0) {
                 throw new IOException(
                         formatWithStdStreams(
                                 proc,
-                                "error running ls -la process, exit code: " + result + "\nstdout:\n%s\nstderr:\n%s"
-                        )
-                );
+                                "error running ls -la process, exit code: "
+                                        + result
+                                        + "\nstdout:\n%s\nstderr:\n%s"));
             }
             final StringWriter out = new StringWriter();
             CharStreams.copy(new InputStreamReader(proc.getInputStream(), Charsets.UTF_8), out);
@@ -259,20 +292,20 @@ public final class PosixFileOperations {
         return String.format(
                 fmt,
                 new String(ByteStreams.toByteArray(proc.getInputStream()), Charsets.UTF_8),
-                new String(ByteStreams.toByteArray(proc.getErrorStream()), Charsets.UTF_8)
-        );
+                new String(ByteStreams.toByteArray(proc.getErrorStream()), Charsets.UTF_8));
     }
-    
+
     public static int getPID() throws IOException {
-        Process proc = Runtime.getRuntime().exec(new String[]{"bash", "-c", "echo $PPID"});
+        Process proc = Runtime.getRuntime().exec(new String[] {"bash", "-c", "echo $PPID"});
         try {
             int result = proc.waitFor();
             if (result != 0) {
                 throw new IOException(
                         formatWithStdStreams(
                                 proc,
-                                "error running bash -c \"echo $PPID\", exit code: " + result + "\nstdout:\n%s\nstderr:\n%s"
-                        ));
+                                "error running bash -c \"echo $PPID\", exit code: "
+                                        + result
+                                        + "\nstdout:\n%s\nstderr:\n%s"));
             }
             StringWriter out = new StringWriter();
             CharStreams.copy(new InputStreamReader(proc.getInputStream(), Charsets.UTF_8), out);
@@ -290,18 +323,18 @@ public final class PosixFileOperations {
         }
         return new File(procfs, String.valueOf(pid)).exists();
     }
-    
+
     public static Integer tryParseInt(String str) {
         return tryParseInt(str, 10);
     }
-    
+
     public static Integer tryParseInt(String str, int radix) {
         if (str.length() == 0) return null;
         int value = 0;
         for (int i = 0; i < str.length(); i++) {
             final int digit = Character.digit(str.charAt(i), radix);
             if (digit < 0) return null;
-            value = value*radix+digit;
+            value = value * radix + digit;
         }
         return value;
     }

@@ -1,8 +1,8 @@
 package com.indeed.util.core.time;
 
+import javax.annotation.Nonnull;
 import java.time.Instant;
 import java.time.ZoneId;
-import javax.annotation.Nonnull;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -10,16 +10,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * Simple wall clock frozen to a moment in time.
  *
  * @deprecated with {@link WallClock}. Use {@link java.time.Clock#fixed(Instant, ZoneId)} instead.
- *
  * @author matts
  */
 @Deprecated
 public final class StoppedClock implements WallClock {
     @Nonnull private final AtomicLong millis;
 
-    /**
-     * Creates a new stopped clock frozen at the current moment in time.
-     */
+    /** Creates a new stopped clock frozen at the current moment in time. */
     public StoppedClock() {
         this(System.currentTimeMillis());
     }
@@ -45,8 +42,8 @@ public final class StoppedClock implements WallClock {
     /**
      * Add the specified amount of time to the current clock.
      *
-     * @param value The numeric value to add to the clock after converting
-     *              based on the provided {@code timeUnit}.
+     * @param value The numeric value to add to the clock after converting based on the provided
+     *     {@code timeUnit}.
      * @param timeUnit The time unit that {@code value} is measured in.
      * @return The time after being adjusted by the provided offset.
      */
@@ -55,7 +52,7 @@ public final class StoppedClock implements WallClock {
     }
 
     @Override
-    public long currentTimeMillis () {
+    public long currentTimeMillis() {
         return millis.get();
     }
 }

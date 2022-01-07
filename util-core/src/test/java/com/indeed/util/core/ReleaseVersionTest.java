@@ -5,9 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-/**
- * @author jack@indeed.com (Jack Humphrey)
- */
+/** @author jack@indeed.com (Jack Humphrey) */
 public class ReleaseVersionTest {
     public static void assertVersionLessThan(final String lhs, final String rhs) {
         assertEquals(-1, ReleaseVersion.fromString(lhs).compareTo(ReleaseVersion.fromString(rhs)));
@@ -92,7 +90,8 @@ public class ReleaseVersionTest {
         assertIllegalArgumentException("1.1.-29348.0");
         assertIllegalArgumentException("1.1.1.-29348.0");
         assertIllegalArgumentException("1..1.x");
-        assertIllegalArgumentException("x"); // TODO: should this be supported? ("match all versions")
+        assertIllegalArgumentException(
+                "x"); // TODO: should this be supported? ("match all versions")
         assertIllegalArgumentException("");
     }
 
@@ -119,6 +118,8 @@ public class ReleaseVersionTest {
         assertEquals("1.1.1.1", ReleaseVersion.fromString("1.1.1.1.x").toString());
         assertEquals("1.1.1.1", ReleaseVersion.fromString("1.1.1.1.x.x").toString());
         assertEquals("1.1.1.1", ReleaseVersion.fromString("1.1.1.1.x.x.itsallgood").toString());
-        assertEquals("32767.65535.65535.65535", ReleaseVersion.fromString("32767.65535.65535.65535").toString());
+        assertEquals(
+                "32767.65535.65535.65535",
+                ReleaseVersion.fromString("32767.65535.65535.65535").toString());
     }
 }

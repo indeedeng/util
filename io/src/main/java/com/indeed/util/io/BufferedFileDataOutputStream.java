@@ -16,9 +16,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class BufferedFileDataOutputStream extends OutputStream implements SyncableDataOutput {
     private static final int DEFAULT_BUFFER_SIZE = 131072;
 
@@ -34,11 +32,14 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
         this(file, ByteOrder.BIG_ENDIAN);
     }
 
-    public BufferedFileDataOutputStream(final File file, final ByteOrder order) throws FileNotFoundException {
+    public BufferedFileDataOutputStream(final File file, final ByteOrder order)
+            throws FileNotFoundException {
         this(file, order, DEFAULT_BUFFER_SIZE);
     }
 
-    public BufferedFileDataOutputStream(final File file, final ByteOrder order, final int bufferSize) throws FileNotFoundException {
+    public BufferedFileDataOutputStream(
+            final File file, final ByteOrder order, final int bufferSize)
+            throws FileNotFoundException {
         // for backwards compatiblity with file interface, we still use RandomAccessFile
         final RandomAccessFile raf = closer.register(new RandomAccessFile(file, "rw"));
         channel = raf.getChannel();
@@ -50,7 +51,8 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
         } else if (order == ByteOrder.BIG_ENDIAN) {
             dataOut = new DataOutputStream(this);
         } else {
-            throw new IllegalArgumentException(order + " is not ByteOrder.BIG_ENDIAN or ByteOrder.LITTLE_ENDIAN");
+            throw new IllegalArgumentException(
+                    order + " is not ByteOrder.BIG_ENDIAN or ByteOrder.LITTLE_ENDIAN");
         }
     }
 
@@ -62,11 +64,14 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
         this(path, order, DEFAULT_BUFFER_SIZE);
     }
 
-    public BufferedFileDataOutputStream(final Path path, final ByteOrder order, final int bufferSize) throws IOException {
-        channel = FileChannel.open(path,
-                StandardOpenOption.CREATE,
-                StandardOpenOption.READ,
-                StandardOpenOption.WRITE);
+    public BufferedFileDataOutputStream(
+            final Path path, final ByteOrder order, final int bufferSize) throws IOException {
+        channel =
+                FileChannel.open(
+                        path,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.READ,
+                        StandardOpenOption.WRITE);
         closer.register(channel);
 
         buffer = ByteBuffer.allocate(bufferSize);
@@ -75,7 +80,8 @@ public final class BufferedFileDataOutputStream extends OutputStream implements 
         } else if (order == ByteOrder.BIG_ENDIAN) {
             dataOut = new DataOutputStream(this);
         } else {
-            throw new IllegalArgumentException(order + " is not ByteOrder.BIG_ENDIAN or ByteOrder.LITTLE_ENDIAN");
+            throw new IllegalArgumentException(
+                    order + " is not ByteOrder.BIG_ENDIAN or ByteOrder.LITTLE_ENDIAN");
         }
     }
 

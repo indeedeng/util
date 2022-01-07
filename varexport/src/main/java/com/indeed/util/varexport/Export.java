@@ -20,9 +20,15 @@ public @interface Export {
     /** @return global tags for the variable */
     public String[] tags() default {};
 
-    /** @return true if variables implementing {@link java.util.Map} should be expanded into multiple variables */
+    /**
+     * @return true if variables implementing {@link java.util.Map} should be expanded into multiple
+     *     variables
+     */
     public boolean expand() default false;
 
-    /** @return how long (in milliseconds) to keep a value cached; default behavior for timeout 0 is no caching */
+    /**
+     * @return how long (in milliseconds) to keep a value cached; default behavior for timeout 0 is
+     *     no caching
+     */
     public long cacheTimeoutMs() default 0L;
 }

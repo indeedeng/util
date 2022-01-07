@@ -12,23 +12,29 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Map;
 
-/**
- * @author jplaisance
- */
-public final class MapStringifier<K,V> implements Stringifier<Map<K, V>> {
+/** @author jplaisance */
+public final class MapStringifier<K, V> implements Stringifier<Map<K, V>> {
     private static final Logger log = LoggerFactory.getLogger(MapStringifier.class);
 
-    private static final EscapeAwareSplitter splitter = new EscapeAwareSplitter(CharMatcher.whitespace().or(CharMatcher.anyOf(",=")), EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
+    private static final EscapeAwareSplitter splitter =
+            new EscapeAwareSplitter(
+                    CharMatcher.whitespace().or(CharMatcher.anyOf(",=")),
+                    EscapeAwareSplitter.ESCAPE_JAVA_LEXER_SUPPLIER);
 
-    public static <K,V> MapStringifier<K,V> hashMapStringifier(Stringifier<K> keyStringifier, Stringifier<V> valueStringifier) {
-        return new MapStringifier<K, V>(new CollectionSuppliers.HashMapSupplier<K, V>(), keyStringifier, valueStringifier);
+    public static <K, V> MapStringifier<K, V> hashMapStringifier(
+            Stringifier<K> keyStringifier, Stringifier<V> valueStringifier) {
+        return new MapStringifier<K, V>(
+                new CollectionSuppliers.HashMapSupplier<K, V>(), keyStringifier, valueStringifier);
     }
 
     private final Supplier<? extends Map<K, V>> mapSupplier;
     private final Stringifier<K> keyStringifier;
     private final Stringifier<V> valueStringifier;
 
-    public MapStringifier(Supplier<? extends Map<K,V>> mapSupplier, Stringifier<K> keyStringifier, Stringifier<V> valueStringifier) {
+    public MapStringifier(
+            Supplier<? extends Map<K, V>> mapSupplier,
+            Stringifier<K> keyStringifier,
+            Stringifier<V> valueStringifier) {
         this.mapSupplier = mapSupplier;
         this.keyStringifier = keyStringifier;
         this.valueStringifier = valueStringifier;
@@ -42,11 +48,12 @@ public final class MapStringifier<K,V> implements Stringifier<Map<K, V>> {
             builder.append('"');
             builder.append(StringEscapeUtils.escapeJava(keyStringifier.toString(entry.getKey())));
             builder.append("\"=\"");
-            builder.append(StringEscapeUtils.escapeJava(valueStringifier.toString(entry.getValue())));
+            builder.append(
+                    StringEscapeUtils.escapeJava(valueStringifier.toString(entry.getValue())));
             builder.append("\", ");
         }
         if (!map.isEmpty()) {
-            builder.setLength(builder.length()-2);
+            builder.setLength(builder.length() - 2);
         }
         builder.append('}');
         return builder.toString();
@@ -54,8 +61,8 @@ public final class MapStringifier<K,V> implements Stringifier<Map<K, V>> {
 
     @Override
     public Map<K, V> fromString(String str) {
-        Map<K,V> ret = mapSupplier.get();
-        Iterator<String> split = splitter.split(str.substring(1, str.length()-1));
+        Map<K, V> ret = mapSupplier.get();
+        Iterator<String> split = splitter.split(str.substring(1, str.length() - 1));
         while (split.hasNext()) {
             K key = keyStringifier.fromString(split.next());
             if (!split.hasNext()) throw new IllegalArgumentException();

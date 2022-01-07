@@ -3,9 +3,7 @@ package com.indeed.util.serialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class StringStringifier implements Stringifier<String> {
     private static final Logger log = LoggerFactory.getLogger(StringStringifier.class);
 

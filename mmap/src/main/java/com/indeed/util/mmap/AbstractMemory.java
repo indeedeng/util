@@ -1,8 +1,6 @@
 package com.indeed.util.mmap;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public abstract class AbstractMemory implements Memory {
 
     @Override

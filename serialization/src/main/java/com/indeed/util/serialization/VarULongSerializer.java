@@ -7,9 +7,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class VarULongSerializer implements Serializer<Long> {
     private static final Logger log = LoggerFactory.getLogger(VarULongSerializer.class);
 
@@ -21,7 +19,7 @@ public final class VarULongSerializer implements Serializer<Long> {
         if (l <= MAX_31) {
             out.writeInt(l.intValue());
         } else {
-            out.writeInt(((int)(l>>>32))|HIGH_BIT);
+            out.writeInt(((int) (l >>> 32)) | HIGH_BIT);
             out.writeInt(l.intValue());
         }
     }
@@ -29,8 +27,8 @@ public final class VarULongSerializer implements Serializer<Long> {
     public Long read(final DataInput in) throws IOException {
         final int first = in.readInt();
         if (first >= 0) {
-            return (long)first;
+            return (long) first;
         }
-        return ((first&MAX_31)<<32L)|(in.readInt()&INT_MASK);
+        return ((first & MAX_31) << 32L) | (in.readInt() & INT_MASK);
     }
 }

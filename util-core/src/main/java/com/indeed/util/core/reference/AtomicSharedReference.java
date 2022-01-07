@@ -10,10 +10,9 @@ import java.io.Closeable;
 import java.io.IOException;
 
 /**
- * This class is a mutable reference to a refcounted object. To access the
- * referenced object, call {@link #getCopy()} which returns a
- * {@link SharedReference} which has a {@link SharedReference#get()} method
- * which will return the object. The shared reference returned by
+ * This class is a mutable reference to a refcounted object. To access the referenced object, call
+ * {@link #getCopy()} which returns a {@link SharedReference} which has a {@link
+ * SharedReference#get()} method which will return the object. The shared reference returned by
  * {@code getCopy()} must be closed when you are done with it.
  *
  * @param <T> The type of object encapsulated by this shared reference.
@@ -45,11 +44,13 @@ public final class AtomicSharedReference<T> {
     }
 
     public synchronized @Nullable SharedReference<T> getAndSet(T t) {
-        return getAndSet(t, (Closeable)t);
+        return getAndSet(t, (Closeable) t);
     }
 
     public synchronized @Nullable SharedReference<T> getAndSet(T t, Closeable closeable) {
-        if ((ref != null) && (ref.get() == t)) return ref.copy();  // If we've been told to set the object we already have, return a copy
+        if ((ref != null) && (ref.get() == t))
+            return ref
+                    .copy(); // If we've been told to set the object we already have, return a copy
         final SharedReference<T> ret = ref;
         ref = SharedReference.create(t, closeable);
         return ret;
@@ -57,6 +58,7 @@ public final class AtomicSharedReference<T> {
 
     /**
      * use getCopy() instead
+     *
      * @return a copy of the reference to the object currently held by this AtomicSharedReference
      */
     public @Deprecated @Nullable SharedReference<T> get() {
@@ -72,7 +74,7 @@ public final class AtomicSharedReference<T> {
     }
 
     public synchronized void set(T t) throws IOException {
-        set(t, (Closeable)t);
+        set(t, (Closeable) t);
     }
 
     /**
@@ -81,13 +83,17 @@ public final class AtomicSharedReference<T> {
      * @param t the value to set the atomic reference to.
      */
     public synchronized void setQuietly(T t) {
-        if ((ref != null) && (ref.get() == t)) return;  // If we've been told to set to the object we are already tracking, this is a no-op.
+        if ((ref != null) && (ref.get() == t))
+            return; // If we've been told to set to the object we are already tracking, this is a
+        // no-op.
         this.unsetQuietly();
-        ref = SharedReference.create(t, (Closeable)t);
+        ref = SharedReference.create(t, (Closeable) t);
     }
 
     public synchronized void set(T t, Closeable closeable) throws IOException {
-        if ((ref != null) && (ref.get() == t)) return;  // If we've been told to set to the object we are already tracking, this is a no-op.
+        if ((ref != null) && (ref.get() == t))
+            return; // If we've been told to set to the object we are already tracking, this is a
+        // no-op.
         if (ref != null) ref.close();
         ref = SharedReference.create(t, closeable);
     }
@@ -97,9 +103,7 @@ public final class AtomicSharedReference<T> {
         ref = null;
     }
 
-    /**
-     * Unsets the reference, closing with Closeables2.closeQuietly().
-     */
+    /** Unsets the reference, closing with Closeables2.closeQuietly(). */
     public synchronized void unsetQuietly() {
         if (ref != null) Closeables2.close(ref);
         ref = null;
@@ -112,8 +116,9 @@ public final class AtomicSharedReference<T> {
     }
 
     /**
-     * Return the ref count for the current managed reference.  Or 0 if unset.
-     * For debugging and logging.
+     * Return the ref count for the current managed reference. Or 0 if unset. For debugging and
+     * logging.
+     *
      * @return ref count.
      */
     public synchronized int getRefCount() {
@@ -122,10 +127,10 @@ public final class AtomicSharedReference<T> {
     }
 
     /**
-     * Call some function f on the reference we are storing.
-     * Saving the value of T after this call returns is COMPLETELY UNSAFE.  Don't do it.
+     * Call some function f on the reference we are storing. Saving the value of T after this call
+     * returns is COMPLETELY UNSAFE. Don't do it.
      *
-     * @param f  lambda(T x)
+     * @param f lambda(T x)
      * @param <Z> Return type; &lt;? extends Object&gt;
      * @return result of f
      */
@@ -138,14 +143,14 @@ public final class AtomicSharedReference<T> {
     }
 
     /**
-     * Call some function f on a threadsafe copy of the reference we are storing.
-     * Should be used if you expect the function to take a while to run.
-     * Saving the value of T after this call returns is COMPLETELY UNSAFE.  Don't do it.
+     * Call some function f on a threadsafe copy of the reference we are storing. Should be used if
+     * you expect the function to take a while to run. Saving the value of T after this call returns
+     * is COMPLETELY UNSAFE. Don't do it.
      *
-     * @param f  lambda(T x)
+     * @param f lambda(T x)
      * @param <Z> Return type; &lt;? extends Object&gt;
      * @return result of f
-     * @throws IOException  if closing the local reference throws.
+     * @throws IOException if closing the local reference throws.
      */
     public @Nullable <Z> Z mapWithCopy(Function<T, Z> f) throws IOException {
         final @Nullable SharedReference<T> localRef = getCopy();
@@ -161,8 +166,8 @@ public final class AtomicSharedReference<T> {
     }
 
     /**
-     * Just like mapWithCopy() except that this silently swallows any exception
-     * that calling close() on the copy might throw.
+     * Just like mapWithCopy() except that this silently swallows any exception that calling close()
+     * on the copy might throw.
      *
      * @param function The function to apply to the value of the local reference.
      * @param <Z> The type of object produced by the function.

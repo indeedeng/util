@@ -5,9 +5,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- *
- */
+/** */
 public class TestWallClocks {
     @Test
     public void testWallClock() {
@@ -31,16 +29,19 @@ public class TestWallClocks {
         wallClock.set(now);
         Assert.assertEquals(
                 "Expected the wall clock time to be insensitive to system time changes",
-                now, wallClock.currentTimeMillis());
+                now,
+                wallClock.currentTimeMillis());
 
         wallClock.plus(10, TimeUnit.SECONDS);
         Assert.assertEquals(
                 "Expected a predictable change in the reported milliseconds",
-                now + 10 * 1000, wallClock.currentTimeMillis());
+                now + 10 * 1000,
+                wallClock.currentTimeMillis());
 
         wallClock.plus(-5, TimeUnit.SECONDS);
         Assert.assertEquals(
                 "Expected negative changes to be accepted",
-                now + 5 * 1000, wallClock.currentTimeMillis());
+                now + 5 * 1000,
+                wallClock.currentTimeMillis());
     }
 }

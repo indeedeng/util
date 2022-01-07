@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class DirectMemory extends AbstractMemory {
     private static final Logger log = LoggerFactory.getLogger(DirectMemory.class);
     private static final boolean debug = true;
@@ -23,12 +21,16 @@ public final class DirectMemory extends AbstractMemory {
         this.address = address;
         this.length = length;
         this.order = order;
-        directDataAccess = order.equals(ByteOrder.nativeOrder()) ? NativeEndianDirectDataAccess.getInstance() : ReverseEndianDirectDataAccess.getInstance();
+        directDataAccess =
+                order.equals(ByteOrder.nativeOrder())
+                        ? NativeEndianDirectDataAccess.getInstance()
+                        : ReverseEndianDirectDataAccess.getInstance();
     }
 
     private void checkBounds(long l, long length) {
         if (debug) {
-            if (l < 0 || l > this.length-length) throw new IndexOutOfBoundsException("l: "+l+" length: "+length);
+            if (l < 0 || l > this.length - length)
+                throw new IndexOutOfBoundsException("l: " + l + " length: " + length);
         }
     }
 
@@ -37,15 +39,19 @@ public final class DirectMemory extends AbstractMemory {
             if (bytes == null) throw new IllegalArgumentException("byte[] bytes cannot be null");
             if (start < 0) throw new IndexOutOfBoundsException("start cannot be less than zero");
             if (length < 0) throw new IllegalArgumentException("length cannot be less than zero");
-            if (start+length > bytes.length) throw new IndexOutOfBoundsException("start plus length cannot be greater than length of byte[] bytes");
-            if (start+length < 0) throw new IndexOutOfBoundsException("start plus length cannot be greater than Integer.MAX_VALUE");
+            if (start + length > bytes.length)
+                throw new IndexOutOfBoundsException(
+                        "start plus length cannot be greater than length of byte[] bytes");
+            if (start + length < 0)
+                throw new IndexOutOfBoundsException(
+                        "start plus length cannot be greater than Integer.MAX_VALUE");
         }
     }
 
     @Override
     public byte getByte(final long l) {
         checkBounds(l, 1);
-        return directDataAccess.getByte(address+l);
+        return directDataAccess.getByte(address + l);
     }
 
     @Override
@@ -57,7 +63,7 @@ public final class DirectMemory extends AbstractMemory {
     @Override
     public short getShort(final long l) {
         checkBounds(l, 2);
-        return directDataAccess.getShort(address+l);
+        return directDataAccess.getShort(address + l);
     }
 
     @Override
@@ -69,7 +75,7 @@ public final class DirectMemory extends AbstractMemory {
     @Override
     public char getChar(final long l) {
         checkBounds(l, 2);
-        return directDataAccess.getChar(address+l);
+        return directDataAccess.getChar(address + l);
     }
 
     @Override
@@ -81,7 +87,7 @@ public final class DirectMemory extends AbstractMemory {
     @Override
     public int getInt(final long l) {
         checkBounds(l, 4);
-        return directDataAccess.getInt(address+l);
+        return directDataAccess.getInt(address + l);
     }
 
     @Override
@@ -93,7 +99,7 @@ public final class DirectMemory extends AbstractMemory {
     @Override
     public long getLong(final long l) {
         checkBounds(l, 8);
-        return directDataAccess.getLong(address+l);
+        return directDataAccess.getLong(address + l);
     }
 
     @Override
@@ -105,7 +111,7 @@ public final class DirectMemory extends AbstractMemory {
     @Override
     public float getFloat(final long l) {
         checkBounds(l, 4);
-        return directDataAccess.getFloat(address+l);
+        return directDataAccess.getFloat(address + l);
     }
 
     @Override
@@ -117,7 +123,7 @@ public final class DirectMemory extends AbstractMemory {
     @Override
     public double getDouble(final long l) {
         checkBounds(l, 8);
-        return directDataAccess.getDouble(address+l);
+        return directDataAccess.getDouble(address + l);
     }
 
     @Override
@@ -167,13 +173,13 @@ public final class DirectMemory extends AbstractMemory {
         final int length = source.remaining();
         checkBounds(l, length);
         if (source.isDirect()) {
-            NativeMemoryUtils.copyFromDirectBuffer(source, source.position(), address+l, length);
-            source.position(source.position()+length);
+            NativeMemoryUtils.copyFromDirectBuffer(source, source.position(), address + l, length);
+            source.position(source.position() + length);
         } else if (source.hasArray()) {
             final byte[] array = source.array();
             final int offset = source.arrayOffset();
-            putBytes(l, array, offset+source.position(), length);
-            source.position(source.position()+length);
+            putBytes(l, array, offset + source.position(), length);
+            source.position(source.position() + length);
         } else {
             final byte[] copyBuffer = new byte[Math.min(length, 4096)];
             long destAddr = l;
@@ -181,7 +187,7 @@ public final class DirectMemory extends AbstractMemory {
                 final int copySize = Math.min(copyBuffer.length, source.remaining());
                 source.get(copyBuffer, 0, copySize);
                 putBytes(destAddr, copyBuffer, 0, copySize);
-                destAddr+=copySize;
+                destAddr += copySize;
             }
         }
     }
@@ -227,13 +233,13 @@ public final class DirectMemory extends AbstractMemory {
         final int length = dest.remaining();
         checkBounds(l, length);
         if (dest.isDirect()) {
-            NativeMemoryUtils.copyToDirectBuffer(address+l, dest, dest.position(), length);
-            dest.position(dest.position()+length);
+            NativeMemoryUtils.copyToDirectBuffer(address + l, dest, dest.position(), length);
+            dest.position(dest.position() + length);
         } else if (dest.hasArray()) {
             final byte[] array = dest.array();
             final int offset = dest.arrayOffset();
-            getBytes(l, array, offset+dest.position(), length);
-            dest.position(dest.position()+length);
+            getBytes(l, array, offset + dest.position(), length);
+            dest.position(dest.position() + length);
         } else {
             final byte[] copyBuffer = new byte[Math.min(length, 4096)];
             long sourceAddr = l;
@@ -241,7 +247,7 @@ public final class DirectMemory extends AbstractMemory {
                 final int copySize = Math.min(copyBuffer.length, dest.remaining());
                 getBytes(sourceAddr, copyBuffer, 0, copySize);
                 dest.put(copyBuffer, 0, copySize);
-                sourceAddr+=copySize;
+                sourceAddr += copySize;
             }
         }
     }
@@ -250,8 +256,9 @@ public final class DirectMemory extends AbstractMemory {
     public DirectMemory slice(long startAddress, long sliceLength) {
         if (startAddress < 0) throw new IllegalArgumentException("startAddress must be >= 0");
         if (sliceLength < 0) throw new IllegalArgumentException("sliceLength must be >= 0");
-        if (startAddress+sliceLength > length) throw new IllegalArgumentException("startAddress+sliceLength must be <= length");
-        return new DirectMemory(address+startAddress, sliceLength, order);
+        if (startAddress + sliceLength > length)
+            throw new IllegalArgumentException("startAddress+sliceLength must be <= length");
+        return new DirectMemory(address + startAddress, sliceLength, order);
     }
 
     @Override
@@ -270,7 +277,9 @@ public final class DirectMemory extends AbstractMemory {
     }
 
     /**
-     * this is really only here for passing to jni calls. don't use it for anything else. deprecated to make your code ugly if you use it.
+     * this is really only here for passing to jni calls. don't use it for anything else. deprecated
+     * to make your code ugly if you use it.
+     *
      * @return address
      */
     @Deprecated

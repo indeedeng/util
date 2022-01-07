@@ -2,9 +2,7 @@ package com.indeed.util.io;
 
 import java.io.IOException;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public interface Seekable extends Positioned {
     public void seek(long position) throws IOException;
 

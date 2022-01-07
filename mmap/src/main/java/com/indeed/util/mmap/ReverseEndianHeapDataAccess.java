@@ -3,14 +3,13 @@ package com.indeed.util.mmap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 final class ReverseEndianHeapDataAccess implements HeapDataAccess {
     private static final Logger log = LoggerFactory.getLogger(ReverseEndianHeapDataAccess.class);
     private static final ReverseEndianHeapDataAccess instance = new ReverseEndianHeapDataAccess();
 
-    private static final NativeEndianHeapDataAccess delegate = NativeEndianHeapDataAccess.getInstance();
+    private static final NativeEndianHeapDataAccess delegate =
+            NativeEndianHeapDataAccess.getInstance();
 
     public static ReverseEndianHeapDataAccess getInstance() {
         return instance;

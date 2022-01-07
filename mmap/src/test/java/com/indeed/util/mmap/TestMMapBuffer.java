@@ -14,16 +14,15 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author jsgroth
- */
+/** @author jsgroth */
 @SuppressWarnings("deprecation")
 public class TestMMapBuffer {
     @Test(expected = FileNotFoundException.class)
     public void testReadNoFile() throws IOException {
         File f = File.createTempFile("asdf", "");
         f.delete();
-        MMapBuffer buffer = new MMapBuffer(f, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
+        MMapBuffer buffer =
+                new MMapBuffer(f, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
         buffer.close();
     }
 
@@ -32,9 +31,10 @@ public class TestMMapBuffer {
         File f = File.createTempFile("asdf", "");
         f.delete();
 
-        MMapBuffer buffer = new MMapBuffer(f, 0, 10, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
+        MMapBuffer buffer =
+                new MMapBuffer(f, 0, 10, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
         DirectMemory memory = buffer.memory();
-        memory.putBytes(0, new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
+        memory.putBytes(0, new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
         buffer.sync(0, memory.length());
         buffer.close();
 
@@ -42,7 +42,7 @@ public class TestMMapBuffer {
         memory = buffer.memory();
         byte[] bytes = new byte[10];
         memory.getBytes(0, bytes);
-        assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, bytes);
+        assertArrayEquals(new byte[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}, bytes);
         buffer.close();
     }
 
@@ -62,10 +62,17 @@ public class TestMMapBuffer {
             assertNotNull(MMapBuffer.openBuffersTracker);
 
             final File tempFile = File.createTempFile("TestMMapBuffer", "");
-            final MMapBuffer buffer = new MMapBuffer(tempFile, 0, 10, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder());
+            final MMapBuffer buffer =
+                    new MMapBuffer(
+                            tempFile,
+                            0,
+                            10,
+                            FileChannel.MapMode.READ_WRITE,
+                            ByteOrder.nativeOrder());
 
             try {
-                final boolean tracked = MMapBuffer.openBuffersTracker.mmapBufferSet.containsKey(buffer);
+                final boolean tracked =
+                        MMapBuffer.openBuffersTracker.mmapBufferSet.containsKey(buffer);
                 assertTrue("A new buffer should be tracked!", tracked);
             } finally {
                 buffer.close();
@@ -88,7 +95,13 @@ public class TestMMapBuffer {
             MMapBuffer.madviseDontNeedTrackedBuffers();
 
             final File tempFile = File.createTempFile("TestMMapBuffer", "");
-            try (MMapBuffer ignored = new MMapBuffer(tempFile, 0, 10, FileChannel.MapMode.READ_WRITE, ByteOrder.nativeOrder())) {
+            try (MMapBuffer ignored =
+                    new MMapBuffer(
+                            tempFile,
+                            0,
+                            10,
+                            FileChannel.MapMode.READ_WRITE,
+                            ByteOrder.nativeOrder())) {
                 MMapBuffer.madviseDontNeedTrackedBuffers();
             }
 

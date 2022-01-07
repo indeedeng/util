@@ -46,10 +46,9 @@ public class Files {
     // if you log stuff to a more specific (context-specific) logger than something in common-util
     private static final Logger LOGGER = LoggerFactory.getLogger(Files.class);
 
-    private Files() {
-    }
+    private Files() {}
 
-    public static String buildPath(String ... parts) {
+    public static String buildPath(String... parts) {
         if (parts.length == 0) return null;
         if (parts.length == 1) return parts[0];
         File temp = new File(parts[0], parts[1]);
@@ -61,12 +60,14 @@ public class Files {
 
     /**
      * Serializes an object to a file, throws an exception if it fails
-     * 
+     *
      * @param obj object to write to a file
      * @param file path to save the object to
-     * @throws java.io.IOException if the existing file could not be erased, or the file could not be written, flushed, synced, or closed
+     * @throws java.io.IOException if the existing file could not be erased, or the file could not
+     *     be written, flushed, synced, or closed
      */
-    public static void writeObjectToFileOrDie2(@Nonnull final Object obj, @Nonnull final String file) throws IOException {
+    public static void writeObjectToFileOrDie2(
+            @Nonnull final Object obj, @Nonnull final String file) throws IOException {
         Preconditions.checkNotNull(file, "file argument is required!");
         Preconditions.checkArgument(!file.isEmpty(), "file argument is required!");
 
@@ -75,36 +76,46 @@ public class Files {
 
         final File targetFile = new File(file);
 
-        // write object to temporary file that is flushed, fsynced, and closed by the time it returns
+        // write object to temporary file that is flushed, fsynced, and closed by the time it
+        // returns
         final ObjectOutputStreamCallback callback = new ObjectOutputStreamCallback(obj);
         final File tmpFile = writeDataToTempFileOrDie2(callback, targetFile);
         final long checksumForWrittenData = callback.getChecksumValue();
 
-        // verify that what we WROTE to the disk is then immediately READABLE before allowing the rename to happen
+        // verify that what we WROTE to the disk is then immediately READABLE before allowing the
+        // rename to happen
         final long checksumFound = computeFileChecksum(tmpFile, new CRC32());
         if (checksumForWrittenData != checksumFound) {
-            throw new IOException("Data written to file is not what we expected, " + checksumFound + " != " + checksumForWrittenData + ": " + tmpFile);
+            throw new IOException(
+                    "Data written to file is not what we expected, "
+                            + checksumFound
+                            + " != "
+                            + checksumForWrittenData
+                            + ": "
+                            + tmpFile);
         }
 
         if (!tmpFile.renameTo(targetFile)) {
-            // failed to atomically rename from temp file to target file, so throw an exception, leaving the filesystem in
+            // failed to atomically rename from temp file to target file, so throw an exception,
+            // leaving the filesystem in
             // a sane state at all times
             throw new IOException("Could not rename '" + tmpFile + "' to '" + targetFile + "'.");
         }
     }
 
-    /**
-     * @deprecated Use {@link #writeObjectToFileOrDie2(java.lang.Object, java.lang.String)}
-     */
+    /** @deprecated Use {@link #writeObjectToFileOrDie2(java.lang.Object, java.lang.String)} */
     @Deprecated
-    public static void writeObjectToFileOrDie(@Nonnull final Object obj, @Nonnull final String file, @Nonnull final org.apache.log4j.Logger log) throws IOException {
+    public static void writeObjectToFileOrDie(
+            @Nonnull final Object obj,
+            @Nonnull final String file,
+            @Nonnull final org.apache.log4j.Logger log)
+            throws IOException {
         writeObjectToFileOrDie2(obj, file);
     }
 
     private static class ObjectOutputStreamCallback implements OutputStreamCallback {
         private long checksumForWrittenData = 0L;
-        @Nonnull
-        private final Object obj;
+        @Nonnull private final Object obj;
 
         private ObjectOutputStreamCallback(@Nonnull Object obj) {
             this.obj = obj;
@@ -116,7 +127,8 @@ public class Files {
 
         @Override
         public void writeAndFlushData(@Nonnull OutputStream outputStream) throws IOException {
-            final ChecksummingOutputStream checksummingOutputStream = new ChecksummingOutputStream(new BufferedOutputStream(outputStream));
+            final ChecksummingOutputStream checksummingOutputStream =
+                    new ChecksummingOutputStream(new BufferedOutputStream(outputStream));
             final ObjectOutputStream out = new ObjectOutputStream(checksummingOutputStream);
 
             // write the data
@@ -127,10 +139,9 @@ public class Files {
             checksumForWrittenData = checksummingOutputStream.getChecksumValue();
         }
     }
-    
+
     private static class ChecksummingOutputStream extends FilterOutputStream {
-        @Nonnull
-        private final Checksum checksummer;
+        @Nonnull private final Checksum checksummer;
 
         private ChecksummingOutputStream(OutputStream out) {
             super(out);
@@ -157,6 +168,7 @@ public class Files {
 
         /**
          * Returns the current checksum value.
+         *
          * @return the current checksum value
          */
         public long getChecksumValue() {
@@ -170,8 +182,9 @@ public class Files {
 
     // return a reference to a temp file that contains the written + flushed + fsynced + closed data
     @Nonnull
-    private static File writeDataToTempFileOrDie2(@Nonnull final OutputStreamCallback callback,
-                                                  @Nonnull final File targetFile) throws IOException {
+    private static File writeDataToTempFileOrDie2(
+            @Nonnull final OutputStreamCallback callback, @Nonnull final File targetFile)
+            throws IOException {
         Preconditions.checkNotNull(callback, "callback argument is required!");
         Preconditions.checkNotNull(targetFile, "targetFile argument is required!");
 
@@ -187,7 +200,8 @@ public class Files {
             fileOut = new FileOutputStream(tmpFile);
             fileChannel = fileOut.getChannel();
 
-            // make sure to use an output stream that flows THROUGH the FileChannel, so that FileChannel.force(true)
+            // make sure to use an output stream that flows THROUGH the FileChannel, so that
+            // FileChannel.force(true)
             // can do what it's supposed to
 
             // write the data AND flush it
@@ -210,21 +224,23 @@ public class Files {
     }
 
     /**
-     * @deprecated Use {@link Files#writeDataToTempFileOrDie2(com.indeed.util.io.Files.OutputStreamCallback, java.io.File)}
+     * @deprecated Use {@link
+     *     Files#writeDataToTempFileOrDie2(com.indeed.util.io.Files.OutputStreamCallback,
+     *     java.io.File)}
      */
     @Deprecated
     @Nonnull
-    private static File writeDataToTempFileOrDie(@Nonnull final OutputStreamCallback callback,
-                                                 @Nonnull final File targetFile,
-                                                 @Nonnull final org.apache.log4j.Logger log) throws IOException {
+    private static File writeDataToTempFileOrDie(
+            @Nonnull final OutputStreamCallback callback,
+            @Nonnull final File targetFile,
+            @Nonnull final org.apache.log4j.Logger log)
+            throws IOException {
         return writeDataToTempFileOrDie2(callback, targetFile);
     }
 
     @Nonnull
     private static File writeTextToTempFileOrDie2(
-            @Nonnull final String[] text,
-            @Nonnull final File targetFile
-    ) throws IOException {
+            @Nonnull final String[] text, @Nonnull final File targetFile) throws IOException {
         Preconditions.checkNotNull(text, "callback argument is required!");
         Preconditions.checkNotNull(targetFile, "targetFile argument is required!");
 
@@ -257,32 +273,31 @@ public class Files {
         }
     }
 
-    /**
-     * @deprecated Use {@link #writeTextToTempFileOrDie2(java.lang.String[], java.io.File)}
-     */
+    /** @deprecated Use {@link #writeTextToTempFileOrDie2(java.lang.String[], java.io.File)} */
     @Deprecated
     @Nonnull
     private static File writeTextToTempFileOrDie(
             @Nonnull final String[] text,
             @Nonnull final File targetFile,
-            @Nonnull final org.apache.log4j.Logger log
-    ) throws IOException {
+            @Nonnull final org.apache.log4j.Logger log)
+            throws IOException {
         return writeTextToTempFileOrDie2(text, targetFile);
     }
 
     /**
-     * Writes an object to a file only if it is different from the current
-     * contents of the file, or if the file does not exist.  Note that you must
-     * have enough heap to contain the entire contents of the object graph.
+     * Writes an object to a file only if it is different from the current contents of the file, or
+     * if the file does not exist. Note that you must have enough heap to contain the entire
+     * contents of the object graph.
      *
      * @param obj object to write to a file
      * @param file path to save the object to
      * @return true if the file was actually written, false if the file was unchanged
-     * @throws java.io.IOException if the existing file could not be read for comparison,
-     *                             if the existing file could not be erased, 
-     *                             or if the new file could not be written, flushed, synced, or closed
+     * @throws java.io.IOException if the existing file could not be read for comparison, if the
+     *     existing file could not be erased, or if the new file could not be written, flushed,
+     *     synced, or closed
      */
-    public static boolean writeObjectIfChangedOrDie2(@Nonnull final Object obj, @Nonnull final String file) throws IOException {
+    public static boolean writeObjectIfChangedOrDie2(
+            @Nonnull final Object obj, @Nonnull final String file) throws IOException {
         Preconditions.checkNotNull(file, "file argument is required!");
         Preconditions.checkArgument(!file.isEmpty(), "file argument is required!");
 
@@ -302,29 +317,42 @@ public class Files {
             // compute the checksum of what we intend on writing to disk
             final Checksum checksum = new CRC32();
             checksum.update(baos.unsafeByteArrayView(), 0, baos.size());
-            final long checksumForWrittenData =  checksum.getValue();
+            final long checksumForWrittenData = checksum.getValue();
 
             final File targetFile = new File(file);
 
-            // write object to temporary file that is flushed, fsynced, and closed by the time it returns
-            final File tmpFile = writeDataToTempFileOrDie2(outputStream -> {
-                // write the data
-                baos.writeTo(outputStream);
-                // flush it, so that the fsync() has everything it needs
-                outputStream.flush();
-            }, targetFile);
+            // write object to temporary file that is flushed, fsynced, and closed by the time it
+            // returns
+            final File tmpFile =
+                    writeDataToTempFileOrDie2(
+                            outputStream -> {
+                                // write the data
+                                baos.writeTo(outputStream);
+                                // flush it, so that the fsync() has everything it needs
+                                outputStream.flush();
+                            },
+                            targetFile);
 
-            // verify that what we WROTE to the disk is then immediately READABLE before allowing the rename to happen
+            // verify that what we WROTE to the disk is then immediately READABLE before allowing
+            // the rename to happen
             checksum.reset();
             final long checksumFound = computeFileChecksum(tmpFile, new CRC32());
             if (checksumForWrittenData != checksumFound) {
-                throw new IOException("Data written to file is not what we expected, " + checksumFound + " != " + checksumForWrittenData + ": " + tmpFile);
+                throw new IOException(
+                        "Data written to file is not what we expected, "
+                                + checksumFound
+                                + " != "
+                                + checksumForWrittenData
+                                + ": "
+                                + tmpFile);
             }
-            
+
             if (!tmpFile.renameTo(targetFile)) {
-                // failed to atomically rename from temp file to target file, so throw an exception, leaving the filesystem in
+                // failed to atomically rename from temp file to target file, so throw an exception,
+                // leaving the filesystem in
                 // a sane state at all times
-                throw new IOException("Could not rename '" + tmpFile + "' to '" + targetFile + "'.");
+                throw new IOException(
+                        "Could not rename '" + tmpFile + "' to '" + targetFile + "'.");
             }
 
             return true;
@@ -333,20 +361,24 @@ public class Files {
         }
     }
 
-    /**
-     * @deprecated Use {@link #writeObjectIfChangedOrDie2(java.lang.Object, java.lang.String)}
-     */
+    /** @deprecated Use {@link #writeObjectIfChangedOrDie2(java.lang.Object, java.lang.String)} */
     @Deprecated
-    public static boolean writeObjectIfChangedOrDie(@Nonnull final Object obj, @Nonnull final String file, @Nonnull final org.apache.log4j.Logger log) throws IOException {
+    public static boolean writeObjectIfChangedOrDie(
+            @Nonnull final Object obj,
+            @Nonnull final String file,
+            @Nonnull final org.apache.log4j.Logger log)
+            throws IOException {
         return writeObjectIfChangedOrDie2(obj, file);
     }
 
-    public static long computeFileChecksum(@Nonnull final File file, @Nonnull final Checksum checksum) throws IOException {
+    public static long computeFileChecksum(
+            @Nonnull final File file, @Nonnull final Checksum checksum) throws IOException {
         return com.google.common.io.Files.asByteSource(file).hash(Hashing.crc32()).padToLong();
     }
 
     /**
      * Writes an object to a file.
+     *
      * @return true if the file was successfully written, false otherwise
      * @deprecated use {@link #writeObjectToFileOrDie2(Object, String)} instead
      */
@@ -356,15 +388,21 @@ public class Files {
             writeObjectToFileOrDie2(obj, file);
             return true;
         } catch (Exception e) {
-            LOGGER.error(e.getClass() + ": writeObjectToFile(" + file + ") encountered exception: " + e.getMessage(), e);
+            LOGGER.error(
+                    e.getClass()
+                            + ": writeObjectToFile("
+                            + file
+                            + ") encountered exception: "
+                            + e.getMessage(),
+                    e);
             return false;
         }
     }
 
     /**
-     * Writes an object to a file only if it is different from the current
-     * contents of the file, or if the file does not exist.  Note that you must
-     * have enough heap to contain the entire contents of the object graph.
+     * Writes an object to a file only if it is different from the current contents of the file, or
+     * if the file does not exist. Note that you must have enough heap to contain the entire
+     * contents of the object graph.
      *
      * @return true if the file was actually written, false otherwise
      * @deprecated use {@link #writeObjectIfChangedOrDie2(Object, String)} instead
@@ -374,16 +412,23 @@ public class Files {
         try {
             return writeObjectIfChangedOrDie2(obj, filepath);
         } catch (Exception e) {
-            LOGGER.error(e.getClass() + ": writeObjectIfChanged(" + filepath + ") encountered exception: " + e.getMessage(), e);
+            LOGGER.error(
+                    e.getClass()
+                            + ": writeObjectIfChanged("
+                            + filepath
+                            + ") encountered exception: "
+                            + e.getMessage(),
+                    e);
             return false;
         }
     }
 
     /**
-     * Returns true iff the bytes in an array are different from the bytes
-     * contained in the given file, or if the file does not exist.
+     * Returns true iff the bytes in an array are different from the bytes contained in the given
+     * file, or if the file does not exist.
      */
-    private static boolean isChanged(final byte[] bytes, final int length, final String filepath) throws IOException {
+    private static boolean isChanged(final byte[] bytes, final int length, final String filepath)
+            throws IOException {
         Preconditions.checkArgument(length >= 0, "invalid length value: %s", length);
         Preconditions.checkArgument(bytes.length >= length, "invalid length value: %s", length);
 
@@ -410,9 +455,7 @@ public class Files {
         }
     }
 
-    /**
-     * Returns true if the array chunks are equal, false otherwise.
-     */
+    /** Returns true if the array chunks are equal, false otherwise. */
     private static boolean arrayCompare(byte[] a, int offset1, byte[] a2, int offset2, int length) {
         for (int i = 0; i < length; i++) {
             if (a[offset1++] != a2[offset2++]) return false;
@@ -462,20 +505,21 @@ public class Files {
     }
 
     /**
-     * Convenience for
-     * {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
+     * Convenience for {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
      * where:
+     *
      * <ul>
-     * <li>{@code clazz} is Object.class</li>
-     * <li>{@code printException} is false</li>
+     *   <li>{@code clazz} is Object.class
+     *   <li>{@code printException} is false
      * </ul>
      */
     public static Object readObjectFromClasspathDir(String file) {
         return readObjectFromClasspathDir(file, Object.class, false);
     }
 
-    public static <T> T readObjectFromClasspathDir(String file, Class<T> clazz, boolean printException) {
-        //final FileInputStream fileIn;
+    public static <T> T readObjectFromClasspathDir(
+            String file, Class<T> clazz, boolean printException) {
+        // final FileInputStream fileIn;
         /*try {
             fileIn = new FileInputStream(file);
         } catch (Exception e) {
@@ -521,11 +565,11 @@ public class Files {
     }
 
     /**
-     * Convenience for
-     * {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
+     * Convenience for {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
      * where:
+     *
      * <ul>
-     * <li>{@code printException} is false</li>
+     *   <li>{@code printException} is false
      * </ul>
      */
     public static <T> T readObjectFromFile(String file, Class<T> clazz) {
@@ -533,11 +577,11 @@ public class Files {
     }
 
     /**
-     * Convenience for
-     * {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
+     * Convenience for {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
      * where:
+     *
      * <ul>
-     * <li>{@code clazz} is Object.class</li>
+     *   <li>{@code clazz} is Object.class
      * </ul>
      */
     public static Object readObjectFromFile(String file, boolean printException) {
@@ -545,12 +589,12 @@ public class Files {
     }
 
     /**
-     * Convenience for
-     * {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
+     * Convenience for {@link #readObjectFromFile(String file, Class clazz, boolean printException)}
      * where:
+     *
      * <ul>
-     * <li>{@code clazz} is Object.class</li>
-     * <li>{@code printException} is false</li>
+     *   <li>{@code clazz} is Object.class
+     *   <li>{@code printException} is false
      * </ul>
      */
     public static Object readObjectFromFile(String file) {
@@ -583,7 +627,9 @@ public class Files {
     }
 
     /**
-     * Reads all the lines in the given file, truncating everything that happens after # (including the #)
+     * Reads all the lines in the given file, truncating everything that happens after # (including
+     * the #)
+     *
      * @param file
      * @return a List of the lines in the file in the order they appear (whitespace trimmed)
      * @throws IOException
@@ -648,19 +694,14 @@ public class Files {
     }
 
     public static void writeToTextFileOrDie(
-            @Nonnull final String[] lines,
-            @Nonnull final String file
-    ) throws IOException {
+            @Nonnull final String[] lines, @Nonnull final String file) throws IOException {
         // Write out a temp file (or die)
         final File f = new File(file);
         final File temp = writeTextToTempFileOrDie2(lines, f);
         // Rename the temp file if writing succeeded
         if (!temp.renameTo(f)) {
-            throw new IOException(String.format(
-                    "couldn't rename %s to %s",
-                    temp.getCanonicalPath(),
-                    file
-            ));
+            throw new IOException(
+                    String.format("couldn't rename %s to %s", temp.getCanonicalPath(), file));
         }
     }
 
@@ -677,23 +718,26 @@ public class Files {
     }
 
     public static String getTempDirectory(String prefix, String suffix) throws IOException {
-        return getTempDirectory(prefix, suffix, (File)null);
+        return getTempDirectory(prefix, suffix, (File) null);
     }
 
-    public static String getTempDirectory(String prefix, String suffix, String directory) throws IOException {
+    public static String getTempDirectory(String prefix, String suffix, String directory)
+            throws IOException {
         File dir = null;
         if (directory != null) {
             dir = new File(directory);
             if (!dir.exists()) {
                 if (!dir.mkdirs()) {
-                    throw new IOException("directory did not exist and could not be created: " + directory);
+                    throw new IOException(
+                            "directory did not exist and could not be created: " + directory);
                 }
             }
         }
         return getTempDirectory(prefix, suffix, dir);
     }
 
-    public static String getTempDirectory(String prefix, String suffix, File directory) throws IOException {
+    public static String getTempDirectory(String prefix, String suffix, File directory)
+            throws IOException {
         File f = File.createTempFile(prefix, suffix, directory);
         f.delete();
         f.mkdir();
@@ -702,15 +746,16 @@ public class Files {
 
     /**
      * Deletes file or recursively deletes a directory
-     * 
-     * NOTE: this returns true if the file was actually deleted,  and false for 2 cases:
-     *    1. file did not exist to start with
-     *    2. File.delete() failed at some point for some reason
-     *    
-     * use {@link #deleteOrDie(String)} instead if you want a clearer distinction between the 'falsy' responses
-     * 
+     *
+     * <p>NOTE: this returns true if the file was actually deleted, and false for 2 cases: 1. file
+     * did not exist to start with 2. File.delete() failed at some point for some reason
+     *
+     * <p>use {@link #deleteOrDie(String)} instead if you want a clearer distinction between the
+     * 'falsy' responses
+     *
      * @param file path to erase
-     * @return true if all deletions were successful. If a deletion fails, the method stops attempting to delete and returns false
+     * @return true if all deletions were successful. If a deletion fails, the method stops
+     *     attempting to delete and returns false
      */
     public static boolean delete(String file) {
         File f = new File(file);
@@ -719,8 +764,7 @@ public class Files {
             // first insure the directory is empty
             String[] children = f.list();
             for (String child : children) {
-                if (!delete(Files.buildPath(file, child)))
-                    return false;
+                if (!delete(Files.buildPath(file, child))) return false;
             }
         }
 
@@ -729,11 +773,12 @@ public class Files {
 
     /**
      * Deletes file or recursively deletes a directory
+     *
      * @param file path to erase
      * @return true if all deletions were successful, false if file did not exist
      * @throws IOException if deletion fails and the file still exists at the end
      */
-   public static boolean deleteOrDie(@Nonnull final String file) throws IOException {
+    public static boolean deleteOrDie(@Nonnull final String file) throws IOException {
         // this returns true if the file was actually deleted
         // and false for 2 cases:
         //   1. file did not exist to start with
@@ -747,7 +792,8 @@ public class Files {
         } else {
             final File fileObj = new File(file);
             if (fileObj.exists()) {
-                throw new IOException("File still exists after erasure, cannot write object to file: " + file);
+                throw new IOException(
+                        "File still exists after erasure, cannot write object to file: " + file);
             }
 
             // file was not deleted, because it does not exist
@@ -756,9 +802,9 @@ public class Files {
     }
 
     /**
-     * Use this function instead of {@link java.io.File#getCanonicalPath()}, as that method
-     * can fail during symlink changes, and this method will retry up to 3 times with a
-     * short delay.  Returns null if unsuccessful after retrying.
+     * Use this function instead of {@link java.io.File#getCanonicalPath()}, as that method can fail
+     * during symlink changes, and this method will retry up to 3 times with a short delay. Returns
+     * null if unsuccessful after retrying.
      *
      * @param path path to canonicalize
      * @return the canonical pathname, or null if unsuccessful
@@ -766,23 +812,23 @@ public class Files {
     public static String getCanonicalPath(String path) {
         if (path == null) return null;
         return getCanonicalPath(
-                path, new Supplier<Boolean>() {
-            int retries = 2;
+                path,
+                new Supplier<Boolean>() {
+                    int retries = 2;
 
-            public Boolean get() {
-                if (retries-- == 0) {
-                    return false;
-                }
-                try {
-                    // if retries not exhausted, sleep 100 milliseconds
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
-                    return false;
-                }
-                return true;
-            }
-        }
-        );
+                    public Boolean get() {
+                        if (retries-- == 0) {
+                            return false;
+                        }
+                        try {
+                            // if retries not exhausted, sleep 100 milliseconds
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            return false;
+                        }
+                        return true;
+                    }
+                });
     }
 
     static String getCanonicalPath(String path, Supplier<Boolean> retryPolicy) {
@@ -803,8 +849,9 @@ public class Files {
     }
 
     /**
-     * Gets the directory name of the canonical path -- the last element in the result of
-     * {@link #getCanonicalPath(String)}.
+     * Gets the directory name of the canonical path -- the last element in the result of {@link
+     * #getCanonicalPath(String)}.
+     *
      * @param path path to canonicalize
      * @return canonical directory name
      */
@@ -836,14 +883,15 @@ public class Files {
         }
     }
 
-    public static String getFileHash(final String file, final String algorithm) throws IOException, NoSuchAlgorithmException {
+    public static String getFileHash(final String file, final String algorithm)
+            throws IOException, NoSuchAlgorithmException {
         final MessageDigest md = MessageDigest.getInstance(algorithm);
         return Files.toHex(md.digest(loadFileAsByteArray(file)));
     }
 
     /**
-     * Converts a byte array to a hex string.  The String returned
-     * will be of length exactly {@code bytes.length * 2}.
+     * Converts a byte array to a hex string. The String returned will be of length exactly {@code
+     * bytes.length * 2}.
      */
     @Nonnull
     public static String toHex(@Nonnull final byte[] bytes) {
@@ -858,10 +906,12 @@ public class Files {
         return buf.toString();
     }
 
-    public static BufferedReader getBufferedReaderForUtf8(String file) throws FileNotFoundException {
+    public static BufferedReader getBufferedReaderForUtf8(String file)
+            throws FileNotFoundException {
         try {
             final FileInputStream fileInputStream = new FileInputStream(file);
-            final InputStreamReader inputStreamReader = new InputStreamReader(fileInputStream, "UTF-8");
+            final InputStreamReader inputStreamReader =
+                    new InputStreamReader(fileInputStream, "UTF-8");
             return new BufferedReader(inputStreamReader);
         } catch (UnsupportedEncodingException uee) {
             // Should never occur!
@@ -869,10 +919,12 @@ public class Files {
         }
     }
 
-    private static BufferedWriter getBufferedWriterForUtf8(String file) throws FileNotFoundException {
+    private static BufferedWriter getBufferedWriterForUtf8(String file)
+            throws FileNotFoundException {
         try {
             final FileOutputStream fileOutputStream = new FileOutputStream(file);
-            final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, "UTF-8");
+            final OutputStreamWriter outputStreamWriter =
+                    new OutputStreamWriter(fileOutputStream, "UTF-8");
             return new BufferedWriter(outputStreamWriter);
         } catch (UnsupportedEncodingException uee) {
             // Should never occur!
@@ -884,7 +936,8 @@ public class Files {
         return readStreamAsString(in, 256);
     }
 
-    public static String readStreamAsString(final InputStream in, final int bufferSize) throws IOException {
+    public static String readStreamAsString(final InputStream in, final int bufferSize)
+            throws IOException {
         final StringBuilder sb = new StringBuilder();
         final char[] buffer = new char[bufferSize];
         final InputStreamReader reader = new InputStreamReader(new BufferedInputStream(in));
@@ -898,16 +951,20 @@ public class Files {
     }
 
     /**
-     * Use this instead of {@link FileWriter} because you cannot specify the character encoding with that.
+     * Use this instead of {@link FileWriter} because you cannot specify the character encoding with
+     * that.
      */
-    public static Writer newBufferedUTF8FileWriter(final String file) throws UnsupportedEncodingException, FileNotFoundException {
+    public static Writer newBufferedUTF8FileWriter(final String file)
+            throws UnsupportedEncodingException, FileNotFoundException {
         return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
     }
 
     /**
-     * Use this instead of {@link FileWriter} because you cannot specify the character encoding with that.
+     * Use this instead of {@link FileWriter} because you cannot specify the character encoding with
+     * that.
      */
-    public static Writer newBufferedUTF8FileWriter(final File file) throws UnsupportedEncodingException, FileNotFoundException {
+    public static Writer newBufferedUTF8FileWriter(final File file)
+            throws UnsupportedEncodingException, FileNotFoundException {
         return new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
     }
 }

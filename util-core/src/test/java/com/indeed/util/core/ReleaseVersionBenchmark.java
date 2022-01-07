@@ -3,12 +3,9 @@ package com.indeed.util.core;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
 import java.util.Random;
 
-/**
- * @author jack@indeed.com (Jack Humphrey)
- */
+/** @author jack@indeed.com (Jack Humphrey) */
 public class ReleaseVersionBenchmark {
 
     private static void fillRandom(int[] numbers, int max, Random random) {
@@ -23,7 +20,8 @@ public class ReleaseVersionBenchmark {
                 ReleaseVersion.MatchPrecision.forLength(Integer.valueOf(args[1]));
         final File resultOutputFile = args.length > 2 ? new File(args[2]) : null;
 
-        System.out.println(size + " comparisons with left-hand side precision " + lhsMatchPrecision);
+        System.out.println(
+                size + " comparisons with left-hand side precision " + lhsMatchPrecision);
 
         final Random random = new Random(52473); // deterministic random output
 
@@ -37,24 +35,28 @@ public class ReleaseVersionBenchmark {
         fillRandom(builds, 0x7FFF, random);
         final String[] strs = new String[size];
         for (int i = 0; i < strs.length; i++) {
-            strs[i] = 
-                    random.nextInt(0x7FFF) + "." +
-                    random.nextInt(0x7FFF) + "." +
-                    random.nextInt(0x7FFF) + "." +
-                    random.nextInt(0x7FFF);
+            strs[i] =
+                    random.nextInt(0x7FFF)
+                            + "."
+                            + random.nextInt(0x7FFF)
+                            + "."
+                            + random.nextInt(0x7FFF)
+                            + "."
+                            + random.nextInt(0x7FFF);
         }
         System.out.println("test version data created");
 
         long createLhs = -System.nanoTime();
         ReleaseVersion[] lhs = new ReleaseVersion[size];
         for (int i = 0; i < lhs.length; i++) {
-            lhs[i] = ReleaseVersion.newBuilder()
-                    .setMajorVersion(majors[i])
-                    .setMinorVersion(minors[i])
-                    .setPatchVersion(patches[i])
-                    .setBuildNumber(builds[i])
-                    .setMatchPrecision(lhsMatchPrecision)
-                    .build();
+            lhs[i] =
+                    ReleaseVersion.newBuilder()
+                            .setMajorVersion(majors[i])
+                            .setMinorVersion(minors[i])
+                            .setPatchVersion(patches[i])
+                            .setBuildNumber(builds[i])
+                            .setMatchPrecision(lhsMatchPrecision)
+                            .build();
         }
         createLhs += System.nanoTime();
         System.out.println("create lhs versions (ns): " + createLhs);
@@ -80,10 +82,10 @@ public class ReleaseVersionBenchmark {
         System.out.println("average comparison time (ns): " + average);
 
         if (resultOutputFile != null) {
-            final ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(resultOutputFile));
+            final ObjectOutputStream out =
+                    new ObjectOutputStream(new FileOutputStream(resultOutputFile));
             out.writeObject(results);
             out.close();
         }
     }
-
 }

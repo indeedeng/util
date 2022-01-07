@@ -3,17 +3,11 @@ package com.indeed.util.core.hash;
 /**
  * Murmur hash 2.0.
  *
- * <p>
- * The murmur hash is a relative fast hash function from
- * http://murmurhash.googlepages.com/ for platforms with efficient
- * multiplication.
- * </p>
+ * <p>The murmur hash is a relative fast hash function from http://murmurhash.googlepages.com/ for
+ * platforms with efficient multiplication.
  *
- * <p>
- * This is a re-implementation of the original C code plus some additional features.
- * </p>
- *
- * Public domain.
+ * <p>This is a re-implementation of the original C code plus some additional features. Public
+ * domain.
  *
  * @author Viliam Holub
  * @version 1.0.2
@@ -42,8 +36,12 @@ public final class MurmurHash {
         int h = seed ^ length;
         int length4 = length / 4;
         for (int i = 0; i < length4; i++) {
-            final int i4 = i*4+start;
-            int k = (data[i4] & 0xff) + ((data[i4 + 1] & 0xff) << 8) + ((data[i4 + 2] & 0xff) << 16) + ((data[i4 + 3] & 0xff) << 24);
+            final int i4 = i * 4 + start;
+            int k =
+                    (data[i4] & 0xff)
+                            + ((data[i4 + 1] & 0xff) << 8)
+                            + ((data[i4 + 2] & 0xff) << 16)
+                            + ((data[i4 + 3] & 0xff) << 24);
             k *= m;
             k ^= k >>> r;
             k *= m;
@@ -122,16 +120,15 @@ public final class MurmurHash {
         int length8 = data.length / 8;
         for (int i = 0; i < length8; i++) {
             final int i8 = i * 8;
-            long
-                    k =
-                    ((long)data[i8] & 0xff) +
-                            (((long)data[i8 + 1] & 0xff) << 8) +
-                            (((long)data[i8 + 2] & 0xff) << 16) +
-                            (((long)data[i8 + 3] & 0xff) << 24) +
-                            (((long)data[i8 + 4] & 0xff) << 32) +
-                            (((long)data[i8 + 5] & 0xff) << 40) +
-                            (((long)data[i8 + 6] & 0xff) << 48) +
-                            (((long)data[i8 + 7] & 0xff) << 56);
+            long k =
+                    ((long) data[i8] & 0xff)
+                            + (((long) data[i8 + 1] & 0xff) << 8)
+                            + (((long) data[i8 + 2] & 0xff) << 16)
+                            + (((long) data[i8 + 3] & 0xff) << 24)
+                            + (((long) data[i8 + 4] & 0xff) << 32)
+                            + (((long) data[i8 + 5] & 0xff) << 40)
+                            + (((long) data[i8 + 6] & 0xff) << 48)
+                            + (((long) data[i8 + 7] & 0xff) << 56);
             k *= m;
             k ^= k >>> r;
             k *= m;
@@ -140,19 +137,19 @@ public final class MurmurHash {
         }
         switch (data.length % 8) {
             case 7:
-                h ^= (long)(data[(data.length & ~7) + 6] & 0xff) << 48;
+                h ^= (long) (data[(data.length & ~7) + 6] & 0xff) << 48;
             case 6:
-                h ^= (long)(data[(data.length & ~7) + 5] & 0xff) << 40;
+                h ^= (long) (data[(data.length & ~7) + 5] & 0xff) << 40;
             case 5:
-                h ^= (long)(data[(data.length & ~7) + 4] & 0xff) << 32;
+                h ^= (long) (data[(data.length & ~7) + 4] & 0xff) << 32;
             case 4:
-                h ^= (long)(data[(data.length & ~7) + 3] & 0xff) << 24;
+                h ^= (long) (data[(data.length & ~7) + 3] & 0xff) << 24;
             case 3:
-                h ^= (long)(data[(data.length & ~7) + 2] & 0xff) << 16;
+                h ^= (long) (data[(data.length & ~7) + 2] & 0xff) << 16;
             case 2:
-                h ^= (long)(data[(data.length & ~7) + 1] & 0xff) << 8;
+                h ^= (long) (data[(data.length & ~7) + 1] & 0xff) << 8;
             case 1:
-                h ^= (long)(data[data.length & ~7] & 0xff);
+                h ^= (long) (data[data.length & ~7] & 0xff);
                 h *= m;
         }
         h ^= h >>> r;

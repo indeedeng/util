@@ -45,8 +45,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
- * Servlet for displaying variables exported by {@link VarExporter}.
- * Will escape values for compatibility with loading into {@link Properties}.
+ * Servlet for displaying variables exported by {@link VarExporter}. Will escape values for
+ * compatibility with loading into {@link Properties}.
  *
  * @author jack@indeed.com (Jack Humphrey)
  */
@@ -72,7 +72,6 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             this.paramValue = paramValue;
             this.mimeType = mimeType;
         }
-
     }
 
     @VisibleForTesting
@@ -122,7 +121,8 @@ public class ViewExportedVariablesServlet extends HttpServlet {
     }
 
     @Override
-    protected void doGet(final HttpServletRequest request, final HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+            throws ServletException, IOException {
         response.setCharacterEncoding("UTF-8");
 
         if ("1".equals(request.getParameter("browse"))) {
@@ -139,11 +139,19 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             } else {
                 displayType = DisplayType.PLAINTEXT;
             }
-            showVariables(request.getRequestURI(), response, request.getParameter("ns"), request.getParameter("tag"), doc, displayType, vars);
+            showVariables(
+                    request.getRequestURI(),
+                    response,
+                    request.getParameter("ns"),
+                    request.getParameter("tag"),
+                    doc,
+                    displayType,
+                    vars);
         }
     }
 
-    private void showNamespaces(final String uri, final HttpServletResponse response) throws IOException {
+    private void showNamespaces(final String uri, final HttpServletResponse response)
+            throws IOException {
         final List<String> namespaces = VarExporter.getNamespaces();
         namespaces.remove(null);
         Collections.sort(namespaces);
@@ -190,8 +198,8 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             final String namespace,
             final boolean includeDoc,
             final boolean html,
-            final String... vars
-    ) throws IOException {
+            final String... vars)
+            throws IOException {
         final DisplayType displayType = html ? DisplayType.HTML : DisplayType.PLAINTEXT;
         showVariables(uri, response, namespace, includeDoc, displayType, vars);
     }
@@ -213,8 +221,8 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             final String namespace,
             final boolean includeDoc,
             final DisplayType displayType,
-            final String... vars
-    ) throws IOException {
+            final String... vars)
+            throws IOException {
         showVariables(uri, response, namespace, null, includeDoc, displayType, vars);
     }
 
@@ -225,15 +233,16 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             final String tag,
             final boolean includeDoc,
             final DisplayType displayType,
-            final String... vars
-    ) throws IOException {
+            final String... vars)
+            throws IOException {
         final VariableHost exporter;
         if (!Strings.isNullOrEmpty(tag)) {
             exporter = VarExporter.withTag(tag);
         } else if (!Strings.isNullOrEmpty(namespace)) {
             final Optional<VarExporter> maybeExporter = VarExporter.forNamespaceIfExists(namespace);
             if (!maybeExporter.isPresent()) {
-                response.sendError(HttpServletResponse.SC_NOT_FOUND, "The specified namespace was not found");
+                response.sendError(
+                        HttpServletResponse.SC_NOT_FOUND, "The specified namespace was not found");
                 return;
             }
             exporter = maybeExporter.get();
@@ -243,14 +252,16 @@ public class ViewExportedVariablesServlet extends HttpServlet {
 
         final PrintWriter out = response.getWriter();
         response.setContentType(displayType.mimeType);
-        switch(displayType) {
+        switch (displayType) {
             case HTML:
-                showUsingTemplate(exporter, uri, namespace, includeDoc, varHtmlTemplate, true, out, vars);
+                showUsingTemplate(
+                        exporter, uri, namespace, includeDoc, varHtmlTemplate, true, out, vars);
                 break;
             case PLAINTEXT:
-                showUsingTemplate(exporter, uri, namespace, includeDoc, varTextTemplate, false, out, vars);
+                showUsingTemplate(
+                        exporter, uri, namespace, includeDoc, varTextTemplate, false, out, vars);
                 break;
-            // TODO: support json -- exporter JSON is currently broken
+                // TODO: support json -- exporter JSON is currently broken
         }
 
         out.flush();
@@ -265,8 +276,8 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             final Template template,
             final boolean withIndex,
             final PrintWriter out,
-            final String... vars
-    ) throws IOException {
+            final String... vars)
+            throws IOException {
         final String name = (namespace == null ? "Global" : namespace);
 
         final Map<String, Object> root = new HashMap<String, Object>();
@@ -288,11 +299,12 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         } else {
             varList = Lists.newArrayListWithExpectedSize(vars != null ? vars.length : 256);
             if (vars == null || vars.length == 0) {
-                exporter.visitVariables(new VariableVisitor() {
-                    public void visit(Variable var) {
-                        addVariable(var, varList);
-                    }
-                });
+                exporter.visitVariables(
+                        new VariableVisitor() {
+                            public void visit(Variable var) {
+                                addVariable(var, varList);
+                            }
+                        });
             } else {
                 for (String var : vars) {
                     Variable v = exporter.getVariable(var);
@@ -325,7 +337,8 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         appendTo(json, buildAlphanumericNGramIndex(varList, 1)).append(',').append('\n');
 
         json.append("\"biGram\":").append('\n');
-        appendTo(json, buildAlphanumericNGramIndex(varList, 2)).append(',').append('\n');;
+        appendTo(json, buildAlphanumericNGramIndex(varList, 2)).append(',').append('\n');
+        ;
 
         json.append("\"triGram\":").append('\n');
         appendTo(json, buildAlphanumericNGramIndex(varList, 3));
@@ -335,7 +348,8 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         return json.toString();
     }
 
-    private <K> StringBuilder appendTo(final StringBuilder json, final SetMultimap<K, Integer> map) {
+    private <K> StringBuilder appendTo(
+            final StringBuilder json, final SetMultimap<K, Integer> map) {
         json.append('{').append('\n');
         boolean isFirst = true;
         for (final K key : map.keySet()) {
@@ -355,14 +369,14 @@ public class ViewExportedVariablesServlet extends HttpServlet {
     }
 
     @VisibleForTesting
-    static SetMultimap<String, Integer> buildAlphanumericNGramIndex(final List<Variable> varList, final int n) {
+    static SetMultimap<String, Integer> buildAlphanumericNGramIndex(
+            final List<Variable> varList, final int n) {
         final TreeMultimap<String, Integer> nGramIndex = TreeMultimap.create();
-        IntStream
-                .range(0, varList.size())
-                .forEach(i ->
-                        alphanumericNGrams(varList.get(i).getName(), n)
-                                .forEach(ngram -> nGramIndex.put(ngram, i))
-                );
+        IntStream.range(0, varList.size())
+                .forEach(
+                        i ->
+                                alphanumericNGrams(varList.get(i).getName(), n)
+                                        .forEach(ngram -> nGramIndex.put(ngram, i)));
         return nGramIndex;
     }
 
@@ -375,11 +389,10 @@ public class ViewExportedVariablesServlet extends HttpServlet {
         }
         return NON_ALPHANUMERIC
                 .splitAsStream(in.toLowerCase(Locale.US))
-                .flatMap(alnumSubString ->
-                        IntStream
-                                .rangeClosed(0, alnumSubString.length() - n)
-                                .mapToObj(i -> alnumSubString.substring(i, i + n))
-                );
+                .flatMap(
+                        alnumSubString ->
+                                IntStream.rangeClosed(0, alnumSubString.length() - n)
+                                        .mapToObj(i -> alnumSubString.substring(i, i + n)));
     }
 
     private void addVariable(final Variable v, final List<Variable> out) {
@@ -390,6 +403,5 @@ public class ViewExportedVariablesServlet extends HttpServlet {
             // skip variables that cannot render due to an exception
             log.warn("Cannot resolve variable " + v.getName(), t);
         }
-
     }
 }

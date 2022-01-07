@@ -14,9 +14,7 @@ import java.io.RandomAccessFile;
 import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class NativeBuffer implements BufferResource {
     private static final Logger log = LoggerFactory.getLogger(NativeBuffer.class);
 
@@ -34,20 +32,20 @@ public final class NativeBuffer implements BufferResource {
         final String thresholdString = System.getProperty("indeed.mmap.threshold");
         long mmapThreshold;
         if (thresholdString == null) {
-            mmapThreshold = 256*1024;
+            mmapThreshold = 256 * 1024;
         } else {
             try {
                 mmapThreshold = Integer.parseInt(thresholdString);
             } catch (NumberFormatException e) {
                 log.error("error setting MMAP_THRESHOLD", e);
-                mmapThreshold = 256*1024;
+                mmapThreshold = 256 * 1024;
             }
         }
         MMAP_THRESHOLD = mmapThreshold;
         try {
             final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
             theUnsafe.setAccessible(true);
-            UNSAFE = (Unsafe)theUnsafe.get(null);
+            UNSAFE = (Unsafe) theUnsafe.get(null);
             FD_FIELD = FileDescriptor.class.getDeclaredField("fd");
             FD_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
@@ -70,8 +68,7 @@ public final class NativeBuffer implements BufferResource {
 
     public NativeBuffer(long length, ByteOrder order) {
         if (length <= 0) {
-            if (length < 0)
-            throw new IllegalArgumentException("length must be >= 0");
+            if (length < 0) throw new IllegalArgumentException("length must be >= 0");
             address = 0;
             memory = new DirectMemory(0, 0, order);
             mmapped = false;
@@ -86,9 +83,16 @@ public final class NativeBuffer implements BufferResource {
                     throw Throwables.propagate(e);
                 }
                 try {
-                    address = MMapBuffer.mmap(length, MMapBuffer.READ_WRITE, MMapBuffer.MAP_PRIVATE, FD_FIELD.getInt(raf.getFD()), 0);
+                    address =
+                            MMapBuffer.mmap(
+                                    length,
+                                    MMapBuffer.READ_WRITE,
+                                    MMapBuffer.MAP_PRIVATE,
+                                    FD_FIELD.getInt(raf.getFD()),
+                                    0);
                     if (address == MMapBuffer.MAP_FAILED) {
-                        throw new RuntimeException("mmap /dev/zero failed with error "+MMapBuffer.errno());
+                        throw new RuntimeException(
+                                "mmap /dev/zero failed with error " + MMapBuffer.errno());
                     }
                     memory = new DirectMemory(address, length, order);
                 } catch (IOException e) {
@@ -99,9 +103,16 @@ public final class NativeBuffer implements BufferResource {
                     closeQuietly(raf);
                 }
             } else {
-                address = MMapBuffer.mmap(length, MMapBuffer.READ_WRITE, MMapBuffer.MAP_PRIVATE | MMapBuffer.MAP_ANONYMOUS, -1, 0);
+                address =
+                        MMapBuffer.mmap(
+                                length,
+                                MMapBuffer.READ_WRITE,
+                                MMapBuffer.MAP_PRIVATE | MMapBuffer.MAP_ANONYMOUS,
+                                -1,
+                                0);
                 if (address == MMapBuffer.MAP_FAILED) {
-                    throw new RuntimeException("anonymous mmap failed with error "+MMapBuffer.errno());
+                    throw new RuntimeException(
+                            "anonymous mmap failed with error " + MMapBuffer.errno());
                 }
                 memory = new DirectMemory(address, length, order);
             }
@@ -126,21 +137,22 @@ public final class NativeBuffer implements BufferResource {
         final long newAddress = UNSAFE.reallocateMemory(address, newLength);
         if (address == 0) throw new OutOfMemoryError();
         closed = true;
-        return new NativeBuffer(newAddress, new DirectMemory(newAddress, newLength, memory.getOrder()), false);
+        return new NativeBuffer(
+                newAddress, new DirectMemory(newAddress, newLength, memory.getOrder()), false);
     }
 
     public void mlock(long position, long length) {
         if (position < 0) throw new IndexOutOfBoundsException();
         if (length < 0) throw new IndexOutOfBoundsException();
-        if (position+length > memory.length()) throw new IndexOutOfBoundsException();
-        NativeMemoryUtils.mlock(address+position, length);
+        if (position + length > memory.length()) throw new IndexOutOfBoundsException();
+        NativeMemoryUtils.mlock(address + position, length);
     }
 
     public void munlock(long position, long length) {
         if (position < 0) throw new IndexOutOfBoundsException();
         if (length < 0) throw new IndexOutOfBoundsException();
-        if (position+length > memory.length()) throw new IndexOutOfBoundsException();
-        NativeMemoryUtils.munlock(address+position, length);
+        if (position + length > memory.length()) throw new IndexOutOfBoundsException();
+        NativeMemoryUtils.munlock(address + position, length);
     }
 
     private NativeBuffer createNewAndClose(long newSize) {
@@ -155,13 +167,14 @@ public final class NativeBuffer implements BufferResource {
             if (OS_TYPE_IS_MAC) {
                 // MAC does not support mremap
                 return createNewAndClose(newSize);
-            }
-            else {
+            } else {
                 final long newAddress = MMapBuffer.mremap(address, memory.length(), newSize);
                 if (newAddress == MMapBuffer.MAP_FAILED) {
-                    throw new RuntimeException("anonymous mremap failed with error " + MMapBuffer.errno());
+                    throw new RuntimeException(
+                            "anonymous mremap failed with error " + MMapBuffer.errno());
                 }
-                return new NativeBuffer(newAddress, new DirectMemory(newAddress, newSize, memory.getOrder()), true);
+                return new NativeBuffer(
+                        newAddress, new DirectMemory(newAddress, newSize, memory.getOrder()), true);
             }
         } else if (!mmapped && newSize < MMAP_THRESHOLD) {
             return realloc0(newSize);
@@ -181,7 +194,7 @@ public final class NativeBuffer implements BufferResource {
             }
         }
     }
-    
+
     public DirectMemory memory() {
         return memory;
     }

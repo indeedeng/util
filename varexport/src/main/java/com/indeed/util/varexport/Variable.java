@@ -1,7 +1,6 @@
 // Copyright 2009 Indeed
 package com.indeed.util.varexport;
 
-
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
@@ -52,8 +51,8 @@ public abstract class Variable<T> {
     }
 
     /**
-     * @deprecated do not use this.
-     * Please implement your own tokenization of variable names, if needed.
+     * @deprecated do not use this. Please implement your own tokenization of variable names, if
+     *     needed.
      */
     @Deprecated
     public String[] getIndexableNames() {
@@ -68,7 +67,9 @@ public abstract class Variable<T> {
         return tags;
     }
 
-    public String getNamespace() { return namespace; }
+    public String getNamespace() {
+        return namespace;
+    }
 
     /** @return epoch millis when value was last updated, null if value is current */
     public Long getLastUpdated() {
@@ -90,9 +91,7 @@ public abstract class Variable<T> {
         return !Strings.isNullOrEmpty(getDoc());
     }
 
-    /**
-     * @return True as long as the variable is "live" and should continue to be valid/usable
-     */
+    /** @return True as long as the variable is "live" and should continue to be valid/usable */
     protected abstract boolean isLive();
 
     protected abstract boolean canExpand();
@@ -100,7 +99,7 @@ public abstract class Variable<T> {
     public abstract T getValue();
 
     public String getNamespaceAndName() {
-        if(Strings.isNullOrEmpty(namespace)) {
+        if (Strings.isNullOrEmpty(namespace)) {
             return name;
         }
 
@@ -109,6 +108,7 @@ public abstract class Variable<T> {
 
     /**
      * Write name and value (and optionally documentation) in {@link java.util.Properties} format.
+     *
      * @param out writer
      * @param includeDoc true if should be prefixed with documentation line
      */
@@ -134,6 +134,7 @@ public abstract class Variable<T> {
 
     /**
      * Write value (escaped for {@link java.util.Properties} format).
+     *
      * @param out writer
      */
     public void writeValue(PrintWriter out) {
@@ -158,7 +159,9 @@ public abstract class Variable<T> {
     }
 
     private static String makePropertiesSafe(Object in, Set<Character> toEscape) {
-        if (in == null) { return "null"; }
+        if (in == null) {
+            return "null";
+        }
         String str = in.toString();
         StringBuilder result = null;
         for (int i = 0; i < str.length(); i++) {

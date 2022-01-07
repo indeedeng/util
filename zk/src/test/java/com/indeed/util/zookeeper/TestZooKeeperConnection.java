@@ -16,9 +16,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.*;
 
-/**
- * @author jsgroth
- */
+/** @author jsgroth */
 public class TestZooKeeperConnection {
     private MiniZooKeeperCluster zk;
     private String tempDir;
@@ -62,12 +60,14 @@ public class TestZooKeeperConnection {
         zkc.connect();
         ZooKeeperConnection.createFullPath(zkc, "/zkc/test", new byte[0], CreateMode.PERSISTENT);
         try {
-            ZooKeeperConnection.createFullPath(zkc, "/zkc/test", new byte[0], CreateMode.PERSISTENT);
+            ZooKeeperConnection.createFullPath(
+                    zkc, "/zkc/test", new byte[0], CreateMode.PERSISTENT);
             assertTrue(false);
         } catch (KeeperException e) {
             assertSame(e.getClass(), KeeperException.NodeExistsException.class);
         }
-        ZooKeeperConnection.createFullPath(zkc, "/zkc/test", new byte[0], CreateMode.PERSISTENT, true);
+        ZooKeeperConnection.createFullPath(
+                zkc, "/zkc/test", new byte[0], CreateMode.PERSISTENT, true);
         zkc.close();
     }
 
@@ -76,10 +76,12 @@ public class TestZooKeeperConnection {
         ZooKeeperConnection zkc = new ZooKeeperConnection(zk.getZkNodes(), 30000);
         zkc.connect();
         assertNull(zkc.exists("/zkc/test", false));
-        ZooKeeperConnection.updateOrCreate(zkc, "/zkc/test", new byte[]{1, 2, 3}, CreateMode.PERSISTENT);
-        assertArrayEquals(new byte[]{1, 2, 3}, zkc.getData("/zkc/test", false, new Stat()));
-        ZooKeeperConnection.updateOrCreate(zkc, "/zkc/test", new byte[]{4, 5, 6}, CreateMode.PERSISTENT);
-        assertArrayEquals(new byte[]{4, 5, 6}, zkc.getData("/zkc/test", false, new Stat()));
+        ZooKeeperConnection.updateOrCreate(
+                zkc, "/zkc/test", new byte[] {1, 2, 3}, CreateMode.PERSISTENT);
+        assertArrayEquals(new byte[] {1, 2, 3}, zkc.getData("/zkc/test", false, new Stat()));
+        ZooKeeperConnection.updateOrCreate(
+                zkc, "/zkc/test", new byte[] {4, 5, 6}, CreateMode.PERSISTENT);
+        assertArrayEquals(new byte[] {4, 5, 6}, zkc.getData("/zkc/test", false, new Stat()));
         zkc.close();
     }
 
@@ -88,18 +90,24 @@ public class TestZooKeeperConnection {
         ZooKeeperConnection zkc = new ZooKeeperConnection(zk.getZkNodes(), 30000);
         zkc.connect();
         assertNull(zkc.exists("/zkc", false));
-        assertTrue(ZooKeeperConnection.createIfNotExists(zkc, "/zkc", new byte[]{1, 2, 3}, CreateMode.PERSISTENT));
-        assertFalse(ZooKeeperConnection.createIfNotExists(zkc, "/zkc", new byte[]{4, 5, 6}, CreateMode.PERSISTENT));
-        assertArrayEquals(new byte[]{1, 2, 3}, zkc.getData("/zkc", false, new Stat()));
+        assertTrue(
+                ZooKeeperConnection.createIfNotExists(
+                        zkc, "/zkc", new byte[] {1, 2, 3}, CreateMode.PERSISTENT));
+        assertFalse(
+                ZooKeeperConnection.createIfNotExists(
+                        zkc, "/zkc", new byte[] {4, 5, 6}, CreateMode.PERSISTENT));
+        assertArrayEquals(new byte[] {1, 2, 3}, zkc.getData("/zkc", false, new Stat()));
         zkc.close();
     }
 
     @Test(expected = KeeperException.NoNodeException.class)
-    public void testCreateIfNotExistsNoParent() throws IOException, InterruptedException, KeeperException {
+    public void testCreateIfNotExistsNoParent()
+            throws IOException, InterruptedException, KeeperException {
         ZooKeeperConnection zkc = new ZooKeeperConnection(zk.getZkNodes(), 30000);
         zkc.connect();
         try {
-            ZooKeeperConnection.createIfNotExists(zkc, "/zkc/test", new byte[0], CreateMode.PERSISTENT);
+            ZooKeeperConnection.createIfNotExists(
+                    zkc, "/zkc/test", new byte[0], CreateMode.PERSISTENT);
         } finally {
             zkc.close();
         }
@@ -112,11 +120,11 @@ public class TestZooKeeperConnection {
         zkc.getSessionId();
         zkc.getSessionPasswd();
         zkc.getSessionTimeout();
-        zkc.register(new Watcher() {
-            @Override
-            public void process(WatchedEvent watchedEvent) {
-            }
-        });
+        zkc.register(
+                new Watcher() {
+                    @Override
+                    public void process(WatchedEvent watchedEvent) {}
+                });
         zkc.create("/zkc", new byte[0], ZooDefs.Ids.OPEN_ACL_UNSAFE, CreateMode.PERSISTENT);
         zkc.getChildren("/zkc", false);
         zkc.getChildren("/zkc", false, new Stat());
@@ -134,6 +142,7 @@ public class TestZooKeeperConnection {
 
     @Test
     public void testGettersAndSetters() {
-        CommonMethodsTester.testGettersAndSetters(ZooKeeperConnection.class, new ZooKeeperConnection("", 0));
+        CommonMethodsTester.testGettersAndSetters(
+                ZooKeeperConnection.class, new ZooKeeperConnection("", 0));
     }
 }

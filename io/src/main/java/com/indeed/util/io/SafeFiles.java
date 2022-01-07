@@ -31,9 +31,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Utilities for atomic (and fsync-friendly) operations on files.
  *
- * <p>
- * When possible methods on this class should be used over the ones in {@link com.indeed.util.io.Files}
- * </p>
+ * <p>When possible methods on this class should be used over the ones in {@link
+ * com.indeed.util.io.Files}
  *
  * @author rboyer
  */
@@ -42,9 +41,9 @@ public final class SafeFiles {
     private static final Logger LOG = LoggerFactory.getLogger(SafeFiles.class);
 
     /**
-     * Perform an atomic rename of oldName -&gt; newName and fsync the containing directory.
-     * This is only truly fsync-safe if both files are in the same directory, but it will at least
-     * try to do the right thing if the files are in different directories.
+     * Perform an atomic rename of oldName -&gt; newName and fsync the containing directory. This is
+     * only truly fsync-safe if both files are in the same directory, but it will at least try to do
+     * the right thing if the files are in different directories.
      *
      * @param oldName original file
      * @param newName new file
@@ -68,8 +67,8 @@ public final class SafeFiles {
     }
 
     /**
-     * Create a directory if it does not already exist.  Fails if the path exists and is NOT a directory.
-     * Will fsync the parent directory inode.
+     * Create a directory if it does not already exist. Fails if the path exists and is NOT a
+     * directory. Will fsync the parent directory inode.
      *
      * @param path path to ensure is a directory.
      * @throws IOException In the event that the path is not a directory.
@@ -87,8 +86,8 @@ public final class SafeFiles {
     }
 
     /**
-     * Walk a directory tree and Fsync both Directory and File inodes. This does NOT follow symlinks and does not
-     * attempt to fsync anything other than Directory or NormalFiles.
+     * Walk a directory tree and Fsync both Directory and File inodes. This does NOT follow symlinks
+     * and does not attempt to fsync anything other than Directory or NormalFiles.
      *
      * @param root directory to start the traversal.
      * @return number of NormalFiles fsynced (not including directories).
@@ -102,8 +101,7 @@ public final class SafeFiles {
     }
 
     private static class FsyncingSimpleFileVisitor extends SimpleFileVisitor<Path> {
-        @Nonnegative
-        private int fileCount = 0;
+        @Nonnegative private int fileCount = 0;
 
         @Nonnegative
         public int getFileCount() {
@@ -121,7 +119,8 @@ public final class SafeFiles {
         }
 
         @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                throws IOException {
             if (attrs.isDirectory()) { // safety
                 fsync(dir);
             }
@@ -137,8 +136,9 @@ public final class SafeFiles {
      * @throws IOException in the event that we could not fsync the provided path.
      */
     public static void fsync(final Path path) throws IOException {
-        if (! Files.isDirectory(path) && ! Files.isRegularFile(path)) {
-            throw new IllegalArgumentException("fsync is only supported for regular files and directories: " + path);
+        if (!Files.isDirectory(path) && !Files.isRegularFile(path)) {
+            throw new IllegalArgumentException(
+                    "fsync is only supported for regular files and directories: " + path);
         }
 
         try (final FileChannel channel = FileChannel.open(path, StandardOpenOption.READ)) {
@@ -160,8 +160,8 @@ public final class SafeFiles {
     }
 
     /**
-     * Write the string to a temporary file, fsync the file, then atomically rename to the target path.
-     * On error it will make a best-effort to erase the temporary file.
+     * Write the string to a temporary file, fsync the file, then atomically rename to the target
+     * path. On error it will make a best-effort to erase the temporary file.
      *
      * @param value string value to write to file as UTF8 bytes
      * @param path path to write out to
@@ -172,8 +172,8 @@ public final class SafeFiles {
     }
 
     /**
-     * Write the bytes to a temporary file, fsync the file, then atomically rename to the target path.
-     * On error it will make a best-effort to erase the temporary file.
+     * Write the bytes to a temporary file, fsync the file, then atomically rename to the target
+     * path. On error it will make a best-effort to erase the temporary file.
      *
      * @param data binary value to write to file
      * @param path path to write out to
@@ -187,38 +187,28 @@ public final class SafeFiles {
     }
 
     /**
-     * This is just like a lazy variation of {@link SafeFiles#write}.  It opens a temp file
-     * and proxies writes through to the underlying file.
+     * This is just like a lazy variation of {@link SafeFiles#write}. It opens a temp file and
+     * proxies writes through to the underlying file.
      *
-     * <p>
-     * Upon calling {@link SafeOutputStream#commit()} the rest of the safety behaviors kick in:
-     * </p>
+     * <p>Upon calling {@link SafeOutputStream#commit()} the rest of the safety behaviors kick in:
      *
      * <ul>
-     *   <li>flush</li>
-     *   <li>fsync temp file</li>
-     *   <li>close temp file</li>
-     *   <li>atomic rename temp file to desired filename</li>
-     *   <li>fsync parent directory</li>
+     *   <li>flush
+     *   <li>fsync temp file
+     *   <li>close temp file
+     *   <li>atomic rename temp file to desired filename
+     *   <li>fsync parent directory
      * </ul>
      *
-     * <p>
-     * On error it will make a best-effort to erase the temporary file.
-     * </p>
+     * <p>On error it will make a best-effort to erase the temporary file.
      *
-     * <p>
-     * If you call {@link SafeOutputStream#close()} without calling {@link SafeOutputStream#commit()}
-     * the atomic write is aborted and cleaned up.
-     * </p>
+     * <p>If you call {@link SafeOutputStream#close()} without calling {@link
+     * SafeOutputStream#commit()} the atomic write is aborted and cleaned up.
      *
-     * <p>
-     * It is safe to call {@link SafeOutputStream#close()}} after {@link SafeOutputStream#commit()}
-     * so that try-with-resources works.
-     * </p>
+     * <p>It is safe to call {@link SafeOutputStream#close()}} after {@link
+     * SafeOutputStream#commit()} so that try-with-resources works.
      *
-     * <p>
-     * The returned {@link SafeOutputStream} is NOT safe for calls from multiple threads.
-     * </p>
+     * <p>The returned {@link SafeOutputStream} is NOT safe for calls from multiple threads.
      *
      * @param path final desired output path
      * @return handle to opened temp file
@@ -228,19 +218,23 @@ public final class SafeFiles {
     public static SafeOutputStream createAtomicFile(final Path path) throws IOException {
         final Path dir = path.getParent();
         final Path name = path.getFileName();
-        final Path tempFile = Files.createTempFile(
-                dir,
-                name.toString(),
-                ".tmp",
-                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--"))
-        );
+        final Path tempFile =
+                Files.createTempFile(
+                        dir,
+                        name.toString(),
+                        ".tmp",
+                        PosixFilePermissions.asFileAttribute(
+                                PosixFilePermissions.fromString("rw-r--r--")));
 
         FileChannel fc = null;
         try {
-            fc = (FileChannel) Files.newByteChannel(tempFile,
-                    StandardOpenOption.CREATE,
-                    StandardOpenOption.TRUNCATE_EXISTING,
-                    StandardOpenOption.WRITE);
+            fc =
+                    (FileChannel)
+                            Files.newByteChannel(
+                                    tempFile,
+                                    StandardOpenOption.CREATE,
+                                    StandardOpenOption.TRUNCATE_EXISTING,
+                                    StandardOpenOption.WRITE);
         } catch (Exception e) {
             // clean up after ourselves on error
             deleteIfExistsQuietly(tempFile);
@@ -265,38 +259,33 @@ public final class SafeFiles {
     public static void deleteIfExistsQuietly(final Path path) {
         try {
             Files.deleteIfExists(path);
-        } catch (IOException deleteExc) { /* ignore */ }
+        } catch (IOException deleteExc) {
+            /* ignore */
+        }
     }
 
-    /**
-     * @see SafeFiles#createAtomicFile(Path)
-     */
+    /** @see SafeFiles#createAtomicFile(Path) */
     @ParametersAreNonnullByDefault
     @NotThreadSafe
     private static class SafeFileOutputStream extends SafeOutputStream {
-        @Nonnull
-        private final Path path;
-        @Nonnull
-        private final Path tempFile;
+        @Nonnull private final Path path;
+        @Nonnull private final Path tempFile;
 
-        @Nonnull
-        private final OutputStream out;        // do not close this
-        @Nonnull
-        private final FileChannel fileChannel; // only close this
+        @Nonnull private final OutputStream out; // do not close this
+        @Nonnull private final FileChannel fileChannel; // only close this
 
         private boolean closed = false;
 
         // private to require you to use SafeFiles.createAtomicFile()
-        private SafeFileOutputStream(final Path path, final Path tempFile, final FileChannel fileChannel) {
+        private SafeFileOutputStream(
+                final Path path, final Path tempFile, final FileChannel fileChannel) {
             this.path = path;
             this.tempFile = tempFile;
             this.fileChannel = fileChannel;
             this.out = Channels.newOutputStream(fileChannel);
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void commit() throws IOException {
             if (closed) {
@@ -329,9 +318,7 @@ public final class SafeFiles {
             fsync(tempFile.getParent());
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public void close() throws IOException {
             if (!closed) {
@@ -344,24 +331,24 @@ public final class SafeFiles {
 
         @Override
         public boolean isOpen() {
-            return (! closed);
+            return (!closed);
         }
 
-        /**
-         * {@inheritDoc}
-         */
+        /** {@inheritDoc} */
         @Override
         public int write(final ByteBuffer src) throws IOException {
             return writeFully(fileChannel, src);
         }
 
         /**
-         * (copied from {@link Channels#writeFullyImpl} and changed to return the number of bytes written)
+         * (copied from {@link Channels#writeFullyImpl} and changed to return the number of bytes
+         * written)
          *
-         * Write all remaining bytes in buffer to the given channel.
-         * If the channel is selectable then it must be configured blocking.
+         * <p>Write all remaining bytes in buffer to the given channel. If the channel is selectable
+         * then it must be configured blocking.
          */
-        private static int writeFully(final WritableByteChannel ch, final ByteBuffer bb) throws IOException {
+        private static int writeFully(final WritableByteChannel ch, final ByteBuffer bb)
+                throws IOException {
             int total = 0;
             while (bb.remaining() > 0) {
                 int n = ch.write(bb);
@@ -404,5 +391,7 @@ public final class SafeFiles {
         }
     }
 
-    private SafeFiles() { /* no */ }
+    private SafeFiles() {
+        /* no */
+    }
 }

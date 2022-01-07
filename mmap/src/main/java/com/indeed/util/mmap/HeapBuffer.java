@@ -6,9 +6,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.ByteOrder;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class HeapBuffer implements BufferResource {
     private static final Logger log = LoggerFactory.getLogger(HeapBuffer.class);
 

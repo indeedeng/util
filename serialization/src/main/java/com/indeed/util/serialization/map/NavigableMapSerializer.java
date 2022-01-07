@@ -11,19 +11,22 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.NavigableMap;
 
-/**
- * @author jplaisance
- */
-public final class NavigableMapSerializer<K,V> implements Serializer<NavigableMap<K,V>> {
+/** @author jplaisance */
+public final class NavigableMapSerializer<K, V> implements Serializer<NavigableMap<K, V>> {
     private static final Logger log = LoggerFactory.getLogger(NavigableMapSerializer.class);
 
-    public static <K extends Comparable,V> NavigableMapSerializer<K,V> treeMapSerializer(Serializer<K> keySerializer, Serializer<V> valueSerializer) {
-        return new NavigableMapSerializer<K, V>(new CollectionSuppliers.TreeMapSupplier<K, V>(), keySerializer, valueSerializer);
+    public static <K extends Comparable, V> NavigableMapSerializer<K, V> treeMapSerializer(
+            Serializer<K> keySerializer, Serializer<V> valueSerializer) {
+        return new NavigableMapSerializer<K, V>(
+                new CollectionSuppliers.TreeMapSupplier<K, V>(), keySerializer, valueSerializer);
     }
-    
-    private final MapSerializer<K,V> mapSerializer;
 
-    public NavigableMapSerializer(Supplier<? extends NavigableMap<K,V>> mapSupplier, Serializer<K> keySerializer, Serializer<V> valueSerializer) {
+    private final MapSerializer<K, V> mapSerializer;
+
+    public NavigableMapSerializer(
+            Supplier<? extends NavigableMap<K, V>> mapSupplier,
+            Serializer<K> keySerializer,
+            Serializer<V> valueSerializer) {
         mapSerializer = new MapSerializer<K, V>(mapSupplier, keySerializer, valueSerializer);
     }
 

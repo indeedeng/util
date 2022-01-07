@@ -3,19 +3,18 @@ package com.indeed.util.mmap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class ByteArray {
     private static final Logger log = LoggerFactory.getLogger(ByteArray.class);
-    
+
     private final Memory buffer;
     private final long length;
 
     public ByteArray(Memory buffer, long address, long length) {
         if (address < 0) throw new IndexOutOfBoundsException("address must be >= 0");
         if (length < 0) throw new IllegalArgumentException("length must be >= 0");
-        if (address+length > buffer.length()) throw new IndexOutOfBoundsException("address+length must be <= buffer.length()");
+        if (address + length > buffer.length())
+            throw new IndexOutOfBoundsException("address+length must be <= buffer.length()");
         this.buffer = buffer.slice(address, length);
         this.length = length;
     }

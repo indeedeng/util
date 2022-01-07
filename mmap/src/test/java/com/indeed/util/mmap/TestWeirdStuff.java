@@ -15,9 +15,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public final class TestWeirdStuff extends TestCase {
 
     private static final Logger log = LoggerFactory.getLogger(TestWeirdStuff.class);
@@ -34,8 +32,10 @@ public final class TestWeirdStuff extends TestCase {
 
     private void writeFile() throws IOException {
         mmapFile = new File(tmpDir, "mmap");
-        LittleEndianDataOutputStream out = new LittleEndianDataOutputStream(new BufferedOutputStream(new FileOutputStream(mmapFile), 65536));
-        //write 8 mb of crap to ensure multiple pages have been written
+        LittleEndianDataOutputStream out =
+                new LittleEndianDataOutputStream(
+                        new BufferedOutputStream(new FileOutputStream(mmapFile), 65536));
+        // write 8 mb of crap to ensure multiple pages have been written
         for (int i = 0; i < 2 * 1024 * 1024; i++) {
             out.writeInt(i);
         }
@@ -44,18 +44,19 @@ public final class TestWeirdStuff extends TestCase {
 
     public void testTruncatedFileIndeedMMap() throws IOException {
         writeFile();
-        MMapBuffer buffer = new MMapBuffer(mmapFile, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
+        MMapBuffer buffer =
+                new MMapBuffer(mmapFile, FileChannel.MapMode.READ_ONLY, ByteOrder.nativeOrder());
         Memory memory = buffer.memory();
-        //read half the file
+        // read half the file
         for (int i = 0; i < 1024 * 1024; i++) {
             assertEquals(i, memory.getInt(i * 4));
         }
-        //trash the file
+        // trash the file
         RandomAccessFile raf = new RandomAccessFile(mmapFile, "rw");
         FileChannel channel = raf.getChannel();
         channel.truncate(0);
         channel.force(true);
-        //read the file again
+        // read the file again
         int i = 0;
         try {
             for (i = 0; i < 2 * 1024 * 1024; i++) {
@@ -65,7 +66,7 @@ public final class TestWeirdStuff extends TestCase {
         } catch (Throwable t) {
             log.info("caught error reading address: " + i * 4, t);
         }
-        //rewrite the file and see what happens
+        // rewrite the file and see what happens
         writeFile();
         for (i = 0; i < 1024 * 1024; i++) {
             assertEquals(i, memory.getInt(i * 4));
@@ -79,16 +80,16 @@ public final class TestWeirdStuff extends TestCase {
         writeFile();
         ByteBuffer buffer = Files.map(mmapFile, FileChannel.MapMode.READ_ONLY);
         buffer.order(ByteOrder.LITTLE_ENDIAN);
-        //read half the file
+        // read half the file
         for (int i = 0; i < 1024 * 1024; i++) {
             assertEquals(i, buffer.getInt(i * 4));
         }
-        //trash the file
+        // trash the file
         RandomAccessFile raf = new RandomAccessFile(mmapFile, "rw");
         FileChannel channel = raf.getChannel();
         channel.truncate(0);
         channel.force(true);
-        //read the file again
+        // read the file again
         int i = 0;
         try {
             for (i = 0; i < 2 * 1024 * 1024; i++) {
@@ -98,7 +99,7 @@ public final class TestWeirdStuff extends TestCase {
         } catch (Throwable t) {
             log.info("caught error reading address: " + i * 4, t);
         }
-        //rewrite the file and see what happens
+        // rewrite the file and see what happens
         writeFile();
         for (i = 0; i < 1024 * 1024; i++) {
             assertEquals(i, buffer.getInt(i * 4));

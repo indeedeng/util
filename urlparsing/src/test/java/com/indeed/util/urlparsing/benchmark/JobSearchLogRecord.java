@@ -1,8 +1,6 @@
 package com.indeed.util.urlparsing.benchmark;
 
-/**
- * @author: preetha
- */
+/** @author: preetha */
 public class JobSearchLogRecord {
 
     private StringBuilder uid = new StringBuilder(16);
@@ -41,12 +39,17 @@ public class JobSearchLogRecord {
 
     @Override
     public String toString() {
-        return "JobSearchLogRecord{" +
-                "uid=" + uid +
-                ", query=" + query +
-                ", location=" + location +
-                ", timestamp=" + timestamp +
-                ", numResults=" + numResults +
-                '}';
+        return "JobSearchLogRecord{"
+                + "uid="
+                + uid
+                + ", query="
+                + query
+                + ", location="
+                + location
+                + ", timestamp="
+                + timestamp
+                + ", numResults="
+                + numResults
+                + '}';
     }
 }

@@ -1,8 +1,6 @@
 package com.indeed.util.mmap;
 
-/**
- * @author jplaisance
- */
+/** @author jplaisance */
 public interface DirectDataAccess {
 
     public byte getByte(long address);
