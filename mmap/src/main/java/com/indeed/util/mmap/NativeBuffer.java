@@ -1,9 +1,9 @@
 package com.indeed.util.mmap;
 
 import com.google.common.base.Throwables;
+import com.indeed.util.unsafe.IndeedUnsafe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.misc.Unsafe;
 
 import java.io.Closeable;
 import java.io.File;
@@ -18,7 +18,6 @@ import java.nio.ByteOrder;
 public final class NativeBuffer implements BufferResource {
     private static final Logger log = LoggerFactory.getLogger(NativeBuffer.class);
 
-    private static final Unsafe UNSAFE;
     private static final Field FD_FIELD;
 
     private static final long MMAP_THRESHOLD;
@@ -43,14 +42,9 @@ public final class NativeBuffer implements BufferResource {
         }
         MMAP_THRESHOLD = mmapThreshold;
         try {
-            final Field theUnsafe = Unsafe.class.getDeclaredField("theUnsafe");
-            theUnsafe.setAccessible(true);
-            UNSAFE = (Unsafe) theUnsafe.get(null);
             FD_FIELD = FileDescriptor.class.getDeclaredField("fd");
             FD_FIELD.setAccessible(true);
         } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
 
@@ -117,7 +111,7 @@ public final class NativeBuffer implements BufferResource {
                 memory = new DirectMemory(address, length, order);
             }
         } else {
-            address = UNSAFE.allocateMemory(length);
+            address = IndeedUnsafe.allocateMemory(length);
             if (address == 0) throw new OutOfMemoryError();
             memory = new DirectMemory(address, length, order);
             mmapped = false;
@@ -134,7 +128,7 @@ public final class NativeBuffer implements BufferResource {
         if (mmapped) throw new UnsupportedOperationException();
         if (newLength >= MMAP_THRESHOLD) throw new UnsupportedOperationException();
         if (newLength <= 0) throw new IllegalArgumentException("length must be > 0");
-        final long newAddress = UNSAFE.reallocateMemory(address, newLength);
+        final long newAddress = IndeedUnsafe.reallocateMemory(address, newLength);
         if (address == 0) throw new OutOfMemoryError();
         closed = true;
         return new NativeBuffer(
@@ -190,7 +184,7 @@ public final class NativeBuffer implements BufferResource {
             if (mmapped) {
                 MMapBuffer.munmap(address, memory.length());
             } else {
-                if (address != 0) UNSAFE.freeMemory(address);
+                if (address != 0) IndeedUnsafe.freeMemory(address);
             }
         }
     }

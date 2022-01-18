@@ -4,6 +4,7 @@ indeedLibrary.name = 'util-mmap'
 dependencies {
     implementation libs.guava
     implementation libs.slf4jApi
+    implementation project(':unsafe')
 
     testImplementation libs.junit
 }
