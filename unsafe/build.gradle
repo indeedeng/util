@@ -1,0 +1,13 @@
+indeedOss.activateFeature 'library'
+indeedLibrary.name = 'util-unsafe'
+
+dependencies {
+}
+
+// We can't use --release for this project, because it enforces stable API usage,
+// which prevents the usage of Unsafe.
+compileJava {
+    options.release = null
+    sourceCompatibility = '1.8'
+    targetCompatibility = '1.8'
+}
