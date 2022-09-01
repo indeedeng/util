@@ -7,4 +7,5 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.guava
+    testImplementation libs.slf4jSimple
 }

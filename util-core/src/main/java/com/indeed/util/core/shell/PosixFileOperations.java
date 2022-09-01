@@ -149,7 +149,16 @@ public final class PosixFileOperations {
                     public FileVisitResult visitFile(
                             final Path file, final BasicFileAttributes attrs) throws IOException {
                         super.visitFile(file, attrs);
-                        Files.createLink(dest.resolve(src.relativize(file)), file);
+                        // Special case symbolic links because they will become hard links if the
+                        //   target does not exist when trying to create a hard link to the original
+                        //   symbolic link.
+                        if (Files.isSymbolicLink(file)) {
+                            Files.createSymbolicLink(
+                                    dest.resolve(src.relativize(file)),
+                                    dest.resolve(Files.readSymbolicLink(file)));
+                        } else {
+                            Files.createLink(dest.resolve(src.relativize(file)), file);
+                        }
                         return FileVisitResult.CONTINUE;
                     }
                 });

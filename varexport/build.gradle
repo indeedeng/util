@@ -12,6 +12,7 @@ dependencies {
     testImplementation libs.easymock
     testImplementation libs.hamcrest
     testImplementation libs.servletApi
+    testImplementation libs.slf4jSimple
 
     // Freemarker is an "optional" dependency, meaning that clients will need to include
     // it themselves if the want to use our freemarker features.

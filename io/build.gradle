@@ -15,4 +15,5 @@ dependencies {
     compileOnly libs.jsr305
 
     testImplementation libs.junit
+    testImplementation libs.slf4jSimple
 }

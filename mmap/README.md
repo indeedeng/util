@@ -22,7 +22,7 @@ The latest util-mmap JAR file can be downloaded via Maven ([link](http://search.
 
 The library depends on [Unix mmap](http://www.gnu.org/software/libc/manual/html_node/Memory_002dmapped-I_002fO.html)
 for its underlying functionality, so it uses JNI. The published JAR file contains 
-native builds for Linux `i386`, `amd64`, and OS X `x86_64`. The Java code in the library loads the 
+native builds for Linux `i386`, Linux `amd64`, macOS `x86_64` and macOS `arm64`. The Java code in the library loads the 
 correct Linux native shared object (.so, .dylib) file from the JAR file at runtime based
 on `os.name` and `os.arch` system properties. If you need to run on an unsupported OS, you'll
 need to rebuild the native code. See the instructions in [Building](#building).
@@ -44,33 +44,22 @@ final long firstValue = longArray.get(0);
 
 ## Building
 
-You can build the native code for util-mmap yourself with the provided Makefile, which are Linux/OS X-specific and depend on GCC:
+You can build the native code for util-mmap yourself by executing the `updateNative` task. It compiles the native code
+using the provided Makefile, which depends on GCC. On Linux, a 64-bit environment with `gcc-multilib` installed is
+required so both 64-bit and 32-bit versions will be installed. On macOS, a universal dylib for both `x86_64` and `arm64`
+is built automatically. Binaries are installed to `mmap/src/main/resources/`. for inclusion in the packaged jar.
+
+The makefile can also be invoked directly with:
 
 ```
-$ cd util/mmap/src/main/native/
-
-$ make
-
-$ ls *.o *.so.*
-com_indeed_util_mmap_MMapBuffer.o	  com_indeed_util_mmap_Stat.o
-com_indeed_util_mmap_NativeMemoryUtils.o  libindeedmmap.so.1.0.1
-
-$ sudo make install
-
-$ ls -l /usr/lib/libindeedmmap.so
-lrwxrwxrwx 1 root root 66 Feb 25 12:52 /usr/lib/libindeedmmap.so -> 
-  /home/user/util/mmap/src/main/native/libindeedmmap.so.1.0.1
+$ ./gradlew :mmap:compileJava
+$ cd mmap/src/main/c/
+$ make clean install
 ```
-
-The installation step assumes that `/usr/lib/` is in your `java.library.path`.
-You can also repackage the shared library in the JAR file, or request that we
-distribute a new build binary in the JAR file by pushing it
-to the GitHub repository under `src/main/resources/native/*platform*/`.
-
 ## Known limitations
 
 The native code base has not been verified on other variants of Unix. For example,
-mremap is unsupported for Darwin (OS X). Contributions welcome.
+`mremap` is unsupported for Darwin (OS X). Contributions welcome.
 
 ## License
 
