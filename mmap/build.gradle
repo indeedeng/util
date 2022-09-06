@@ -1,6 +1,6 @@
-plugins {
-    id 'c'
-}
+// plugins {
+//    id 'c'
+//}
 
 indeedOss.activateFeature 'library'
 indeedLibrary.name = 'util-mmap'
