@@ -141,8 +141,13 @@ public class TestZooKeeperConnection {
     }
 
     @Test
-    public void testGettersAndSetters() {
-        CommonMethodsTester.testGettersAndSetters(
-                ZooKeeperConnection.class, new ZooKeeperConnection("", 0));
+    public void testGettersAndSetters() throws Throwable {
+        ZooKeeperConnection zkc = new ZooKeeperConnection(zk.getZkNodes(), 30000);
+        zkc.connect();
+        try {
+            CommonMethodsTester.testGettersAndSetters(ZooKeeperConnection.class, zkc);
+        } finally {
+            zkc.close();
+        }
     }
 }

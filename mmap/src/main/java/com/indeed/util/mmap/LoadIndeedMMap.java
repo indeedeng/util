@@ -23,7 +23,15 @@ public final class LoadIndeedMMap {
                 final String arch = System.getProperty("os.arch");
                 final String extension = getLibraryType(osName);
                 final String resourcePath =
-                        "/native/" + osName + "-" + arch + "/libindeedmmap." + extension + ".1.0.1";
+                        "Mac OS X".equals(osName)
+                                ? "/native/" + osName + "/libindeedmmap." + extension + ".1.0.1"
+                                : "/native/"
+                                        + osName
+                                        + "-"
+                                        + arch
+                                        + "/libindeedmmap."
+                                        + extension
+                                        + ".1.0.1";
                 final InputStream is = MMapBuffer.class.getResourceAsStream(resourcePath);
                 if (is == null) {
                     throw new FileNotFoundException(
