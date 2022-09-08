@@ -9,21 +9,15 @@ A binary is included for Linux-amd64. It will not work on 32-bit platforms. Othe
 
 **Requires libsnappy-dev**
 
+You can build the native code for compress yourself by executing the `updateNative` task. It compiles the native code
+using the provided Makefile, which depends on GCC. On Linux, a 64-bit environment with `gcc-multilib` installed is
+required so both 64-bit and 32-bit versions will be installed. On macOS, a universal dylib for both `x86_64` and `arm64`
+is built automatically. Binaries are installed to `compress/src/main/resources/`. for inclusion in the packaged jar.
+
+The makefile can also be invoked directly with:
+
 ```
-# starting in this compress directory
-../gradlew compileJava
-
-rm src/main/native/com_indeed_util_compress_*.h
-
-javah -classpath build/classes/java/main -d src/main/native/ com.indeed.util.compress.snappy.SnappyCompressor com.indeed.util.compress.snappy.SnappyDecompressor com.indeed.util.compress.zlib.ZlibCompressor com.indeed.util.compress.zlib.ZlibDecompressor
-
-cd src/main/native
-
-gcc -c -I$JAVA_HOME/include -I$JAVA_HOME/include/linux -O3 -fPIC -std=c99 *.c
-
-gcc -fPIC -shared -O3 *.o -o libindeedcompress.so
-
-mv libindeedcompress.so ../resources/native/Linux-amd64/
-
-rm *.o
+$ ./gradlew :mmap:compileJava
+$ cd compress/src/main/c/
+$ make clean install
 ```
