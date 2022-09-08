@@ -27,6 +27,8 @@ task updateNative(type:Exec) {
     commandLine 'make', 'clean', 'install'
 }
 
+processResources.mustRunAfter(updateNative)
+
 // TODO: Build native library using Gradle software model once https://github.com/gradle/gradle-native/issues/1096 is fixed
 //model {
 //    platforms {
