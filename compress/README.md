@@ -17,7 +17,7 @@ is built automatically. Binaries are installed to `compress/src/main/resources/`
 The makefile can also be invoked directly with:
 
 ```
-$ ./gradlew :mmap:compileJava
+$ ./gradlew :compress:compileJava
 $ cd compress/src/main/c/
 $ make clean install
 ```

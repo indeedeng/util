@@ -23,13 +23,7 @@ ifeq ($(OS), darwin)
 	LD_FLAGS += -dynamiclib -arch arm64 -arch x86_64
 	DEST_DIR := "../resources/native/Mac OS X/"
 else
-	ifneq ($(ARCH), x86_64)
-		CFLAGS += -m32
-		LD_FLAGS += -m32
-		DEST_DIR := "../resources/native/Linux-i386/"
-	else
-		DEST_DIR := "../resources/native/Linux-amd64/"
-	endif
+	DEST_DIR := "../resources/native/Linux-amd64/"
 	LIBTYPE := so
 	LD_FLAGS += -shared -Wl,-soname,$(LIBSONAME)
 endif
@@ -54,19 +48,10 @@ OBJS = \
 $(REALLIBNAME): $(OBJS)
 	$(CC) $(LD_FLAGS) -o $@ $(OBJS)
 
-build: $(REALLIBNAME) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,build32))
+build: $(REALLIBNAME) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
 
-build32:
-	$(MAKE) ARCH=i386 build
-
-install: build $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,install32))
+install: build $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
 	cp $(REALLIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(REALLIBNAME))
 
-install32:
-	$(MAKE) ARCH=i386 install
-
-clean: $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,clean32))
+clean: $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
 	rm -rf $(OBJS) $(TARGET)
-
-clean32:
-	$(MAKE) ARCH=i386 clean

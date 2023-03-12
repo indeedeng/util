@@ -29,7 +29,7 @@ need to rebuild the native code. See the instructions in [Building](#building).
 
 ## Usage
 
-A good starting point for using util-mmap is the [MMapBuffer class](https://eng-git.ausoff.indeed.net/opensource/util/blob/master/mmap/src/main/java/com/indeed/util/mmap/MMapBuffer.java).
+A good starting point for using util-mmap is the [MMapBuffer class](https://github.com/indeedeng/util/blob/main/mmap/src/main/java/com/indeed/util/mmap/MMapBuffer.java).
 The following example maps in a large file containing an array of longs, written in little-endian order.
 
 ```
@@ -45,8 +45,7 @@ final long firstValue = longArray.get(0);
 ## Building
 
 You can build the native code for util-mmap yourself by executing the `updateNative` task. It compiles the native code
-using the provided Makefile, which depends on GCC. On Linux, a 64-bit environment with `gcc-multilib` installed is
-required so both 64-bit and 32-bit versions will be installed. On macOS, a universal dylib for both `x86_64` and `arm64`
+using the provided Makefile, which depends on GCC. On Linux you will need a 64 bit x86 environment, other architectures are not currently supported. On macOS, a universal dylib for both `x86_64` and `arm64`
 is built automatically. Binaries are installed to `mmap/src/main/resources/`. for inclusion in the packaged jar.
 
 The makefile can also be invoked directly with:
