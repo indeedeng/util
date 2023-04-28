@@ -48,10 +48,10 @@ OBJS = \
 $(REALLIBNAME): $(OBJS)
 	$(CC) $(LD_FLAGS) -o $@ $(OBJS)
 
-build: $(REALLIBNAME) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
+build: $(REALLIBNAME) 
 
-install: build $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
+install: build 
 	cp $(REALLIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(REALLIBNAME))
 
-clean: $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
+clean: 
 	rm -rf $(OBJS) $(TARGET)

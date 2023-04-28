@@ -50,14 +50,14 @@ OBJS = \
 $(LIBNAME): $(OBJS)
 	$(CC) $(LD_FLAGS) -o $@ $(OBJS)
 
-build: $(LIBNAME) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
+build: $(LIBNAME) 
 
 $(DEST_DIR):
 	mkdir -p $(DEST_DIR)
 
-install: build $(DEST_DIR) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
+install: build $(DEST_DIR) 
 	cp $(LIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(LIBNAME))
 
-clean: $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,))
+clean: 
 	rm -rf $(OBJS) $(TARGET)
 
