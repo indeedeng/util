@@ -6,7 +6,9 @@ all: build
 
 OS := $(shell uname -s | tr A-Z a-z)
 ARCH ?= $(shell uname -m)
-CC := gcc
+REALARCH := $(shell uname -m)
+
+CC ?= gcc
 
 #CFLAGS += -g -fPIC -O3 -Wall
 CFLAGS += -fPIC -O3 -std=c99
@@ -23,13 +25,11 @@ ifeq ($(OS), darwin)
 	LD_FLAGS += -dynamiclib -arch arm64 -arch x86_64 -Wl,-rpath,/opt/homebrew/lib
 	DEST_DIR := "../resources/native/Mac OS X"
 else
-	ifneq ($(ARCH), x86_64)
-		CFLAGS += -m32
-		LD_FLAGS += -m32
-		DEST_DIR := "../resources/native/Linux-i386"
-	else
-		DEST_DIR := "../resources/native/Linux-amd64"
-	endif
+	ifeq ($(ARCH), x86_64)
+                DEST_DIR := "../resources/native/Linux-amd64/"
+        else
+                DEST_DIR := "../resources/native/Linux-$(ARCH)/"
+        endif
 	LIBTYPE := so
 	LD_FLAGS += -shared
 	#LD_FLAGS += -shared -Wl,-soname,$(LIBSONAME)
@@ -56,22 +56,27 @@ OBJS = \
 $(LIBNAME): $(OBJS)
 	$(CC) $(LD_FLAGS) -o $@ $(OBJS)
 
-build: $(LIBNAME) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,build32))
-
-build32:
-	$(MAKE) ARCH=i386 build
+buildAARCH64OnX86:
+	$(MAKE) CC=aarch64-linux-gnu-gcc ARCH=aarch64 build
+buildX86OnAARCH64:
+	$(MAKE) CC=x86_64-linux-gnu-gcc ARCH=x86_64 build
+build: $(LIBNAME) $(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),buildX86OnAARCH64,buildAARCH64OnX86))
 
 $(DEST_DIR):
 	mkdir -p $(DEST_DIR)
 
-install: build $(DEST_DIR) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,install32))
+install: build $(DEST_DIR) $(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),installX86,installAARCH64))
 	cp $(LIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(LIBNAME))
 
-install32:
-	$(MAKE) ARCH=i386 install
+installX86: 
+	$(MAKE) ARCH=x86_64 install
 
-clean: $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,clean32))
+installAARCH64:
+	$(MAKE) ARCH=aarch64 install
+
+clean:  $(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),cleanX86,cleanAARCH64))
 	rm -rf $(OBJS) $(TARGET)
-
-clean32:
-	$(MAKE) ARCH=i386 clean
+cleanX86:
+	$(MAKE) ARCH=x86_64 clean
+cleanAARCH64:
+	$(MAKE) ARCH=aarch64 clean
