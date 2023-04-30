@@ -60,12 +60,12 @@ buildAARCH64OnX86:
 	$(MAKE) CC=aarch64-linux-gnu-gcc ARCH=aarch64 build
 buildX86OnAARCH64:
 	$(MAKE) CC=x86_64-linux-gnu-gcc ARCH=x86_64 build
-build: $(LIBNAME) $(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),buildX86OnAARCH64,buildAARCH64OnX86))
+build: $(LIBNAME) $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),buildX86OnAARCH64,buildAARCH64OnX86)))
 
 $(DEST_DIR):
 	mkdir -p $(DEST_DIR)
 
-install: build $(DEST_DIR) $(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),installX86,installAARCH64))
+install: build $(DEST_DIR)  $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),installX86,installAARCH64)))
 	cp $(LIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(LIBNAME))
 
 installX86: 
@@ -74,7 +74,7 @@ installX86:
 installAARCH64:
 	$(MAKE) ARCH=aarch64 install
 
-clean:  $(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),cleanX86,cleanAARCH64))
+clean: $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),cleanX86,cleanAARCH64)))
 	rm -rf $(OBJS) $(TARGET)
 cleanX86:
 	$(MAKE) ARCH=x86_64 clean
