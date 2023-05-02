@@ -48,7 +48,7 @@ You can build the native code for util-mmap yourself by executing the `updateNat
 using the provided Makefile, which depends on GCC. On Linux you will need a 64 bit x86 or aarch64 environment, other architectures are not currently supported. On macOS, a universal dylib for both `x86_64` and `arm64`
 is built automatically. Binaries are installed to `mmap/src/main/resources/`. for inclusion in the packaged jar.
 
-For Linux if you are running on an x86 and you wish to build the ARM compatible library, you will need to install "aarch64-linux-gnu-gcc", if you are running on an AARCH64 and wish to build the x86 version of the library you will need to install "x86_64-linux-gnu-gcc". If you do not wish to cross-compile for local testing you can invoke the buildX86/buildAARCH64/installX86/installAARCH64 targets to build just for your current architecture. However we ask when comitting changes that modify the C code that you rebuild for all the supported architectures.
+For Linux if you are running on an x86 you will need to install "aarch64-linux-gnu-gcc" to build the AARCH64 library, if you are running on an AARCH64 you will need to install "x86_64-linux-gnu-gcc" to build the x86 compatible library 
 
 The makefile can also be invoked directly with:
 

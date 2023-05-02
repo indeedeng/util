@@ -30,6 +30,16 @@ else
 	else
 		DEST_DIR := "../resources/native/Linux-$(ARCH)/"
 	endif
+	ifeq ($(ARCH), $(REALARCH))
+		ifeq ($(ARCH), x86_64)
+			ADDITIONAL_ARCH := aarch64
+			ADDITIONAL_CC := aarch64-linux-gnu-gcc
+		else
+			ADDITIONAL_ARCH := x86_64
+			ADDITIONAL_CC := x86_64-linux-gnu-gcc
+		endif
+	endif
+
 	LIBTYPE := so
 	LD_FLAGS += -shared -Wl,-soname,$(LIBSONAME)
 endif
@@ -54,28 +64,18 @@ OBJS = \
 $(REALLIBNAME): $(OBJS)
 	$(CC) $(LD_FLAGS) -o $@ $(OBJS)
 
-buildAARCH64OnX86:
-	$(MAKE) CC=aarch64-linux-gnu-gcc ARCH=aarch64 build
+build: $(REALLIBNAME) $(if $(ADDITIONAL_ARCH),buildAdditional)
 
-buildX86OnAARCH64:
-	$(MAKE) CC=x86_64-linux-gnu-gcc ARCH=x86_64 build
+buildAdditional:
+	$(MAKE) CC=$(ADDITIONAL_CC) ARCH=$(ADDITIONAL_ARCH)
 
-build: $(REALLIBNAME) $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),buildX86OnAARCH64,buildAARCH64OnX86)))
-
-install: build $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),installX86,installAARCH64)))
+install: build $(if $(ADDITIONAL_ARCH),installAdditional)
 	cp $(REALLIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(REALLIBNAME))
 
-installX86:
-	$(MAKE) ARCH=x86_64 install
+installAdditional:
+	$(MAKE) ARCH=$(ADDITIONAL_ARCH) install
 
-installAARCH64:
-	$(MAKE) ARCH=aarch64 install
-
-clean: $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),cleanX86,cleanAARCH64)))
+clean: $(if $(ADDITIONAL_ARCH),cleanAdditional)
 	rm -rf $(OBJS) $(TARGET)
-
-cleanX86:
-	$(MAKE) ARCH=x86_64 clean
-cleanAARCH64:
-	$(MAKE) ARCH=aarch64 clean
-
+cleanAdditional:
+	$(MAKE) ARCH=$(ADDITIONAL_ARCH) clean

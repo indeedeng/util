@@ -32,7 +32,16 @@ else
         endif
 	LIBTYPE := so
 	LD_FLAGS += -shared
-	#LD_FLAGS += -shared -Wl,-soname,$(LIBSONAME)
+
+	ifeq ($(ARCH),$(REALARCH))
+            ifeq ($(ARCH),x86_64)
+                ADDITIONAL_ARCH := aarch64
+                ADDITIONAL_CC := aarch64-linux-gnu-gcc
+            else
+                ADDITIONAL_ARCH := x86_64
+                ADDITIONAL_CC := x86_64-linux-gnu-gcc
+            endif
+	endif
 endif
 
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -56,27 +65,20 @@ OBJS = \
 $(LIBNAME): $(OBJS)
 	$(CC) $(LD_FLAGS) -o $@ $(OBJS)
 
-buildAARCH64OnX86:
-	$(MAKE) CC=aarch64-linux-gnu-gcc ARCH=aarch64 build
-buildX86OnAARCH64:
-	$(MAKE) CC=x86_64-linux-gnu-gcc ARCH=x86_64 build
-build: $(LIBNAME) $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),buildX86OnAARCH64,buildAARCH64OnX86)))
+buildAdditional:
+	$(MAKE) CC=$(ADDITIONAL_CC) ARCH=$(ADDITIONAL_ARCH)
+build: $(LIBNAME) $(if $(ADDITIONAL_ARCH),buildAdditional)
 
 $(DEST_DIR):
 	mkdir -p $(DEST_DIR)
 
-install: build $(DEST_DIR)  $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),installX86,installAARCH64)))
+install: build $(DEST_DIR) $(if $(ADDITIONAL_ARCH),installAdditional)
 	cp $(LIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(LIBNAME))
 
-installX86: 
-	$(MAKE) ARCH=x86_64 install
+installAdditional: 
+	$(MAKE) ARCH=$(ADDITIONAL_ARCH) install
 
-installAARCH64:
-	$(MAKE) ARCH=aarch64 install
-
-clean: $(if $(OS:linux=),,$(if $(ARCH:$(REALARCH)=),,$(if $(ARCH:x86_64=),cleanX86,cleanAARCH64)))
+clean: $(if $(ADDITIONAL_ARCH),cleanAdditional)
 	rm -rf $(OBJS) $(TARGET)
-cleanX86:
-	$(MAKE) ARCH=x86_64 clean
-cleanAARCH64:
-	$(MAKE) ARCH=aarch64 clean
+cleanAdditional:
+	$(MAKE) ARCH=$(ADDITIONAL_ARCH) clean
