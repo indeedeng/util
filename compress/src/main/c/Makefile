@@ -6,7 +6,9 @@ all: build
 
 OS := $(shell uname -s | tr A-Z a-z)
 ARCH ?= $(shell uname -m)
-CC := gcc
+REALARCH := $(shell uname -m)
+
+CC ?= gcc
 
 #CFLAGS += -g -fPIC -O3 -Wall
 CFLAGS += -fPIC -O3 -std=c99
@@ -23,16 +25,23 @@ ifeq ($(OS), darwin)
 	LD_FLAGS += -dynamiclib -arch arm64 -arch x86_64 -Wl,-rpath,/opt/homebrew/lib
 	DEST_DIR := "../resources/native/Mac OS X"
 else
-	ifneq ($(ARCH), x86_64)
-		CFLAGS += -m32
-		LD_FLAGS += -m32
-		DEST_DIR := "../resources/native/Linux-i386"
-	else
-		DEST_DIR := "../resources/native/Linux-amd64"
-	endif
+	ifeq ($(ARCH), x86_64)
+                DEST_DIR := "../resources/native/Linux-amd64/"
+        else
+                DEST_DIR := "../resources/native/Linux-$(ARCH)/"
+        endif
 	LIBTYPE := so
 	LD_FLAGS += -shared
-	#LD_FLAGS += -shared -Wl,-soname,$(LIBSONAME)
+
+	ifeq ($(ARCH),$(REALARCH))
+            ifeq ($(ARCH),x86_64)
+                ADDITIONAL_ARCH := aarch64
+                ADDITIONAL_CC := aarch64-linux-gnu-gcc
+            else
+                ADDITIONAL_ARCH := x86_64
+                ADDITIONAL_CC := x86_64-linux-gnu-gcc
+            endif
+	endif
 endif
 
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
@@ -56,22 +65,20 @@ OBJS = \
 $(LIBNAME): $(OBJS)
 	$(CC) $(LD_FLAGS) -o $@ $(OBJS)
 
-build: $(LIBNAME) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,build32))
-
-build32:
-	$(MAKE) ARCH=i386 build
+buildAdditional:
+	$(MAKE) CC=$(ADDITIONAL_CC) ARCH=$(ADDITIONAL_ARCH)
+build: $(LIBNAME) $(if $(ADDITIONAL_ARCH),buildAdditional)
 
 $(DEST_DIR):
 	mkdir -p $(DEST_DIR)
 
-install: build $(DEST_DIR) $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,install32))
+install: build $(DEST_DIR) $(if $(ADDITIONAL_ARCH),installAdditional)
 	cp $(LIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(LIBNAME))
 
-install32:
-	$(MAKE) ARCH=i386 install
+installAdditional: 
+	$(MAKE) ARCH=$(ADDITIONAL_ARCH) install
 
-clean: $(if $(OS:linux=),,$(if $(ARCH:x86_64=),,clean32))
+clean: $(if $(ADDITIONAL_ARCH),cleanAdditional)
 	rm -rf $(OBJS) $(TARGET)
-
-clean32:
-	$(MAKE) ARCH=i386 clean
+cleanAdditional:
+	$(MAKE) ARCH=$(ADDITIONAL_ARCH) clean
