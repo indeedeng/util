@@ -26,6 +26,30 @@ int get_c_flags(int flags) {
 }
 
 /*
+ * Class:     com_indeed_squall_mmap_MMapBuffer
+ * Method:    extractFd
+ * Signature: (J)I
+ * See: https://www.kfu.com/~nsayer/Java/jni-filedesc.html
+ */
+JNIEXPORT jint JNICALL Java_com_indeed_util_mmap_MMapBuffer_extractFd(JNIEnv* env, jclass class, jobject fileDesciptor) {
+    jfieldID field_fd;
+    jclass class_fdesc;
+
+    // FindClass and GetFieldID will throw the appropriate exceptions so the return values here are irrelevant.
+    class_fdesc = (*env)->FindClass(env, "java/io/FileDescriptor");
+    if (class_fdesc == NULL) {
+        return -1;
+    }
+
+    field_fd = (*env)->GetFieldID(env, class_fdesc, "fd", "I");
+    if (field_fd == NULL) {
+        return -1;
+    }
+
+    return (*env)->GetIntField(env, fileDesciptor, field_fd);
+}
+
+/*
  * Class:     com_indeed_util_mmap_MMapBuffer
  * Method:    mmap
  * Signature: (JIIJ)J

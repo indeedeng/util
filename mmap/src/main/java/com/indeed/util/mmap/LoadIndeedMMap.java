@@ -12,6 +12,7 @@ import java.io.OutputStream;
 
 /** @author jplaisance */
 public final class LoadIndeedMMap {
+    private static final String VERSION = "1.0.3";
     private static final Logger log = LoggerFactory.getLogger(LoadIndeedMMap.class);
 
     private static boolean loaded = false;
@@ -24,20 +25,28 @@ public final class LoadIndeedMMap {
                 final String extension = getLibraryType(osName);
                 final String resourcePath =
                         "Mac OS X".equals(osName)
-                                ? "/native/" + osName + "/libindeedmmap." + extension + ".1.0.1"
+                                ? "/native/"
+                                        + osName
+                                        + "/libindeedmmap."
+                                        + extension
+                                        + "."
+                                        + VERSION
                                 : "/native/"
                                         + osName
                                         + "-"
                                         + arch
                                         + "/libindeedmmap."
                                         + extension
-                                        + ".1.0.1";
+                                        + "."
+                                        + VERSION;
                 final InputStream is = MMapBuffer.class.getResourceAsStream(resourcePath);
                 if (is == null) {
                     throw new FileNotFoundException(
                             "unable to find libindeedmmap."
                                     + extension
-                                    + ".1.0.1 at resource path "
+                                    + "."
+                                    + VERSION
+                                    + " at resource path "
                                     + resourcePath);
                 }
                 final File tempFile = File.createTempFile("libindeedmmap", "." + extension);

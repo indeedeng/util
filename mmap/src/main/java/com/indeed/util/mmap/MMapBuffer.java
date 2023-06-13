@@ -9,7 +9,6 @@ import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -20,7 +19,6 @@ import java.util.Map;
 /** @author jplaisance */
 public final class MMapBuffer implements BufferResource {
 
-    private static final Field FD_FIELD;
     public static final int PAGE_SIZE = 4096;
 
     private static final int READ_ONLY = 0;
@@ -34,12 +32,6 @@ public final class MMapBuffer implements BufferResource {
 
     static {
         LoadIndeedMMap.loadLibrary();
-        try {
-            FD_FIELD = FileDescriptor.class.getDeclaredField("fd");
-            FD_FIELD.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @VisibleForTesting static Tracker openBuffersTracker;
@@ -164,11 +156,7 @@ public final class MMapBuffer implements BufferResource {
                     }
                 }
                 final int fd;
-                try {
-                    fd = FD_FIELD.getInt(raf.getFD());
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
+                fd = extractFd(raf.getFD());
                 address = mmap(length, prot, MAP_SHARED, fd, offset);
                 if (address == MAP_FAILED) {
                     final int errno = errno();
@@ -197,6 +185,8 @@ public final class MMapBuffer implements BufferResource {
             openBuffersTracker.mmapBufferOpened(this);
         }
     }
+
+    static native int extractFd(FileDescriptor fileDescritor);
 
     static native long mmap(long length, int prot, int flags, int fd, long offset);
 

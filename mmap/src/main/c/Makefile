@@ -15,7 +15,7 @@ CFLAGS += -g -fPIC -O3 -Wall
 # These rely on lazy evaluation of each variable since LIBTYPE is not set until later.
 LIBNAME = libindeedmmap-$(ARCH).$(LIBTYPE)
 LIBSONAME = $(LIBNAME).1
-REALLIBNAME = $(LIBSONAME).0.1
+REALLIBNAME = $(LIBSONAME).0.3
 
 TARGET = $(REALLIBNAME)
 
@@ -70,6 +70,7 @@ buildAdditional:
 	$(MAKE) CC=$(ADDITIONAL_CC) ARCH=$(ADDITIONAL_ARCH)
 
 install: build $(if $(ADDITIONAL_ARCH),installAdditional)
+	mkdir -p $(DEST_DIR)
 	cp $(REALLIBNAME) $(DEST_DIR)/$(subst -$(ARCH),,$(REALLIBNAME))
 
 installAdditional:
