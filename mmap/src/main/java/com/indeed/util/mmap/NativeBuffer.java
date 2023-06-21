@@ -7,18 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.Closeable;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Field;
 import java.nio.ByteOrder;
 
 /** @author jplaisance */
 public final class NativeBuffer implements BufferResource {
     private static final Logger log = LoggerFactory.getLogger(NativeBuffer.class);
-
-    private static final Field FD_FIELD;
 
     private static final long MMAP_THRESHOLD;
 
@@ -41,12 +37,6 @@ public final class NativeBuffer implements BufferResource {
             }
         }
         MMAP_THRESHOLD = mmapThreshold;
-        try {
-            FD_FIELD = FileDescriptor.class.getDeclaredField("fd");
-            FD_FIELD.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            throw new RuntimeException(e);
-        }
 
         OS_TYPE_IS_MAC = System.getProperty("os.name").toLowerCase().indexOf("mac") >= 0;
     }
@@ -82,7 +72,7 @@ public final class NativeBuffer implements BufferResource {
                                     length,
                                     MMapBuffer.READ_WRITE,
                                     MMapBuffer.MAP_PRIVATE,
-                                    FD_FIELD.getInt(raf.getFD()),
+                                    MMapBuffer.extractFd(raf.getFD()),
                                     0);
                     if (address == MMapBuffer.MAP_FAILED) {
                         throw new RuntimeException(
@@ -90,8 +80,6 @@ public final class NativeBuffer implements BufferResource {
                     }
                     memory = new DirectMemory(address, length, order);
                 } catch (IOException e) {
-                    throw Throwables.propagate(e);
-                } catch (IllegalAccessException e) {
                     throw Throwables.propagate(e);
                 } finally {
                     closeQuietly(raf);
