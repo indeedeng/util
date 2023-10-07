@@ -216,31 +216,33 @@ public final class MMapBuffer implements BufferResource {
     }
 
     /**
-     * Give advice about use of memory using just the POSIX-supported advice. Advice helps your usage
-     * have a smaller impact on the overall operating system. For example, SEQUENTIAL advice means
-     * the OS should (if supported) schedule prefetches of pages ahead of where you are reading/writing so that
-     * as you reach those pages they are likely to already be in memory (causing fewer context
-     * switches and interrupts, and possibly reading much larger chunks at a time) AND it tries to
-     * mark the pages you've touched for immediate collection back to the OS free list (or if you wrote
-     * to them possibly schedule I/O to move them towards the free list ASAP).
+     * Give advice about use of memory using just the POSIX-supported advice. Advice helps your
+     * usage have a smaller impact on the overall operating system. For example, SEQUENTIAL advice
+     * means the OS should (if supported) schedule prefetches of pages ahead of where you are
+     * reading/writing so that as you reach those pages they are likely to already be in memory
+     * (causing fewer context switches and interrupts, and possibly reading much larger chunks at a
+     * time) AND it tries to mark the pages you've touched for immediate collection back to the OS
+     * free list (or if you wrote to them possibly schedule I/O to move them towards the free list
+     * ASAP).
      *
-     * Normally filesystem cache uses a least-recently-used algorithm, but if you are reading a file
-     * sequentially (and don't plan to jump back), the SEQUENTIAL advice tells it that other data that is
-     * already in the file cache is likely more important.
+     * <p>Normally filesystem cache uses a least-recently-used algorithm, but if you are reading a
+     * file sequentially (and don't plan to jump back), the SEQUENTIAL advice tells it that other
+     * data that is already in the file cache is likely more important.
      *
-     * So, say you were sequentially reading and processing a 16GB file on an 8GB RAM machine
+     * <p>So, say you were sequentially reading and processing a 16GB file on an 8GB RAM machine
      * (adding up numbers or something). If you didn't use this advice, then you would essentially
-     * "flush" all the other useful information
-     * from the virtual memory system that hadn't been touched recently (possibly including code!)
-     * increasing the possibility of page misses on data that should have been kept around. With the sequential
-     * advice you end up with a MUCH smaller impact on the rest of the system.
+     * "flush" all the other useful information from the virtual memory system that hadn't been
+     * touched recently (possibly including code!) increasing the possibility of page misses on data
+     * that should have been kept around. With the sequential advice you end up with a MUCH smaller
+     * impact on the rest of the system.
      *
-     * Two other bits of advice you can give (will need and don't need) are just what you'd expect,
-     * though WILL_NEED may actually do I/O on your thread to get the pages into memory. The DONTNEED
-     * advice is like the SEQUENTIAL advice in that it tries to mark the pages as reclaimable to reduce
-     * virtual memory pressure on the OS itself.
+     * <p>Two other bits of advice you can give (will need and don't need) are just what you'd
+     * expect, though WILL_NEED may actually do I/O on your thread to get the pages into memory. The
+     * DONTNEED advice is like the SEQUENTIAL advice in that it tries to mark the pages as
+     * reclaimable to reduce virtual memory pressure on the OS itself.
      *
-     * See POSIX documentation on madvise for more information. The system defaults to MADV_NORMAL.
+     * <p>See POSIX documentation on madvise for more information. The system defaults to
+     * MADV_NORMAL.
      *
      * @param position The position from which you plan to work.
      * @param length The length of the region you plan to work on.
