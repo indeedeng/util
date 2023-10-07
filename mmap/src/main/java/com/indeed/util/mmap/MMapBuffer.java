@@ -30,6 +30,12 @@ public final class MMapBuffer implements BufferResource {
     static final int MAP_PRIVATE = 2;
     static final int MAP_ANONYMOUS = 4;
 
+    static final int MADV_NORMAL = 0;
+    static final int MADV_RANDOM = 1;
+    static final int MADV_SEQUENTIAL = 2;
+    static final int MADV_WILLNEED = 3;
+    static final int MADV_DONTNEED = 4;
+
     static {
         LoadIndeedMMap.loadLibrary();
     }
@@ -198,16 +204,54 @@ public final class MMapBuffer implements BufferResource {
 
     private static native int madvise(long address, long length);
 
+    private static native int posix_madvise(long address, long length, int advice);
+
     private static native int madviseDontNeed(long address, long length);
 
     static native int errno();
 
     // this is not particularly useful, the syscall takes forever
     public void advise(long position, long length) throws IOException {
+        posixAdvise(position, length, MADV_WILLNEED);
+    }
+
+    /**
+     * Give advice about use of memory using just the POSIX-supported advice. Advice helps your usage
+     * have a smaller impact on the overall operating system. For example, SEQUENTIAL advice means
+     * the OS should (if supported) schedule prefetches of pages ahead of where you are reading/writing so that
+     * as you reach those pages they are likely to already be in memory (causing fewer context
+     * switches and interrupts, and possibly reading much larger chunks at a time) AND it tries to
+     * mark the pages you've touched for immediate collection back to the OS free list (or if you wrote
+     * to them possibly schedule I/O to move them towards the free list ASAP).
+     *
+     * Normally filesystem cache uses a least-recently-used algorithm, but if you are reading a file
+     * sequentially (and don't plan to jump back), the SEQUENTIAL advice tells it that other data that is
+     * already in the file cache is likely more important.
+     *
+     * So, say you were sequentially reading and processing a 16GB file on an 8GB RAM machine
+     * (adding up numbers or something). If you didn't use this advice, then you would essentially
+     * "flush" all the other useful information
+     * from the virtual memory system that hadn't been touched recently (possibly including code!)
+     * increasing the possibility of page misses on data that should have been kept around. With the sequential
+     * advice you end up with a MUCH smaller impact on the rest of the system.
+     *
+     * Two other bits of advice you can give (will need and don't need) are just what you'd expect,
+     * though WILL_NEED may actually do I/O on your thread to get the pages into memory. The DONTNEED
+     * advice is like the SEQUENTIAL advice in that it tries to mark the pages as reclaimable to reduce
+     * virtual memory pressure on the OS itself.
+     *
+     * See POSIX documentation on madvise for more information. The system defaults to MADV_NORMAL.
+     *
+     * @param position The position from which you plan to work.
+     * @param length The length of the region you plan to work on.
+     * @param advice one of MADV_NORMAL, MADV_RANDOM, MADV_SEQUENTIAL, MADV_WILLNEED, MADV_DONTNEED
+     * @throws IOException
+     */
+    public void posixAdvise(long position, long length, int advice) throws IOException {
         final long ap = address + position;
         final long a = (ap) / PAGE_SIZE * PAGE_SIZE;
         final long l = Math.min(length + (ap - a), address + memory.length() - ap);
-        final int err = madvise(a, l);
+        final int err = posix_madvise(a, l, advice);
         if (err != 0) {
             throw new IOException("madvise failed with error code: " + err);
         }
