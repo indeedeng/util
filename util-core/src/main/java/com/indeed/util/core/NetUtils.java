@@ -2,11 +2,11 @@ package com.indeed.util.core;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -33,7 +33,7 @@ public class NetUtils {
      * @return hostname
      * @throws java.net.UnknownHostException unable to lookup a host name correctly
      */
-    @Nonnull
+    @NonNull
     public static String determineHostName() throws UnknownHostException {
         if (!OPT_HOSTNAME.isPresent()) {
             final String hostName = InetAddress.getLocalHost().getHostName();
@@ -58,8 +58,8 @@ public class NetUtils {
      * @param defaultValue The default hostname to use in the event one is not preset.
      * @return The detected hostname if present, or the default value.
      */
-    @Nonnull
-    public static String determineHostName(@Nonnull final String defaultValue) {
+    @NonNull
+    public static String determineHostName(@NonNull final String defaultValue) {
         checkNotNull(defaultValue, "Unable to use default value of null for hostname");
         if (!OPT_HOSTNAME.isPresent()) {
             try {

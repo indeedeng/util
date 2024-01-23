@@ -4,13 +4,11 @@ package com.indeed.util.io;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.indeed.util.core.io.Closeables2;
+import com.indeed.util.core.nullsafety.ParametersAreNonnullByDefault;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.concurrent.NotThreadSafe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -93,7 +91,6 @@ public final class SafeFiles {
      * @return number of NormalFiles fsynced (not including directories).
      * @throws IOException in the event that we could not fsync the provided directory.
      */
-    @Nonnegative
     public static int fsyncRecursive(final Path root) throws IOException {
         final FsyncingSimpleFileVisitor visitor = new FsyncingSimpleFileVisitor();
         Files.walkFileTree(root, visitor);
@@ -101,9 +98,8 @@ public final class SafeFiles {
     }
 
     private static class FsyncingSimpleFileVisitor extends SimpleFileVisitor<Path> {
-        @Nonnegative private int fileCount = 0;
+        private int fileCount = 0;
 
-        @Nonnegative
         public int getFileCount() {
             return fileCount;
         }
@@ -214,7 +210,7 @@ public final class SafeFiles {
      * @return handle to opened temp file
      * @throws IOException in the event that the file could not be created.
      */
-    @Nonnull
+    @NonNull
     public static SafeOutputStream createAtomicFile(final Path path) throws IOException {
         final Path dir = path.getParent();
         final Path name = path.getFileName();
@@ -264,15 +260,17 @@ public final class SafeFiles {
         }
     }
 
-    /** @see SafeFiles#createAtomicFile(Path) */
+    /**
+     * @see SafeFiles#createAtomicFile(Path)
+     *     <p>NotThreadSafe
+     */
     @ParametersAreNonnullByDefault
-    @NotThreadSafe
     private static class SafeFileOutputStream extends SafeOutputStream {
-        @Nonnull private final Path path;
-        @Nonnull private final Path tempFile;
+        @NonNull private final Path path;
+        @NonNull private final Path tempFile;
 
-        @Nonnull private final OutputStream out; // do not close this
-        @Nonnull private final FileChannel fileChannel; // only close this
+        @NonNull private final OutputStream out; // do not close this
+        @NonNull private final FileChannel fileChannel; // only close this
 
         private boolean closed = false;
 

@@ -1,6 +1,7 @@
 package com.indeed.util.core;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Arrays;
 
 /**

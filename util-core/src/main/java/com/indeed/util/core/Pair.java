@@ -1,9 +1,9 @@
 package com.indeed.util.core;
 
 import com.google.common.base.Function;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Comparator;
 
@@ -82,10 +82,10 @@ public class Pair<A, B> implements Serializable {
      * @return a Function that returns null or the first value of the Pair, which also may be null
      * @deprecated use {@link #fst()}.
      */
-    @Nonnull
+    @NonNull
     @Deprecated
     public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T1> fst(
-            @Nonnull final Class<T1> clazz) {
+            @NonNull final Class<T1> clazz) {
         return new First<>();
     }
 
@@ -108,7 +108,7 @@ public class Pair<A, B> implements Serializable {
      * @param <T> The expected data type of {@link Pair#a}
      * @return a Function that returns null or the first value of the Pair, which also may be null
      */
-    @Nonnull
+    @NonNull
     public static <T> Function<Pair<? extends T, ?>, ? extends T> fst() {
         return new Function<Pair<? extends T, ?>, T>() {
             @Nullable
@@ -131,10 +131,10 @@ public class Pair<A, B> implements Serializable {
      * @param <T2> Expected data type for {@link Pair#b}
      * @return A function that returns null or the second value of the Pair, which also may be null
      */
-    @Nonnull
+    @NonNull
     @Deprecated
     public static <T1, T2> Function<Pair<? extends T1, ? extends T2>, ? extends T2> snd(
-            @Nonnull final Class<T2> clazz) {
+            @NonNull final Class<T2> clazz) {
         return new Second<>();
     }
 
@@ -157,7 +157,7 @@ public class Pair<A, B> implements Serializable {
      * @param <T> The expected data type for {@link Pair#b}.
      * @return a Function that returns null or the second value of the Pair, which also may be null
      */
-    @Nonnull
+    @NonNull
     public static <T> Function<Pair<?, ? extends T>, ? extends T> snd() {
         return new Function<Pair<?, ? extends T>, T>() {
             @Nullable

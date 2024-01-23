@@ -4,8 +4,8 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.indeed.util.io.BufferedFileDataOutputStream;
 import com.indeed.util.serialization.Stringifier;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -23,17 +23,17 @@ public class FileBasedCheckpointer<T> implements Checkpointer<T> {
     private volatile T value;
 
     public FileBasedCheckpointer(
-            @Nonnull final File checkpointFile,
-            @Nonnull Stringifier<T> stringifier,
-            @Nonnull T defaultValue)
+            @NonNull final File checkpointFile,
+            @NonNull Stringifier<T> stringifier,
+            @NonNull T defaultValue)
             throws IOException {
         this(checkpointFile.toPath(), stringifier, defaultValue);
     }
 
     public FileBasedCheckpointer(
-            @Nonnull final Path checkpointFilePath,
-            @Nonnull Stringifier<T> stringifier,
-            @Nonnull T defaultValue)
+            @NonNull final Path checkpointFilePath,
+            @NonNull Stringifier<T> stringifier,
+            @NonNull T defaultValue)
             throws IOException {
         this.checkpointFilePath =
                 Preconditions.checkNotNull(checkpointFilePath, "no checkpoint file");

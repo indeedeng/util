@@ -1,6 +1,7 @@
 package com.indeed.util.core;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -79,8 +80,8 @@ public class TreeTimer {
      * Left-pads a String with spaces so it is length <code>n</code>. If the String is already at
      * least length n, no padding is done.
      */
-    @Nonnull
-    private static String leftpad(@Nonnull String s, int n) {
+    @NonNull
+    private static String leftpad(@NonNull String s, int n) {
         return leftpad(s, n, ' ');
     }
 
@@ -88,8 +89,8 @@ public class TreeTimer {
      * Left-pads a String with the specific padChar so it is length <code>n</code>. If the String is
      * already at least length n, no padding is done.
      */
-    @Nonnull
-    private static String leftpad(@Nonnull String s, int n, char padChar) {
+    @NonNull
+    private static String leftpad(@NonNull String s, int n, char padChar) {
         int diff = n - s.length();
         if (diff <= 0) {
             return s;

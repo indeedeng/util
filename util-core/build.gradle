@@ -5,14 +5,12 @@ dependencies {
     implementation project(':varexport')
     implementation libs.guava
     implementation libs.slf4jApi
+    api libs.checkerQual
 
     // This is a fake copy of the log4j1 Logger, which allows us to continue
     // accepting it in our deprecated method signatures without accidentially using
     // any of its functionality.
     compileOnly project(':log4j1dummyshim')
-
-    compileOnly libs.jsr305
-    testCompileOnly libs.jsr305
 
     testImplementation libs.junit
 }

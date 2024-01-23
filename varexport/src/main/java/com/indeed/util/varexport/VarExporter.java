@@ -13,11 +13,11 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.PrintWriter;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.AnnotatedElement;
@@ -109,7 +109,7 @@ public class VarExporter implements VariableHost {
      *     namespace does not exist
      */
     public static synchronized Optional<VarExporter> forNamespaceIfExists(
-            @Nonnull final String namespace) {
+            @NonNull final String namespace) {
         return Optional.ofNullable(namespaces.get(namespace));
     }
 
@@ -122,7 +122,7 @@ public class VarExporter implements VariableHost {
      * @return exporter for the given class will be created if never before accessed.
      */
     public static synchronized VarExporter forNamespace(
-            @Nonnull final Class<?> clazz, final boolean declaredFieldsOnly) {
+            @NonNull final Class<?> clazz, final boolean declaredFieldsOnly) {
         return getInstance(clazz.getSimpleName(), clazz, declaredFieldsOnly);
     }
 
