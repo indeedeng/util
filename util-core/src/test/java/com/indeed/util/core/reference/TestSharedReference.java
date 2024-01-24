@@ -1,8 +1,8 @@
 package com.indeed.util.core.reference;
 
 import junit.framework.TestCase;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.io.IOException;
 

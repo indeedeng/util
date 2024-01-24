@@ -9,13 +9,13 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Annotation for types or packages which assumes all member variables are @Nonnull unless indicated
- * otherwise with {@link org.checkerframework.checker.nullness.qual.Nullable}
- *
- * @deprecated Use {@link NonnullByDefault}
+ * Annotation for types or packages which assumes all parameters, member variables, and return
+ * values are @Nonnull unless indicated otherwise with {@link
+ * org.checkerframework.checker.nullness.qual.Nullable}
  */
-@Deprecated
 @Documented
-@DefaultQualifier(value = NonNull.class, locations = TypeUseLocation.FIELD)
+@DefaultQualifier(
+        value = NonNull.class,
+        locations = {TypeUseLocation.FIELD, TypeUseLocation.RETURN, TypeUseLocation.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface FieldsAreNonnullByDefault {}
+public @interface NonnullByDefault {}

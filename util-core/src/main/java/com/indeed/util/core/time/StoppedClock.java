@@ -1,6 +1,7 @@
 package com.indeed.util.core.time;
 
-import javax.annotation.Nonnull;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.concurrent.TimeUnit;
@@ -14,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 @Deprecated
 public final class StoppedClock implements WallClock {
-    @Nonnull private final AtomicLong millis;
+    @NonNull private final AtomicLong millis;
 
     /** Creates a new stopped clock frozen at the current moment in time. */
     public StoppedClock() {
@@ -47,7 +48,7 @@ public final class StoppedClock implements WallClock {
      * @param timeUnit The time unit that {@code value} is measured in.
      * @return The time after being adjusted by the provided offset.
      */
-    public final long plus(final long value, @Nonnull final TimeUnit timeUnit) {
+    public final long plus(final long value, @NonNull final TimeUnit timeUnit) {
         return this.millis.addAndGet(timeUnit.toMillis(value));
     }
 

@@ -5,7 +5,7 @@ dependencies {
     implementation libs.guava
     implementation libs.slf4jApi
 
-    compileOnly libs.jsr305
+    api libs.checkerQual
     compileOnly libs.servletApi
 
     testImplementation libs.junit

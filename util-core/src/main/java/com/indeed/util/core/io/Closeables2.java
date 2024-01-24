@@ -1,11 +1,11 @@
 package com.indeed.util.core.io;
 
 import com.google.common.base.Throwables;
+import org.checkerframework.checker.nullness.qual.NonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.Closeable;
 import java.util.Arrays;
 
@@ -36,7 +36,7 @@ public class Closeables2 {
     /** @deprecated Use {@link #close(java.io.Closeable)} */
     @Deprecated
     public static void closeQuietly(
-            @Nullable final Closeable closeable, @Nonnull final org.apache.log4j.Logger log) {
+            @Nullable final Closeable closeable, final org.apache.log4j.@NonNull Logger log) {
         close(closeable);
     }
 
@@ -46,7 +46,7 @@ public class Closeables2 {
      *
      * @param closeables The closeables that we want to close.
      */
-    public static void close(@Nonnull final Iterable<? extends Closeable> closeables) {
+    public static void close(@NonNull final Iterable<? extends Closeable> closeables) {
         Throwable throwable = null;
         for (Closeable closeable : closeables) {
             try {
@@ -67,8 +67,8 @@ public class Closeables2 {
     /** @deprecated Use {@link #close(java.lang.Iterable)} */
     @Deprecated
     public static void closeAll(
-            @Nonnull final Iterable<? extends Closeable> closeables,
-            @Nonnull final org.apache.log4j.Logger log) {
+            @NonNull final Iterable<? extends Closeable> closeables,
+            final org.apache.log4j.@NonNull Logger log) {
         close(closeables);
     }
 
@@ -78,22 +78,22 @@ public class Closeables2 {
      *
      * @param closeables The closeables that we want to close.
      */
-    public static void close(@Nonnull final Closeable... closeables) {
+    public static void close(@NonNull final Closeable... closeables) {
         close(Arrays.asList(closeables));
     }
 
     /** @deprecated Use {@link #close(java.io.Closeable...)} */
     @Deprecated
     public static void closeAll(
-            @Nonnull final org.apache.log4j.Logger log, @Nonnull final Closeable... closeables) {
+            final org.apache.log4j.@NonNull Logger log, @NonNull final Closeable... closeables) {
         close(closeables);
     }
 
     /** @deprecated Use {@link #close(java.io.Closeable...)} */
     @Deprecated
     public static void closeAll(
-            @Nonnull final org.apache.log4j.Logger log,
-            @Nonnull final Iterable<? extends Closeable> closeables) {
+            final org.apache.log4j.@NonNull Logger log,
+            @NonNull final Iterable<? extends Closeable> closeables) {
         close(closeables);
     }
 
@@ -111,7 +111,7 @@ public class Closeables2 {
      */
     @Deprecated
     public static <C extends Closeable> Closeable forIterable(
-            @Nonnull final org.apache.log4j.Logger log, @Nonnull final Iterable<C> closeables) {
+            final org.apache.log4j.@NonNull Logger log, @NonNull final Iterable<C> closeables) {
         return () -> close(closeables);
     }
 
@@ -128,7 +128,7 @@ public class Closeables2 {
      */
     @Deprecated
     public static Closeable forArray(
-            @Nonnull final org.apache.log4j.Logger log, @Nonnull final Closeable... closeables) {
+            final org.apache.log4j.@NonNull Logger log, @NonNull final Closeable... closeables) {
         return () -> close(closeables);
     }
 }

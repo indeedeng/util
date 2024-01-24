@@ -2,8 +2,8 @@ package com.indeed.util.core.sort;
 
 import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Ints;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnull;
 import java.util.Random;
 
 /** @author ahudson */
@@ -51,7 +51,7 @@ public class Quicksortables {
     }
 
     public static Quicksortable getQuicksortableParallelArrays(
-            @Nonnull final long[] array1, @Nonnull final int[] array2) {
+            final long @NonNull [] array1, final int @NonNull [] array2) {
         return new Quicksortable() {
             public void swap(int i, int j) {
                 Quicksortables.swap(array1, i, j);

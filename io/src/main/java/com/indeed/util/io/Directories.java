@@ -2,9 +2,8 @@
 package com.indeed.util.io;
 
 import com.google.common.collect.Iterables;
+import org.checkerframework.checker.nullness.qual.NonNull;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.DirectoryStream;
@@ -26,8 +25,7 @@ public final class Directories {
      * @return number of inodes under it.
      * @throws IOException
      */
-    @Nonnegative
-    public static int count(@Nonnull final Path dir) throws IOException {
+    public static int count(@NonNull final Path dir) throws IOException {
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             return Iterables.size(stream);
         } catch (DirectoryIteratorException ex) {
@@ -48,8 +46,8 @@ public final class Directories {
      * @return all files in that directory
      * @throws IOException
      */
-    @Nonnull
-    public static List<Path> list(@Nonnull final Path dir) throws IOException {
+    @NonNull
+    public static List<Path> list(@NonNull final Path dir) throws IOException {
         final List<Path> contents = new ArrayList<>();
         try (final DirectoryStream<Path> stream = Files.newDirectoryStream(dir)) {
             for (final Path entry : stream) {

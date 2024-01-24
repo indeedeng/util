@@ -1,6 +1,7 @@
 package com.indeed.util.core.threads;
 
-import javax.annotation.Nullable;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.io.Serializable;
 import java.util.Arrays;
 

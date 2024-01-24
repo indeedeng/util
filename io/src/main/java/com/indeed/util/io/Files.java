@@ -5,10 +5,10 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Supplier;
 import com.google.common.hash.Hashing;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
@@ -67,7 +67,7 @@ public class Files {
      *     be written, flushed, synced, or closed
      */
     public static void writeObjectToFileOrDie2(
-            @Nonnull final Object obj, @Nonnull final String file) throws IOException {
+            @NonNull final Object obj, @NonNull final String file) throws IOException {
         Preconditions.checkNotNull(file, "file argument is required!");
         Preconditions.checkArgument(!file.isEmpty(), "file argument is required!");
 
@@ -106,18 +106,18 @@ public class Files {
     /** @deprecated Use {@link #writeObjectToFileOrDie2(java.lang.Object, java.lang.String)} */
     @Deprecated
     public static void writeObjectToFileOrDie(
-            @Nonnull final Object obj,
-            @Nonnull final String file,
-            @Nonnull final org.apache.log4j.Logger log)
+            @NonNull final Object obj,
+            @NonNull final String file,
+            final org.apache.log4j.@NonNull Logger log)
             throws IOException {
         writeObjectToFileOrDie2(obj, file);
     }
 
     private static class ObjectOutputStreamCallback implements OutputStreamCallback {
         private long checksumForWrittenData = 0L;
-        @Nonnull private final Object obj;
+        @NonNull private final Object obj;
 
-        private ObjectOutputStreamCallback(@Nonnull Object obj) {
+        private ObjectOutputStreamCallback(@NonNull Object obj) {
             this.obj = obj;
         }
 
@@ -126,7 +126,7 @@ public class Files {
         }
 
         @Override
-        public void writeAndFlushData(@Nonnull OutputStream outputStream) throws IOException {
+        public void writeAndFlushData(@NonNull OutputStream outputStream) throws IOException {
             final ChecksummingOutputStream checksummingOutputStream =
                     new ChecksummingOutputStream(new BufferedOutputStream(outputStream));
             final ObjectOutputStream out = new ObjectOutputStream(checksummingOutputStream);
@@ -141,7 +141,7 @@ public class Files {
     }
 
     private static class ChecksummingOutputStream extends FilterOutputStream {
-        @Nonnull private final Checksum checksummer;
+        @NonNull private final Checksum checksummer;
 
         private ChecksummingOutputStream(OutputStream out) {
             super(out);
@@ -177,13 +177,13 @@ public class Files {
     }
 
     private static interface OutputStreamCallback {
-        void writeAndFlushData(@Nonnull final OutputStream outputStream) throws IOException;
+        void writeAndFlushData(@NonNull final OutputStream outputStream) throws IOException;
     }
 
     // return a reference to a temp file that contains the written + flushed + fsynced + closed data
-    @Nonnull
+    @NonNull
     private static File writeDataToTempFileOrDie2(
-            @Nonnull final OutputStreamCallback callback, @Nonnull final File targetFile)
+            @NonNull final OutputStreamCallback callback, @NonNull final File targetFile)
             throws IOException {
         Preconditions.checkNotNull(callback, "callback argument is required!");
         Preconditions.checkNotNull(targetFile, "targetFile argument is required!");
@@ -229,18 +229,18 @@ public class Files {
      *     java.io.File)}
      */
     @Deprecated
-    @Nonnull
+    @NonNull
     private static File writeDataToTempFileOrDie(
-            @Nonnull final OutputStreamCallback callback,
-            @Nonnull final File targetFile,
-            @Nonnull final org.apache.log4j.Logger log)
+            @NonNull final OutputStreamCallback callback,
+            @NonNull final File targetFile,
+            final org.apache.log4j.@NonNull Logger log)
             throws IOException {
         return writeDataToTempFileOrDie2(callback, targetFile);
     }
 
-    @Nonnull
+    @NonNull
     private static File writeTextToTempFileOrDie2(
-            @Nonnull final String[] text, @Nonnull final File targetFile) throws IOException {
+            @NonNull final String[] text, @NonNull final File targetFile) throws IOException {
         Preconditions.checkNotNull(text, "callback argument is required!");
         Preconditions.checkNotNull(targetFile, "targetFile argument is required!");
 
@@ -275,11 +275,11 @@ public class Files {
 
     /** @deprecated Use {@link #writeTextToTempFileOrDie2(java.lang.String[], java.io.File)} */
     @Deprecated
-    @Nonnull
+    @NonNull
     private static File writeTextToTempFileOrDie(
-            @Nonnull final String[] text,
-            @Nonnull final File targetFile,
-            @Nonnull final org.apache.log4j.Logger log)
+            @NonNull final String[] text,
+            @NonNull final File targetFile,
+            final org.apache.log4j.@NonNull Logger log)
             throws IOException {
         return writeTextToTempFileOrDie2(text, targetFile);
     }
@@ -297,7 +297,7 @@ public class Files {
      *     synced, or closed
      */
     public static boolean writeObjectIfChangedOrDie2(
-            @Nonnull final Object obj, @Nonnull final String file) throws IOException {
+            @NonNull final Object obj, @NonNull final String file) throws IOException {
         Preconditions.checkNotNull(file, "file argument is required!");
         Preconditions.checkArgument(!file.isEmpty(), "file argument is required!");
 
@@ -364,15 +364,15 @@ public class Files {
     /** @deprecated Use {@link #writeObjectIfChangedOrDie2(java.lang.Object, java.lang.String)} */
     @Deprecated
     public static boolean writeObjectIfChangedOrDie(
-            @Nonnull final Object obj,
-            @Nonnull final String file,
-            @Nonnull final org.apache.log4j.Logger log)
+            @NonNull final Object obj,
+            @NonNull final String file,
+            final org.apache.log4j.@NonNull Logger log)
             throws IOException {
         return writeObjectIfChangedOrDie2(obj, file);
     }
 
     public static long computeFileChecksum(
-            @Nonnull final File file, @Nonnull final Checksum checksum) throws IOException {
+            @NonNull final File file, @NonNull final Checksum checksum) throws IOException {
         return com.google.common.io.Files.asByteSource(file).hash(Hashing.crc32()).padToLong();
     }
 
@@ -694,7 +694,7 @@ public class Files {
     }
 
     public static void writeToTextFileOrDie(
-            @Nonnull final String[] lines, @Nonnull final String file) throws IOException {
+            @NonNull final String[] lines, @NonNull final String file) throws IOException {
         // Write out a temp file (or die)
         final File f = new File(file);
         final File temp = writeTextToTempFileOrDie2(lines, f);
@@ -778,7 +778,7 @@ public class Files {
      * @return true if all deletions were successful, false if file did not exist
      * @throws IOException if deletion fails and the file still exists at the end
      */
-    public static boolean deleteOrDie(@Nonnull final String file) throws IOException {
+    public static boolean deleteOrDie(@NonNull final String file) throws IOException {
         // this returns true if the file was actually deleted
         // and false for 2 cases:
         //   1. file did not exist to start with
@@ -893,8 +893,8 @@ public class Files {
      * Converts a byte array to a hex string. The String returned will be of length exactly {@code
      * bytes.length * 2}.
      */
-    @Nonnull
-    public static String toHex(@Nonnull final byte[] bytes) {
+    @NonNull
+    public static String toHex(@NonNull final byte[] bytes) {
         StringBuilder buf = new StringBuilder(bytes.length * 2);
         for (byte b : bytes) {
             String hexDigits = Integer.toHexString((int) b & 0x00ff);

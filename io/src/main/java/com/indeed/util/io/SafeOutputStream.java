@@ -1,8 +1,8 @@
 // Copyright 2015 Indeed
 package com.indeed.util.io;
 
-import javax.annotation.Nonnull;
-import javax.annotation.concurrent.NotThreadSafe;
+import org.checkerframework.checker.nullness.qual.NonNull;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -10,8 +10,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
 import java.nio.file.Path;
 
-/** @see SafeFiles#createAtomicFile(Path) */
-@NotThreadSafe
+/**
+ * @see SafeFiles#createAtomicFile(Path)
+ *     <p>Not Thread Safe
+ */
 public abstract class SafeOutputStream extends OutputStream
         implements WritableByteChannel, Closeable {
     /**
@@ -25,7 +27,7 @@ public abstract class SafeOutputStream extends OutputStream
      * @throws IOException in the event that the buffer could not be written.
      */
     @Override
-    public abstract int write(@Nonnull final ByteBuffer src) throws IOException;
+    public abstract int write(@NonNull final ByteBuffer src) throws IOException;
 
     /**
      * Commit causes the current atomic file writing operation to conclude and the current temp file
