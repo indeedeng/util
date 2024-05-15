@@ -1,7 +1,13 @@
 indeedOss.activateFeature 'library'
 indeedLibrary.name = 'util-core'
 
+configurations {
+    checkerQualPatch
+}
+sourceSets.main.compileClasspath = configurations.checkerQualPatch + sourceSets.main.compileClasspath
+
 dependencies {
+    checkerQualPatch project(':checker-qual-shim')
     implementation project(':varexport')
     implementation libs.guava
     implementation libs.slf4jApi

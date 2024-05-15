@@ -1,0 +1,9 @@
+plugins {
+    id 'java'
+}
+
+dependencies {
+    compileOnly libs.checkerQual
+}
+
+indeedOss.activateFeature 'java'
