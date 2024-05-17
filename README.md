@@ -1,6 +1,4 @@
-# indeedeng/util
-
-![OSS Lifecycle](https://img.shields.io/osslifecycle/indeedeng/util.svg)
+# This repository has been retired and is no longer supported
 
 ## [util-core](https://github.com/indeedeng/util/tree/master/util-core)
 
